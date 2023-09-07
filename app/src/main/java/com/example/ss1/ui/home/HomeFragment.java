@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -17,6 +18,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
@@ -50,6 +52,8 @@ public class HomeFragment extends Fragment {
     private View view;
     boolean isLoading = false;
     Customer customer;
+    List<Level_1_cardModal> level1list;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -62,11 +66,19 @@ public class HomeFragment extends Fragment {
 
         syncLoggedInCustomer();
         customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
+        level1list = LocalCache.retrieveLevel1List(this.getActivity());
 
 
         setProfileIcon();
 
-        ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar);
+        if(!level1list.isEmpty()){
+            initLevel_1_CardProfilesRecyclerView(level1list);
+        }
+
+        ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),false);
+
+
+
 
         return view;
     }
@@ -94,6 +106,7 @@ public class HomeFragment extends Fragment {
         level1cardsRecyclerView = view.findViewById(R.id.level1cardsRecyclerView);
         notification = view.findViewById(R.id.notification);
         searchProfiles = view.findViewById(R.id.searchProfiles);
+        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.refreshLayout);
     }
 
     private void initOnclickListener() {
@@ -122,20 +135,18 @@ public class HomeFragment extends Fragment {
             showNotificationListDialog();
         });
 
-        profilePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserProfile();
-            }
-        });
+        profilePhoto.setOnClickListener(view -> showUserProfile());
 
+        searchProfiles.setOnClickListener(view -> searchProfiles());
 
-        searchProfiles.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchProfiles();
-            }
-        });
+        // Refresh  the layout
+        swipeRefreshLayout.setOnRefreshListener(
+                () -> {
+                    ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),true);
+                    swipeRefreshLayout.setRefreshing(false);
+                    showSnackBar("refrshing...");
+                }
+        );
 
 
     }

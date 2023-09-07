@@ -166,10 +166,11 @@
                         android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            android:id="@+id/basicdetails_layout_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
                             android:orientation="vertical">
 
                             <TextView
@@ -196,9 +197,9 @@
 
                         <LinearLayout
                             android:id="@+id/basicdetails_layout"
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -467,10 +468,11 @@
                         android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            android:id="@+id/contactdetails_layout_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
                             android:orientation="vertical">
 
                             <TextView
@@ -700,11 +702,13 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical">
+
                         <LinearLayout
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            android:id="@+id/astrodetails_layout_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
                             android:orientation="vertical">
 
                             <TextView
@@ -731,9 +735,9 @@
 
                         <LinearLayout
                             android:id="@+id/astrodetails_layout"
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -1174,10 +1178,11 @@
                         android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            android:id="@+id/familydetails_layout_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
                             android:orientation="vertical">
 
                             <TextView
@@ -1189,7 +1194,6 @@
                                 android:textSize="18dp" />
 
                             <ImageView
-                                android:id="@+id/familydetails_img"
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:src="@drawable/up_icon" />
@@ -1204,9 +1208,9 @@
 
                         <LinearLayout
                             android:id="@+id/familydetails_layout"
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -1218,6 +1222,7 @@
                                 android:orientation="horizontal">
 
                                 <ImageView
+                                    android:id="@+id/familydetails_img"
                                     android:layout_width="30dp"
                                     android:layout_height="30dp"
                                     android:src="@drawable/father_icon" />
@@ -1478,13 +1483,13 @@
 
                 <!--Preference Details-->
                 <androidx.cardview.widget.CardView
-                    android:layout_marginBottom="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="10dp"
+                    android:layout_marginBottom="20dp"
                     android:background="@color/black"
                     android:foregroundGravity="center_vertical"
                     app:cardCornerRadius="5dp"
@@ -1503,10 +1508,11 @@
                         android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            android:id="@+id/partnerdetails_layout_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
                             android:orientation="vertical">
 
                             <TextView
@@ -1533,9 +1539,9 @@
 
                         <LinearLayout
                             android:id="@+id/partnerdetails_layout"
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
                             <LinearLayout
                                 android:layout_width="match_parent"

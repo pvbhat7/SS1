@@ -62,10 +62,10 @@ public class Level2ProfileActivity extends AppCompatActivity {
     Boolean enableDisableContactViewButton = false;
     Button viewContactDetailsBtn, l2_whatsappsendmsgbtn, l2_callbtn;
     TextView l2_name, l2_mobile, l2_email, l2_age, profileCardId;
-    LinearLayout contactSecurityLayout, celebrationLayout, basicdetails_layout, contactdetails_layout, astrodetails_layout, familydetails_layout,partnerdetails_layout;
-    ImageView basicdetails_img, contactdetails_img, astrodetails_img, familydetails_img,partnerdetails_img;
+    LinearLayout contactSecurityLayout, celebrationLayout, basicdetails_layout, contactdetails_layout, astrodetails_layout, familydetails_layout, partnerdetails_layout, basicdetails_layout_title, contactdetails_layout_title, astrodetails_layout_title, familydetails_layout_title, partnerdetails_layout_title;
+    ImageView basicdetails_img, contactdetails_img, astrodetails_img, familydetails_img, partnerdetails_img;
 
-    Customer customer ;
+    Customer customer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,19 +107,19 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
     private void handleOnClickListeners() {
 
-        basicdetails_img.setOnClickListener(view -> {
+        basicdetails_layout_title.setOnClickListener(view -> {
             showHideLayout(basicdetails_img, "1");
         });
-        contactdetails_img.setOnClickListener(view -> {
+        contactdetails_layout_title.setOnClickListener(view -> {
             showHideLayout(contactdetails_img, "2");
         });
-        astrodetails_img.setOnClickListener(view -> {
+        astrodetails_layout_title.setOnClickListener(view -> {
             showHideLayout(astrodetails_img, "3");
         });
-        familydetails_img.setOnClickListener(view -> {
+        familydetails_layout_title.setOnClickListener(view -> {
             showHideLayout(familydetails_img, "4");
         });
-        partnerdetails_img.setOnClickListener(view -> {
+        partnerdetails_layout_title.setOnClickListener(view -> {
             showHideLayout(partnerdetails_img, "5");
         });
     }
@@ -166,6 +166,11 @@ public class Level2ProfileActivity extends AppCompatActivity {
         astrodetails_layout = findViewById(R.id.astrodetails_layout);
         familydetails_layout = findViewById(R.id.familydetails_layout);
         partnerdetails_layout = findViewById(R.id.partnerdetails_layout);
+        basicdetails_layout_title = findViewById(R.id.basicdetails_layout_title);
+        contactdetails_layout_title = findViewById(R.id.contactdetails_layout_title);
+        astrodetails_layout_title = findViewById(R.id.astrodetails_layout_title);
+        familydetails_layout_title = findViewById(R.id.familydetails_layout_title);
+        partnerdetails_layout_title = findViewById(R.id.partnerdetails_layout_title);
 
         basicdetails_img = findViewById(R.id.basicdetails_img);
         contactdetails_img = findViewById(R.id.contactdetails_img);
@@ -196,12 +201,12 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         viewContactDetailsBtn.setOnClickListener(view -> {
             // check if package exist or not
-            if(customer.getActivePackageId() == null)
-            //showSnackBar("No active membership found :"+customer.getActivePackageId());
-                showDialog("No Active membership","Please purchase memership to view contact details",null);
+            if (customer.getActivePackageId() == null)
+                //showSnackBar("No active membership found :"+customer.getActivePackageId());
+                showDialog("No Active membership", "Please purchase memership to view contact details", null);
             else {
 
-                ApiCallUtil.viewContactData(customer.getProfileId(), vcpid.getProfileId(),this);
+                ApiCallUtil.viewContactData(customer.getProfileId(), vcpid.getProfileId(), this);
 
                 l2_mobile.setText("+91 " + vcpid.getMobile1().toString().trim());
                 l2_email.setText(vcpid.getEmail().trim());
@@ -358,16 +363,15 @@ public class Level2ProfileActivity extends AppCompatActivity {
         }
     }
 
-    public void showDialog(String title ,String subTitle,Integer img){
+    public void showDialog(String title, String subTitle, Integer img) {
         Dialog d = new Dialog(this);
         d.setContentView(R.layout.notification_dialog);
         //Glide.with(this).asGif().load(img).into((ImageView) d.findViewById(R.id.result_img));
-        ((TextView)d.findViewById(R.id.result_title)).setText(title);
-        if(subTitle.isEmpty()){
-            ((TextView)d.findViewById(R.id.result_subtitle)).setVisibility(View.GONE);
-        }
-        else
-            ((TextView)d.findViewById(R.id.result_subtitle)).setText(subTitle);
+        ((TextView) d.findViewById(R.id.result_title)).setText(title);
+        if (subTitle.isEmpty()) {
+            ((TextView) d.findViewById(R.id.result_subtitle)).setVisibility(View.GONE);
+        } else
+            ((TextView) d.findViewById(R.id.result_subtitle)).setText(subTitle);
         d.setCanceledOnTouchOutside(true);
         d.setCancelable(true);
         d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

@@ -1,109 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/level1CoordinatorLayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/refreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:layout_marginBottom="50dp"
-    tools:context=".MainActivity">
-    <com.github.ybq.android.spinkit.SpinKitView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/progressBar"
-        style="@style/SpinKitView.Large.MultiplePulse"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:layout_gravity="center"
-        app:SpinKit_Color="@color/colorAccent" />
-    <LinearLayout
-        android:id="@+id/homefragmentid"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="50dp">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/level1CoordinatorLayout"
+
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".ui.home.HomeFragment">
+        android:layout_height="fill_parent"
+        tools:context=".MainActivity">
+
+        <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/progressBar"
+            style="@style/SpinKitView.Large.MultiplePulse"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_gravity="center"
+            app:SpinKit_Color="@color/colorAccent" />
 
         <LinearLayout
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <com.mikhaellopez.circularimageview.CircularImageView
-                android:id="@+id/profilePhoto"
-                android:src="@drawable/oops"
-                android:layout_gravity="center"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:clickable="false"
-                app:civ_border_width="3dp"
-                app:civ_border_color="#FFFFFFFF"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_below="@+id/header_cover_image"
-                android:layout_centerHorizontal="true"
-                android:elevation="5dp"
-                android:padding="10dp"
-                android:scaleType="centerCrop" />
-
-            <androidx.cardview.widget.CardView
-                android:background="?attr/selectableItemBackground"
-                android:focusable="true"
-                android:layout_weight="10"
-                android:id="@+id/searchProfiles"
-                android:clickable="true"
-                android:layout_margin="10dp"
-                app:cardCornerRadius="40dp"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp">
-                <androidx.appcompat.widget.SearchView
-                    android:id="@+id/searchView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:iconifiedByDefault="false"
-                    android:queryHint="Search" />
-                <TextView
-                    android:gravity="center_vertical"
-                    android:textAlignment="center"
-                    android:textColor="@color/black"
-                    android:layout_height="match_parent"
-                    android:fontFamily="@font/roboto_bold"
-                    android:text="Search profiles"
-                    android:layout_width="fill_parent"/>
-
-            </androidx.cardview.widget.CardView>
-
-            <ImageView
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:id="@+id/notification"
-                android:src="@drawable/notification"
-                android:layout_width="40dp"
-                android:layout_height="40dp"/>
-
-        </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/level1cardsRecyclerView"
+            android:id="@+id/homefragmentid"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:scrollbars="vertical" />
+            android:orientation="vertical"
+            tools:context=".ui.home.HomeFragment">
 
-        <TextView
-            android:id="@+id/text_home"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </LinearLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <com.mikhaellopez.circularimageview.CircularImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/profilePhoto"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_below="@+id/header_cover_image"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:elevation="5dp"
+                    android:padding="10dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/oops"
+                    app:civ_border_color="#FFFFFFFF"
+                    app:civ_border_width="3dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/searchProfiles"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:layout_weight="10"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="40dp">
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/searchView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:iconifiedByDefault="false"
+                        android:queryHint="Search" />
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/roboto_bold"
+                        android:gravity="center_vertical"
+                        android:text="Search profiles"
+                        android:textAlignment="center"
+                        android:textColor="@color/black" />
+
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                    android:id="@+id/notification"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:src="@drawable/notification" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/level1cardsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:scrollbars="vertical" />
+
+            <TextView
+                android:id="@+id/text_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

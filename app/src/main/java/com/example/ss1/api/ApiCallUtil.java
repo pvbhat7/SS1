@@ -39,8 +39,8 @@ public class ApiCallUtil {
 
 
     // get level 1 data
-    public static void getAllProfiles(String loggedInCpid, Fragment fragment, SpinKitView progressBar) {
-        new GetAllCustomerProfilesTask(loggedInCpid, fragment, progressBar).execute();
+    public static void getAllProfiles(String loggedInCpid, Fragment fragment, SpinKitView progressBar, Activity activity, Boolean override) {
+        new GetAllCustomerProfilesTask(loggedInCpid, fragment, progressBar, activity, override).execute();
     }
 
     public static void setLoggedInCustomer(Activity activity, String mobile, SpinKitView progressBar) {
@@ -60,7 +60,6 @@ public class ApiCallUtil {
     }
 
 
-
     static class GetAllCustomerProfilesTask extends AsyncTask<Void, Void, Void> {
 
         Fragment fragment;
@@ -69,11 +68,15 @@ public class ApiCallUtil {
         String loggedInCpid;
         Circle d = new Circle();
         List<Level_1_cardModal> list = new ArrayList<>();
+        Boolean override;
+        Activity activity;
 
-        public GetAllCustomerProfilesTask(String loggedInCpid, Fragment fragment, SpinKitView progressBar) {
+        public GetAllCustomerProfilesTask(String loggedInCpid, Fragment fragment, SpinKitView progressBar, Activity activity, Boolean override) {
             this.fragment = fragment;
             this.progressBar = progressBar;
             this.loggedInCpid = loggedInCpid;
+            this.activity = activity;
+            this.override = override;
         }
 
         @Override
@@ -101,9 +104,17 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             //HelperUtility.addLastTenDaysCount(list, activity);
             if (!list.isEmpty()) {
-                Log.i("onPostExecute", "list size  " + list.size());
                 Collections.shuffle(list);
+
+                if (LocalCache.retrieveLevel1List(activity).isEmpty())
+                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+
+                if(override)
                 ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+
+
+                LocalCache.saveLevel1List(list, activity);
+
                 d.stop();
                 progressBar.setVisibility(View.GONE);
             } else
@@ -174,7 +185,7 @@ public class ApiCallUtil {
 
     // get level 2 data
 
-    public static void getLevel2Data(String cpid, Activity activity,Boolean flag) {
+    public static void getLevel2Data(String cpid, Activity activity, Boolean flag) {
         ApiUtils.vibrateFunction(activity);
         new GetLevel2DataTask(cpid, activity, flag).execute();
     }
@@ -223,7 +234,7 @@ public class ApiCallUtil {
     }
 
     public static void viewContactData(String cpid, String vcpid, Activity activity) {
-        new ViewContactDataTask(cpid, vcpid ,activity).execute();
+        new ViewContactDataTask(cpid, vcpid, activity).execute();
     }
 
     static class ViewContactDataTask extends AsyncTask<Void, Void, Void> {
@@ -252,7 +263,7 @@ public class ApiCallUtil {
             try {
                 // check if package exists or not
                 response = RetrofitClient.getInstance().getApi().viewContactData(cpid, vcpid).execute().body();
-                syncAccountBalance(cpid,activity);
+                syncAccountBalance(cpid, activity);
             } catch (Exception e) {
                 Log.i("ss_nw_call", "UpdateViewCountTask doInBackground error" + e.toString());
             }
@@ -268,7 +279,7 @@ public class ApiCallUtil {
     }
 
     public static void syncAccountBalance(String cpid, Activity activity) {
-        new SyncAccountBalanceTask(cpid, activity ).execute();
+        new SyncAccountBalanceTask(cpid, activity).execute();
     }
 
     static class SyncAccountBalanceTask extends AsyncTask<Void, Void, Void> {
@@ -293,7 +304,7 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "GetCountLeftTask doInBackground calling...");
             try {
                 response_list = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
-                LocalCache.saveActiveOrder(response_list.get(0),activity);
+                LocalCache.saveActiveOrder(response_list.get(0), activity);
 
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetCountLeftTask doInBackground error" + e.toString());
@@ -651,12 +662,11 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "SetLoggedInCustomerTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
             if (notificationsList != null && !notificationsList.isEmpty()) {
-                NotificationAdapter adapter = new NotificationAdapter(notificationsList, activity,dialog);
+                NotificationAdapter adapter = new NotificationAdapter(notificationsList, activity, dialog);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(activity));
                 recyclerView.setAdapter(adapter);
-            }
-            else{
+            } else {
                 recyclerView.setVisibility(View.GONE);
                 no_noti_text.setVisibility(View.VISIBLE);
             }
@@ -667,7 +677,7 @@ public class ApiCallUtil {
     static class UpdateViewedNotificationStateTask extends AsyncTask<Void, Void, Void> {
 
 
-       String noti_id;
+        String noti_id;
 
         public UpdateViewedNotificationStateTask(String noti_id) {
             this.noti_id = noti_id;
