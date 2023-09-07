@@ -30,6 +30,7 @@ import com.example.ss1.activity.SendOtpActivity;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.ApiUtils;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.OrderModal;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
@@ -40,8 +41,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MyAccountFragment extends Fragment {
@@ -88,7 +91,7 @@ public class MyAccountFragment extends Fragment {
             else
                 cb_card.setVisibility(View.GONE);
 
-            ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity());
+            ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity(),cb_card,cb_text,true);
         }
         catch (Exception e){
             Log.i("ss_nw_call","ErrorAla : myaccountfragment"+e.getMessage());
@@ -206,6 +209,8 @@ public class MyAccountFragment extends Fragment {
     public void handleLogout() {
         if (ApiUtils.isConnected()) {
             LocalCache.saveLoggedInCustomer(new Customer(), this.getActivity());
+            LocalCache.saveActiveOrder(new OrderModal(), this.getActivity());
+            LocalCache.saveLevel1List(new ArrayList<>(), this.getActivity());
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this.getActivity(), SendOtpActivity.class);
             intent.putExtra("logout", true);

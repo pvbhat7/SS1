@@ -231,37 +231,29 @@ public class Level2ProfileActivity extends AppCompatActivity {
         } else
             viewContactDetailsBtn.setVisibility(View.VISIBLE);
 
-        l2_whatsappsendmsgbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String uri = "https://wa.me/+91" + vcpid.getMobile1().toString().trim();
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                startActivity(intent);
-            }
+        l2_whatsappsendmsgbtn.setOnClickListener(view -> {
+            String uri = "https://wa.me/+91" + vcpid.getMobile1().toString().trim();
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            startActivity(intent);
         });
 
-        l2_callbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Dexter.withActivity(Level2ProfileActivity.this)
-                        .withPermissions(Manifest.permission.CALL_PHONE)
-                        .withListener(new MultiplePermissionsListener() {
-                            @Override
-                            public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                if (report.areAllPermissionsGranted()) {
-                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                    callIntent.setData(Uri.parse("tel:+91" + vcpid.getMobile1().toString().trim()));
-                                    startActivity(callIntent);
-                                }
-                            }
+        l2_callbtn.setOnClickListener(view -> Dexter.withActivity(Level2ProfileActivity.this)
+                .withPermissions(Manifest.permission.CALL_PHONE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                            callIntent.setData(Uri.parse("tel:+91" + vcpid.getMobile1().toString().trim()));
+                            startActivity(callIntent);
+                        }
+                    }
 
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                token.continuePermissionRequest();
-                            }
-                        }).check();
-            }
-        });
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check());
 
         profileIdCard.setOnClickListener(new View.OnClickListener() {
             @Override

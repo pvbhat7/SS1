@@ -2,6 +2,8 @@ package com.example.ss1.activity;
 
 
 import static com.google.android.material.internal.ViewUtils.hideKeyboard;
+import static com.google.android.material.internal.ViewUtils.requestFocusAndShowKeyboard;
+import static com.google.android.material.internal.ViewUtils.showKeyboard;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -144,7 +144,6 @@ public class HomeFragment extends Fragment {
                 () -> {
                     ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),true);
                     swipeRefreshLayout.setRefreshing(false);
-                    showSnackBar("refrshing...");
                 }
         );
 
@@ -204,6 +203,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),true);
     }
 
     public void initLevel_1_CardProfilesRecyclerView(List<Level_1_cardModal> list) {
@@ -211,6 +211,14 @@ public class HomeFragment extends Fragment {
             recyclerView = view.findViewById(R.id.level1cardsRecyclerView);
             if (recyclerView != null) {
                 if (list != null) {
+                    rowsArrayList = list;
+                    level1CardAdapter = new Level_1_profilecardAdapter(view, list, this, this.getActivity(), false);
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+                    recyclerView.setAdapter(level1CardAdapter);
+                }
+                else{
+                    list = new ArrayList<>();
                     rowsArrayList = list;
                     level1CardAdapter = new Level_1_profilecardAdapter(view, list, this, this.getActivity(), false);
                     recyclerView.setHasFixedSize(true);

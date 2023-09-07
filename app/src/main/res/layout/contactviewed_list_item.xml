@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/cv_card"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:layout_margin="5dp"
+        android:layout_height="140dp"
+        android:layout_margin="10dp"
         app:cardCornerRadius="10dp"
         android:elevation="4dp">
 
@@ -17,15 +19,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <ImageView
+                android:id="@+id/cv_photo"
                 android:src="@drawable/prashant"
-                android:layout_width="130dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"/>
             <LinearLayout
-                android:layout_marginLeft="10dp"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <TextView
+                    android:id="@+id/cv_name"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginTop="9dp"
                     android:textSize="20dp"
                     android:textColor="@color/black"
@@ -34,6 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <LinearLayout
+                    android:layout_marginLeft="10dp"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="20dp">
@@ -43,6 +48,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"/>
                     <TextView
+                        android:id="@+id/cv_city"
                         android:layout_marginLeft="5dp"
                         android:layout_gravity="center_vertical"
                         android:textSize="10dp"
@@ -53,6 +59,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:layout_marginLeft="10dp"
                     android:layout_marginTop="3dp"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -63,6 +70,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"/>
                     <TextView
+                        android:id="@+id/cv_age"
                         android:layout_marginLeft="5dp"
                         android:layout_gravity="center_vertical"
                         android:textSize="10dp"
@@ -72,46 +80,33 @@
                         android:layout_height="15dp"/>
                 </LinearLayout>
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="15dp"
-                    android:background="@color/colorDivider" />
-
-
                 <LinearLayout
-                    android:gravity="center"
+                    android:gravity="left"
+                    android:layout_gravity="left"
                     android:layout_marginTop="5dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="25dp">
+                    android:layout_height="40dp">
+
                     <ImageView
+                        android:id="@+id/cv_callicon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/call_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"/>
+                        android:src="@drawable/call_icon" />
+
                     <ImageView
+                        android:id="@+id/cv_whatstappicon"
                         android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
                         android:src="@drawable/whatsapp_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"/>
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"/>
                     <ImageView
+                        android:id="@+id/cv_instaicon"
                         android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
                         android:src="@drawable/insta_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"/>
-                    <ImageView
-                        android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/email"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"/>
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"/>
 
                 </LinearLayout>
 
@@ -121,9 +116,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <TextView
+                        android:id="@+id/cv_viewedOn"
                         android:layout_marginRight="10dp"
                         android:layout_gravity="center_vertical"
-                        android:textSize="6dp"
+                        android:textSize="7dp"
                         android:text="viewed on  : 20/08/2023 05:20 pm"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

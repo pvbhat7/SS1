@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +17,9 @@ import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
 import com.example.ss1.activity.Level2ProfileActivity;
+import com.example.ss1.adapters.ContactViewedAdapter;
 import com.example.ss1.adapters.NotificationAdapter;
+import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
@@ -57,6 +60,10 @@ public class ApiCallUtil {
 
     public static void updateViewedNotificationState(String noti_id) {
         new UpdateViewedNotificationStateTask(noti_id).execute();
+    }
+
+    public static void getContactViewedProfiles(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView, Activity activity) {
+        new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView, activity).execute();
     }
 
 
@@ -103,22 +110,27 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
             //HelperUtility.addLastTenDaysCount(list, activity);
-            if (!list.isEmpty()) {
+            if (list != null && !list.isEmpty()) {
                 Collections.shuffle(list);
 
                 if (LocalCache.retrieveLevel1List(activity).isEmpty())
                     ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
 
-                if(override)
-                ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+                if (override)
+                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
 
 
                 LocalCache.saveLevel1List(list, activity);
 
                 d.stop();
                 progressBar.setVisibility(View.GONE);
-            } else
+            } else{
                 Log.i("onPostExecute", "list is null");
+                LocalCache.saveLevel1List(new ArrayList<>(), activity);
+                if (override)
+                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+            }
+
             d.stop();
             progressBar.setVisibility(View.GONE);
         }
@@ -263,7 +275,7 @@ public class ApiCallUtil {
             try {
                 // check if package exists or not
                 response = RetrofitClient.getInstance().getApi().viewContactData(cpid, vcpid).execute().body();
-                syncAccountBalance(cpid, activity);
+                syncAccountBalance(cpid, activity, null, null, false);
             } catch (Exception e) {
                 Log.i("ss_nw_call", "UpdateViewCountTask doInBackground error" + e.toString());
             }
@@ -278,8 +290,8 @@ public class ApiCallUtil {
         }
     }
 
-    public static void syncAccountBalance(String cpid, Activity activity) {
-        new SyncAccountBalanceTask(cpid, activity).execute();
+    public static void syncAccountBalance(String cpid, Activity activity, CardView cb_card, TextView cb_text, Boolean flag) {
+        new SyncAccountBalanceTask(cpid, activity, cb_card, cb_text, flag).execute();
     }
 
     static class SyncAccountBalanceTask extends AsyncTask<Void, Void, Void> {
@@ -288,10 +300,16 @@ public class ApiCallUtil {
         List<OrderModal> response_list;
 
         Activity activity;
+        CardView cb_card;
+        TextView cb_text;
+        Boolean flag;
 
-        public SyncAccountBalanceTask(String cpid, Activity activity) {
+        public SyncAccountBalanceTask(String cpid, Activity activity, CardView cb_card, TextView cb_text, Boolean flag) {
             this.cpid = cpid;
             this.activity = activity;
+            this.cb_card = cb_card;
+            this.cb_text = cb_text;
+            this.flag = flag;
         }
 
         @Override
@@ -304,7 +322,6 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "GetCountLeftTask doInBackground calling...");
             try {
                 response_list = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
-                LocalCache.saveActiveOrder(response_list.get(0), activity);
 
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetCountLeftTask doInBackground error" + e.toString());
@@ -316,7 +333,15 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "GetCountLeftTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
-
+            if (flag && !response_list.isEmpty()) {
+                LocalCache.saveActiveOrder(response_list.get(0), activity);
+                OrderModal activeOrder = LocalCache.retrieveActiveOrder(activity);
+                if (activeOrder != null && activeOrder.getId() != null) {
+                    int balance = Integer.parseInt(activeOrder.getMaxCount()) - Integer.parseInt(activeOrder.getUsedCount());
+                    cb_card.setVisibility(View.VISIBLE);
+                    cb_text.setText("Contact Balance : " + balance);
+                }
+            }
         }
     }
 
@@ -701,6 +726,48 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+        }
+    }
+
+    static class GetContactViewedProfilesTask extends AsyncTask<Void, Void, Void> {
+
+
+        String cpid;
+        List<ContactViewedModal> list = new ArrayList<>();
+        ContactViewedAdapter adapter;
+        RecyclerView contactviewedRecyclerView;
+        Activity activity;
+
+        public GetContactViewedProfilesTask(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView, Activity activity) {
+            this.cpid = cpid;
+            this.adapter = adapter;
+            this.contactviewedRecyclerView = contactviewedRecyclerView;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                list = RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (list != null && !list.isEmpty()) {
+                adapter = new ContactViewedAdapter(list, activity);
+                contactviewedRecyclerView.setHasFixedSize(true);
+                contactviewedRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                contactviewedRecyclerView.setAdapter(adapter);
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.ss1.api;
 
 import android.os.TestLooperManager;
 
+import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
@@ -38,6 +39,9 @@ public interface Api {
     Call<SingleResponse> viewContactData(@Query("cpid") String cpid , @Query("vcpid") String vcpid);
     @GET("level1_view/viewcontact/getProfilesByTag.php")
     Call<List<Level_1_cardModal>> getProfilesByTag(@Query("cpid") String cpid , @Query("tag") String tag);
+
+    @GET("level1_view/viewcontact/getByCpid.php")
+    Call<List<ContactViewedModal>> getContactViewedProfiles(@Query("cpid") String cpid);
 
 
     // SHORTLIST ( ADD / REMOVE / VIEW )

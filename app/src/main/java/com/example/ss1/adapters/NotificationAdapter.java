@@ -65,8 +65,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     .into(holder.tickimg);
 
             holder.noti_card.setOnClickListener(view -> {
-                if(obj.getIs_viewed().equalsIgnoreCase("0"))
-                ApiCallUtil.updateViewedNotificationState(String.valueOf(obj.getId()));
+                if (obj.getIs_viewed().equalsIgnoreCase("0"))
+                    ApiCallUtil.updateViewedNotificationState(String.valueOf(obj.getId()));
                 dialog.dismiss();
                 ApiCallUtil.getLevel2Data(obj.getVcpid(), activity, false);
             });

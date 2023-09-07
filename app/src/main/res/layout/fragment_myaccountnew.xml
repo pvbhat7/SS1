@@ -208,7 +208,7 @@
                             <ImageView
                                 android:layout_marginLeft="10dp"
                                 android:layout_gravity="center_vertical"
-                                android:src="@drawable/editprofile_icon"
+                                android:src="@drawable/balanceleft_icon"
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
                             <TextView
