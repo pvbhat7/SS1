@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">SS1</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="contact_viewed">Contact Viewed</string>
+    <string name="matches">Matches</string>
+    <string name="myaccount">My Account</string>
+    <string name="dobandtime">Birth Date &amp; Time</string>
+    <string name="settings_menu">Settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="otp_verification">Otp Verification</string>
+    <string name="otp_not_received">otp not received ?</string>
+    <string name="resend_otp">resend otp</string>
+    <string name="no_notifications">No Notifications found</string>
+
+
+    <string name="name">नाव</string>
+    <string name="bloodgroup">रक्तगट </string>
+    <string name="height">उंची </string>
+    <string name="weight">वजन </string>
+    <string name="color">रंग </string>
+
+    <string name="navrasnav">नावरस नाव </string>
+    <string name="birthdate">जन्म तारीख</string>
+    <string name="birthtime">जन्म वेळ </string>
+    <string name="birthplace">जन्मस्थळ </string>
+    <string name="birthday">जन्मवार</string>
+
+
+    <string name="education">शिक्षण </string>
+    <string name="business">व्यवसाय </string>
+    <string name="job">नोकरी </string>
+    <string name="income">उत्पन्न </string>
+
+    <string name="kuldaivat">कुलदैवत </string>
+    <string name="devak">देवक</string>
+
+    <string name="caste">जात / धर्म </string>
+    <string name="zodiac">रास</string>
+    <string name="nakshatra">नक्षत्र </string>
+    <string name="nadi">नाडी</string>
+    <string name="gan">गण </string>
+    <string name="yoni">योनी</string>
+    <string name="charan">चरण</string>
+    <string name="gotra">गोत्र</string>
+
+
+    <string name="varn">वर्ण</string>
+    <string name="mangal">मंगल</string>
+
+
+    <string name="fathername">वडिलांचे नाव </string>
+    <string name="mothername">आईचे नाव </string>
+
+    <string name="sister">बहीण </string>
+    <string name="brother">भाऊ </string>
+    <string name="chulte">चुलते </string>
+    <string name="mama">मामा </string>
+    <string name="atya">आत्या </string>
+    <string name="mavshi">मावशी </string>
+    <string name="ajoba">आजोबा </string>
+    <string name="aaji">आजी </string>
+
+    <string name="relatives">नातेसंबंध </string>
+    <string name="expectation">अपेक्षा </string>
+
+
+</resources>
