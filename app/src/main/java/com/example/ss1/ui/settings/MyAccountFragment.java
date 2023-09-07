@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
+import com.example.ss1.activity.ContactViewedActivity;
 import com.example.ss1.activity.SendOtpActivity;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.ApiUtils;
@@ -162,6 +163,8 @@ public class MyAccountFragment extends Fragment {
 
         cb_link.setOnClickListener(view -> {
             ApiUtils.vibrateFunction(this.getActivity());
+            Intent intent = new Intent(this.getActivity(), ContactViewedActivity.class);
+            startActivity(intent);
         });
 
         logoutId.setOnClickListener(view -> {
