@@ -3,8 +3,8 @@ package com.example.ss1.modal;
 public class Level_1_cardModal {
 
     private String profileId;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private String dob;
     private String age;
 
@@ -14,7 +14,21 @@ public class Level_1_cardModal {
 
     private String isInterestsent;
 
-    private String profilePhotoAddress;
+    private String profilephotoaddress;
+
+
+    public Level_1_cardModal(String profileId, String firstname, String lastname, String dob, String age, String profilephotoaddress, String isShortlisted, String isInterestsent, String isLiked) {
+        this.profileId = profileId;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.dob = dob;
+        this.age = age;
+        this.profilephotoaddress = profilephotoaddress;
+        this.isShortlisted = isShortlisted;
+        this.isInterestsent = isInterestsent;
+        this.isLiked = isLiked;
+    }
+
     public String getProfileId() {
         return profileId;
     }
@@ -23,20 +37,20 @@ public class Level_1_cardModal {
         this.profileId = profileId;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public String getDob() {
@@ -55,29 +69,12 @@ public class Level_1_cardModal {
         this.age = age;
     }
 
-    public String getProfilePhotoAddress() {
-        return profilePhotoAddress;
-    }
-
-    public void setProfilePhotoAddress(String profilePhotoAddress) {
-        this.profilePhotoAddress = profilePhotoAddress;
-    }
-
-
     public String getIsShortlisted() {
         return isShortlisted;
     }
 
     public void setIsShortlisted(String isShortlisted) {
         this.isShortlisted = isShortlisted;
-    }
-
-    public String getIsInterestsent() {
-        return isInterestsent;
-    }
-
-    public void setIsInterestsent(String isInterestsent) {
-        this.isInterestsent = isInterestsent;
     }
 
     public String getIsLiked() {
@@ -88,15 +85,19 @@ public class Level_1_cardModal {
         this.isLiked = isLiked;
     }
 
-    public Level_1_cardModal(String profileId, String firstName, String lastName, String dob, String age, String profilePhotoAddress, String isShortlisted, String isInterestsent, String isLiked) {
-        this.profileId = profileId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dob = dob;
-        this.age = age;
-        this.profilePhotoAddress = profilePhotoAddress;
-        this.isShortlisted = isShortlisted;
+    public String getIsInterestsent() {
+        return isInterestsent;
+    }
+
+    public void setIsInterestsent(String isInterestsent) {
         this.isInterestsent = isInterestsent;
-        this.isLiked = isLiked;
+    }
+
+    public String getProfilephotoaddress() {
+        return profilephotoaddress;
+    }
+
+    public void setProfilephotoaddress(String profilephotoaddress) {
+        this.profilephotoaddress = profilephotoaddress;
     }
 }

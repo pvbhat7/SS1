@@ -5,33 +5,33 @@ import java.util.ArrayList;
 public class Level_2_Modal {
 
     private String profileId;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private String email;
     private String mobile1;
     private String mobile2;
     private String gender;
-    private String creationDate;
-    private String creationSource;
+    private String creationdate;
+    private String creationsource;
     private String discontinue;
-    private String activePackageId;
-    private String profilePhotoAddress;
-    private String biodataAddress;
+    private String activepackageid;
+    private String profilephotoaddress;
+    private String biodataaddress;
     private String height;
     private String birthtime;
     private String caste;
     private String education;
     private String occupation;
     private String zodiac;
-    private String birthName;
-    private String bloodGroup;
+    private String birthname;
+    private String bloodgroup;
     private String property;
-    private String fatherName;
-    private String motherName;
+    private String fathername;
+    private String mothername;
     private String address;
     private String city;
     private String state;
-    private String marriageStatus;
+    private String marriagestatus;
     private String birthdate;
     private String birthday;
     private String birthplace;
@@ -52,7 +52,6 @@ public class Level_2_Modal {
     public ArrayList<Photo> photos;
     public ArrayList<FamilyMember> familyMembers;
 
-
     public String getProfileId() {
         return profileId;
     }
@@ -61,20 +60,20 @@ public class Level_2_Modal {
         this.profileId = profileId;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public String getEmail() {
@@ -101,6 +100,30 @@ public class Level_2_Modal {
         this.mobile2 = mobile2;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getCreationdate() {
+        return creationdate;
+    }
+
+    public void setCreationdate(String creationdate) {
+        this.creationdate = creationdate;
+    }
+
+    public String getCreationsource() {
+        return creationsource;
+    }
+
+    public void setCreationsource(String creationsource) {
+        this.creationsource = creationsource;
+    }
+
     public String getDiscontinue() {
         return discontinue;
     }
@@ -109,20 +132,28 @@ public class Level_2_Modal {
         this.discontinue = discontinue;
     }
 
-    public String getActivePackageId() {
-        return activePackageId;
+    public String getActivepackageid() {
+        return activepackageid;
     }
 
-    public void setActivePackageId(String activePackageId) {
-        this.activePackageId = activePackageId;
+    public void setActivepackageid(String activepackageid) {
+        this.activepackageid = activepackageid;
     }
 
-    public String getProfilePhotoAddress() {
-        return profilePhotoAddress;
+    public String getProfilephotoaddress() {
+        return profilephotoaddress;
     }
 
-    public void setProfilePhotoAddress(String profilePhotoAddress) {
-        this.profilePhotoAddress = profilePhotoAddress;
+    public void setProfilephotoaddress(String profilephotoaddress) {
+        this.profilephotoaddress = profilephotoaddress;
+    }
+
+    public String getBiodataaddress() {
+        return biodataaddress;
+    }
+
+    public void setBiodataaddress(String biodataaddress) {
+        this.biodataaddress = biodataaddress;
     }
 
     public String getHeight() {
@@ -133,6 +164,13 @@ public class Level_2_Modal {
         this.height = height;
     }
 
+    public String getBirthtime() {
+        return birthtime;
+    }
+
+    public void setBirthtime(String birthtime) {
+        this.birthtime = birthtime;
+    }
 
     public String getCaste() {
         return caste;
@@ -166,20 +204,20 @@ public class Level_2_Modal {
         this.zodiac = zodiac;
     }
 
-    public String getBirthName() {
-        return birthName;
+    public String getBirthname() {
+        return birthname;
     }
 
-    public void setBirthName(String birthName) {
-        this.birthName = birthName;
+    public void setBirthname(String birthname) {
+        this.birthname = birthname;
     }
 
-    public String getBloodGroup() {
-        return bloodGroup;
+    public String getBloodgroup() {
+        return bloodgroup;
     }
 
-    public void setBloodGroup(String bloodGroup) {
-        this.bloodGroup = bloodGroup;
+    public void setBloodgroup(String bloodgroup) {
+        this.bloodgroup = bloodgroup;
     }
 
     public String getProperty() {
@@ -190,20 +228,20 @@ public class Level_2_Modal {
         this.property = property;
     }
 
-    public String getFatherName() {
-        return fatherName;
+    public String getFathername() {
+        return fathername;
     }
 
-    public void setFatherName(String fatherName) {
-        this.fatherName = fatherName;
+    public void setFathername(String fathername) {
+        this.fathername = fathername;
     }
 
-    public String getMotherName() {
-        return motherName;
+    public String getMothername() {
+        return mothername;
     }
 
-    public void setMotherName(String motherName) {
-        this.motherName = motherName;
+    public void setMothername(String mothername) {
+        this.mothername = mothername;
     }
 
     public String getAddress() {
@@ -230,69 +268,12 @@ public class Level_2_Modal {
         this.state = state;
     }
 
-    public ArrayList<Photo> getPhotos() {
-        return photos;
+    public String getMarriagestatus() {
+        return marriagestatus;
     }
 
-    public void setPhotos(ArrayList<Photo> photos) {
-        this.photos = photos;
-    }
-
-    public ArrayList<FamilyMember> getFamilyMembers() {
-        return familyMembers;
-    }
-
-    public void setFamilyMembers(ArrayList<FamilyMember> familyMembers) {
-        this.familyMembers = familyMembers;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getCreationSource() {
-        return creationSource;
-    }
-
-    public void setCreationSource(String creationSource) {
-        this.creationSource = creationSource;
-    }
-
-
-    public String getBiodataAddress() {
-        return biodataAddress;
-    }
-
-    public void setBiodataAddress(String biodataAddress) {
-        this.biodataAddress = biodataAddress;
-    }
-
-    public String getBirthtime() {
-        return birthtime;
-    }
-
-    public void setBirthtime(String birthtime) {
-        this.birthtime = birthtime;
-    }
-
-    public String getMarriageStatus() {
-        return marriageStatus;
-    }
-
-    public void setMarriageStatus(String marriageStatus) {
-        this.marriageStatus = marriageStatus;
+    public void setMarriagestatus(String marriagestatus) {
+        this.marriagestatus = marriagestatus;
     }
 
     public String getBirthdate() {
@@ -423,5 +404,19 @@ public class Level_2_Modal {
         this.expectations = expectations;
     }
 
+    public ArrayList<Photo> getPhotos() {
+        return photos;
+    }
 
+    public void setPhotos(ArrayList<Photo> photos) {
+        this.photos = photos;
+    }
+
+    public ArrayList<FamilyMember> getFamilyMembers() {
+        return familyMembers;
+    }
+
+    public void setFamilyMembers(ArrayList<FamilyMember> familyMembers) {
+        this.familyMembers = familyMembers;
+    }
 }

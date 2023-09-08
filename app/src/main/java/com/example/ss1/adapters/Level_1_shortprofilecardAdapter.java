@@ -83,11 +83,11 @@ public class Level_1_shortprofilecardAdapter extends RecyclerView.Adapter<Recycl
         final Level_1_cardModal obj = mItemList.get(position);
         if (obj != null) {
 
-            holder.name.setText(obj.getFirstName() + " " + obj.getLastName());
+            holder.name.setText(obj.getFirstname() + " " + obj.getLastname());
 
 
             Glide.with(activity)
-                    .load(obj.getProfilePhotoAddress())
+                    .load(obj.getProfilephotoaddress())
                     .placeholder(R.drawable.oops)
                     .into(holder.profilephoto);
 

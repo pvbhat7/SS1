@@ -2,35 +2,35 @@ package com.example.ss1.modal;
 
 public class Customer {
     private String profileId;
-    private String firstName;
+    private String firstname;
 
-    private String middleName;
-    private String lastName;
+    private String middlename;
+    private String lastname;
     private String email;
     private String mobile1;
     private String mobile2;
     private String gender;
-    private String creationDate;
-    private String creationSource;
+    private String creationdate;
+    private String creationsource;
     private String discontinue;
-    private String activePackageId;
-    private String profilePhotoAddress;
-    private String biodataAddress;
+    private String activepackageId;
+    private String profilephotoaddress;
+    private String biodataaddress;
     private String height;
     private String birthtime;
     private String caste;
     private String education;
     private String occupation;
     private String zodiac;
-    private String birthName;
-    private String bloodGroup;
+    private String birthname;
+    private String bloodgroup;
     private String property;
-    private String fatherName;
-    private String motherName;
+    private String fathername;
+    private String mothername;
     private String address;
     private String city;
     private String state;
-    private String marriageStatus;
+    private String marriagestatus;
     private String birthdate;
     private String birthday;
     private String birthplace;
@@ -48,6 +48,61 @@ public class Customer {
     private String relatives;
     private String expectations;
 
+    public Customer(){
+
+    }
+
+    public Customer(String creationSource, String profilePhotoAddress, String biodataAddress,
+                    String firstName, String middleName, String lastName, String email,
+                    String mobile1, String mobile2, String gender, String height,
+                    String birthtime, String caste, String education, String occupation,
+                    String zodiac, String birthName, String bloodGroup, String property,
+                    String fatherName, String motherName, String address, String city,
+                    String marriageStatus, String birthdate, String birthday, String birthplace,
+                    String income, String kuldaivat, String devak, String nakshatra, String nadi,
+                    String gan, String yoni, String charan, String gotra, String varn,
+                    String mangal, String expectations) {
+        this.creationsource = creationSource;
+        this.profilephotoaddress = profilePhotoAddress;
+        this.biodataaddress = biodataAddress;
+        this.firstname = firstName;
+        this.middlename = middleName;
+        this.lastname = lastName;
+        this.email = email;
+        this.mobile1 = mobile1;
+        this.mobile2 = mobile2;
+        this.gender = gender;
+        this.height = height;
+        this.birthtime = birthtime;
+        this.caste = caste;
+        this.education = education;
+        this.occupation = occupation;
+        this.zodiac = zodiac;
+        this.birthname = birthName;
+        this.bloodgroup = bloodGroup;
+        this.property = property;
+        this.fathername = fatherName;
+        this.mothername = motherName;
+        this.address = address;
+        this.city = city;
+        this.marriagestatus = marriageStatus;
+        this.birthdate = birthdate;
+        this.birthday = birthday;
+        this.birthplace = birthplace;
+        this.income = income;
+        this.kuldaivat = kuldaivat;
+        this.devak = devak;
+        this.nakshatra = nakshatra;
+        this.nadi = nadi;
+        this.gan = gan;
+        this.yoni = yoni;
+        this.charan = charan;
+        this.gotra = gotra;
+        this.varn = varn;
+        this.mangal = mangal;
+        this.expectations = expectations;
+    }
+
     public String getProfileId() {
         return profileId;
     }
@@ -56,20 +111,28 @@ public class Customer {
         this.profileId = profileId;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getMiddlename() {
+        return middlename;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setMiddlename(String middlename) {
+        this.middlename = middlename;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public String getEmail() {
@@ -104,23 +167,23 @@ public class Customer {
         this.gender = gender;
     }
 
-    public String getCreationDate() {
-        return creationDate;
+    public String getCreationdate() {
+        return creationdate;
     }
 
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
+    public void setCreationdate(String creationdate) {
+        this.creationdate = creationdate;
     }
 
-    public String getCreationSource() {
-        return creationSource;
+    public String getCreationsource() {
+        return creationsource;
     }
 
-    public void setCreationSource(String creationSource) {
-        this.creationSource = creationSource;
+    public void setCreationsource(String creationsource) {
+        this.creationsource = creationsource;
     }
 
-    public String isDiscontinue() {
+    public String getDiscontinue() {
         return discontinue;
     }
 
@@ -128,28 +191,28 @@ public class Customer {
         this.discontinue = discontinue;
     }
 
-    public String getActivePackageId() {
-        return activePackageId;
+    public String getActivepackageId() {
+        return activepackageId;
     }
 
-    public void setActivePackageId(String activePackageId) {
-        this.activePackageId = activePackageId;
+    public void setActivepackageId(String activepackageId) {
+        this.activepackageId = activepackageId;
     }
 
-    public String getProfilePhotoAddress() {
-        return profilePhotoAddress;
+    public String getProfilephotoaddress() {
+        return profilephotoaddress;
     }
 
-    public void setProfilePhotoAddress(String profilePhotoAddress) {
-        this.profilePhotoAddress = profilePhotoAddress;
+    public void setProfilephotoaddress(String profilephotoaddress) {
+        this.profilephotoaddress = profilephotoaddress;
     }
 
-    public String getBiodataAddress() {
-        return biodataAddress;
+    public String getBiodataaddress() {
+        return biodataaddress;
     }
 
-    public void setBiodataAddress(String biodataAddress) {
-        this.biodataAddress = biodataAddress;
+    public void setBiodataaddress(String biodataaddress) {
+        this.biodataaddress = biodataaddress;
     }
 
     public String getHeight() {
@@ -200,20 +263,20 @@ public class Customer {
         this.zodiac = zodiac;
     }
 
-    public String getBirthName() {
-        return birthName;
+    public String getBirthname() {
+        return birthname;
     }
 
-    public void setBirthName(String birthName) {
-        this.birthName = birthName;
+    public void setBirthname(String birthname) {
+        this.birthname = birthname;
     }
 
-    public String getBloodGroup() {
-        return bloodGroup;
+    public String getBloodgroup() {
+        return bloodgroup;
     }
 
-    public void setBloodGroup(String bloodGroup) {
-        this.bloodGroup = bloodGroup;
+    public void setBloodgroup(String bloodgroup) {
+        this.bloodgroup = bloodgroup;
     }
 
     public String getProperty() {
@@ -224,20 +287,20 @@ public class Customer {
         this.property = property;
     }
 
-    public String getFatherName() {
-        return fatherName;
+    public String getFathername() {
+        return fathername;
     }
 
-    public void setFatherName(String fatherName) {
-        this.fatherName = fatherName;
+    public void setFathername(String fathername) {
+        this.fathername = fathername;
     }
 
-    public String getMotherName() {
-        return motherName;
+    public String getMothername() {
+        return mothername;
     }
 
-    public void setMotherName(String motherName) {
-        this.motherName = motherName;
+    public void setMothername(String mothername) {
+        this.mothername = mothername;
     }
 
     public String getAddress() {
@@ -264,12 +327,12 @@ public class Customer {
         this.state = state;
     }
 
-    public String getMarriageStatus() {
-        return marriageStatus;
+    public String getMarriagestatus() {
+        return marriagestatus;
     }
 
-    public void setMarriageStatus(String marriageStatus) {
-        this.marriageStatus = marriageStatus;
+    public void setMarriagestatus(String marriagestatus) {
+        this.marriagestatus = marriagestatus;
     }
 
     public String getBirthdate() {
@@ -398,17 +461,5 @@ public class Customer {
 
     public void setExpectations(String expectations) {
         this.expectations = expectations;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getDiscontinue() {
-        return discontinue;
     }
 }

@@ -108,7 +108,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
                 holder.profileCardId.setText("Profile id : A"+obj.getProfileId());
 
                 // name
-                holder.name.setText(obj.getFirstName() + " " + obj.getLastName());
+                holder.name.setText(obj.getFirstname() + " " + obj.getLastname());
 
                 // dob
                 Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());
@@ -117,7 +117,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
 
                 // photo
                 Glide.with(activity)
-                        .load(obj.getProfilePhotoAddress())
+                        .load(obj.getProfilephotoaddress())
                         .placeholder(R.drawable.oops)
                         .into(holder.profilephoto);
 

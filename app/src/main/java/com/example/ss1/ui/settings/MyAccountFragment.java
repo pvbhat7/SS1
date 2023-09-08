@@ -73,12 +73,12 @@ public class MyAccountFragment extends Fragment {
 
 
 
-            profileHeadingName.setText(customer.getFirstName()+" "+customer.getLastName());
+            profileHeadingName.setText(customer.getFirstname()+" "+customer.getLastname());
             profileHeadingmobile.setText("+91 "+customer.getMobile1());
             profileHeadingEmail.setText(customer.getEmail());
             profileCardId.setText("Profile id : A"+customer.getProfileId());
             Glide.with(this.getActivity())
-                    .load(customer.getProfilePhotoAddress() != null ? customer.getProfilePhotoAddress() : R.drawable.prashant)
+                    .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.prashant)
                     .placeholder(R.drawable.oops)
                     .into(sprofilephoto);
 
@@ -134,13 +134,13 @@ public class MyAccountFragment extends Fragment {
     }
 
     private void createProfile(Dialog d) {
-        String creationSource = "mobile app";
-        String profilePhotoAddress;
-        String biodataAddress;
+        String creationsource = "mobile app";
+        String profilephotoaddress="";
+        String biodataaddress="";
 
-        String firstName = ((TextInputEditText) d.findViewById(R.id.firstName)).getText().toString().trim();
-        String middleName = ((TextInputEditText) d.findViewById(R.id.middleName)).getText().toString().trim();
-        String lastName  = ((TextInputEditText) d.findViewById(R.id.lastName)).getText().toString().trim();
+        String firstname = ((TextInputEditText) d.findViewById(R.id.firstname)).getText().toString().trim();
+        String middlename = ((TextInputEditText) d.findViewById(R.id.middlename)).getText().toString().trim();
+        String lastname  = ((TextInputEditText) d.findViewById(R.id.lastname)).getText().toString().trim();
         String email  = ((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim();
         String mobile1  = ((TextInputEditText) d.findViewById(R.id.mobile1)).getText().toString().trim();
         String mobile2  = ((TextInputEditText) d.findViewById(R.id.mobile2)).getText().toString().trim();
@@ -175,7 +175,16 @@ public class MyAccountFragment extends Fragment {
         String mangal = ((TextInputEditText) d.findViewById(R.id.mangal)).getText().toString().trim();
         String expectations = ((TextInputEditText) d.findViewById(R.id.expectations)).getText().toString().trim();
 
+        Customer customer = new Customer(creationsource, profilephotoaddress, biodataaddress,
+                firstname, middlename, lastname, email, mobile1, mobile2, gender, height,
+                birthtime, caste, education, occupation, zodiac, birthName, bloodGroup,
+                property, fatherName, motherName, address, city, marriageStatus, birthdate,
+                birthday, birthplace, income, kuldaivat, devak, nakshatra, nadi, gan, yoni,
+                charan, gotra, varn, mangal, expectations);
+
         System.out.println("hello");
+        ApiCallUtil.registerProfile(customer,this.getActivity());
+        d.dismiss();
 
     }
 

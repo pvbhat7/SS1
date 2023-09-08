@@ -93,12 +93,12 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
             if (vcpid != null) {
                 handleCarosol(vcpid);
-                l2_name.setText(vcpid.getFirstName() + " " + vcpid.getLastName());
+                l2_name.setText(vcpid.getFirstname() + " " + vcpid.getLastname());
                 l2_age.setText(Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(vcpid.getBirthdate()))) / 365 + " yrs , " + vcpid.getCity());
                 profileCardId.setText("Profile id : A" + vcpid.getProfileId());
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println(e);
         }
 
 
@@ -200,7 +200,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         viewContactDetailsBtn.setOnClickListener(view -> {
             // check if package exist or not
-            if (customer.getActivePackageId() == null)
+            if (customer.getActivepackageId() == null)
                 //showSnackBar("No active membership found :"+customer.getActivePackageId());
                 showDialog("No Active membership", "Please purchase memership to view contact details", null);
             else {
@@ -281,7 +281,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
             }
         } else {
             arr = new String[1];
-            arr[0] = level2Modal.getProfilePhotoAddress();
+            arr[0] = level2Modal.getProfilephotoaddress();
         }
 
 

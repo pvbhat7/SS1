@@ -6,10 +6,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Vibrator;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -18,7 +16,6 @@ import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.modal.Customer;
-import com.example.ss1.ui.home.HomeFragment;
 import com.github.ybq.android.spinkit.SpinKitView;
 
 public class ApiUtils {
@@ -64,10 +61,10 @@ public class ApiUtils {
         d.show();
     }
 
-    public static void showDialog(Fragment fragment , SpinKitView progressBar, Activity activity, int img, String title, String btnTitle) {
+    public static void showSearchingDialog(Fragment fragment , SpinKitView progressBar, Activity activity, int img, String title, String btnTitle) {
         Customer customer = LocalCache.retrieveLoggedInCustomer(activity);
         Dialog d = new Dialog(activity);
-        d.setContentView(R.layout.generic_dialog);
+        d.setContentView(R.layout.searching_dialog);
 
         Glide.with(activity).asGif().load(img).into((ImageView) d.findViewById(R.id.d_img));
 
@@ -78,6 +75,23 @@ public class ApiUtils {
             d.dismiss();
             ApiCallUtil.getAllProfiles(customer.getProfileId(),fragment, progressBar,activity,true);
         });
+
+
+        /*d.setCanceledOnTouchOutside(false);
+        d.setCancelable(false);*/
+        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        d.show();
+    }
+
+    public static void showDialog(Activity activity, int img, String title, String subtitle) {
+        Dialog d = new Dialog(activity);
+        d.setContentView(R.layout.generic_dialog);
+
+        Glide.with(activity).asGif().load(img).into((ImageView) d.findViewById(R.id.d_img));
+
+        d.findViewById(R.id.d_img);
+        ((TextView)d.findViewById(R.id.d_title)).setText(title);
+        ((TextView)d.findViewById(R.id.d_subtitle)).setText(subtitle);
 
 
         /*d.setCanceledOnTouchOutside(false);

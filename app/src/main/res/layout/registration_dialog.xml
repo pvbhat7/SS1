@@ -164,7 +164,7 @@
                             android:textAlignment="center">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/firstName"
+                                android:id="@+id/firstname"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:singleLine="true"
@@ -183,7 +183,7 @@
                             android:textAlignment="center">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/middleName"
+                                android:id="@+id/middlename"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:singleLine="true"
@@ -202,7 +202,7 @@
                             android:textAlignment="center">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/lastName"
+                                android:id="@+id/lastname"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:singleLine="true"

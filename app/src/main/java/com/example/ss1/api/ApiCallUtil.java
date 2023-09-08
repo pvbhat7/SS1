@@ -66,6 +66,10 @@ public class ApiCallUtil {
         new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView, activity).execute();
     }
 
+    public static void registerProfile(Customer customer, Activity activity) {
+        new RegisterNewCustomerTask(customer, activity).execute();
+    }
+
 
     static class GetAllCustomerProfilesTask extends AsyncTask<Void, Void, Void> {
 
@@ -767,6 +771,44 @@ public class ApiCallUtil {
                 contactviewedRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
                 contactviewedRecyclerView.setAdapter(adapter);
             }
+        }
+    }
+
+    static class RegisterNewCustomerTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        Customer customer;
+
+        SingleResponse response;
+        String error;
+
+        public RegisterNewCustomerTask(Customer customer, Activity activity) {
+            this.customer = customer;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                response = RetrofitClient.getInstance().getApi().registerNewCustomer(customer).execute().body();
+            } catch (Exception e) {
+                error = e.getMessage();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(response != null){
+                ApiUtils.showDialog(activity,R.drawable.success,"Profile created !!!","id : "+response.getResult());
+            }
+            else
+                ApiUtils.showDialog(activity,R.drawable.failure,"Error occured !!!",error);
         }
     }
 
