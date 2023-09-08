@@ -106,57 +106,14 @@ public class MyAccountFragment extends Fragment {
             Dialog d = new Dialog(this.getContext());
             d.setContentView(R.layout.registration_dialog);
 
-            String[] bloodGroupArray = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-            ((AutoCompleteTextView) d.findViewById(R.id.bloodGroupDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, bloodGroupArray));
-
-            String[] educationArray = {"B.E.", "B.Sc", "B.Ed", "10th Pass"};
-            ((AutoCompleteTextView) d.findViewById(R.id.educationDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, educationArray));
-
-            String[] occupationArray = {"Business", "Job"};
-            ((AutoCompleteTextView) d.findViewById(R.id.occupationDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, occupationArray));
-
-            String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
-            ((AutoCompleteTextView) d.findViewById(R.id.incomeDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, incomeArray));
-
-            String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai"};
-            ((AutoCompleteTextView) d.findViewById(R.id.birthplaceDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, birthplaceArray));
-
-            String[] zodiacArray = {"virgo", "taurus", "Mumbai"};
-            ((AutoCompleteTextView) d.findViewById(R.id.zodiacDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, zodiacArray));
-
-            String[] casteArray = {"Hindu", "Brahmin"};
-            ((AutoCompleteTextView) d.findViewById(R.id.casteDropdown)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, casteArray));
-
+            initArrays(d);
             d.findViewById(R.id.cancel_btn).setOnClickListener(view12 -> {
                 d.dismiss();
             });
-            d.findViewById(R.id.dob_field).setOnClickListener(view1 -> {
-                //Date Picker
-                MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-                MaterialDatePicker<Long> picker = builder.build();
-                picker.show(getFragmentManager(), picker.toString());
-                picker.addOnPositiveButtonClickListener(selectedDate -> {
-                    // Do something...
-                    //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    //calendar.setTimeInMillis(selection);
-                    Date date = new Date(selectedDate);
-                    SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-                    ((TextView) d.findViewById(R.id.dob_field)).setText(simpleFormat.format(date));
-                });
+            d.findViewById(R.id.save_btn).setOnClickListener(view12 -> {
+                createProfile(d);
             });
-            d.findViewById(R.id.time_field).setOnClickListener(view1 -> {
-                //Time Picker
-                Calendar calendar = Calendar.getInstance();
-                int hour = calendar.get(Calendar.HOUR);
-                int min = calendar.get(Calendar.MINUTE);
 
-                TimePickerDialog timePickerDialog = new TimePickerDialog(this.getContext(), (timePicker, hour1, min1) -> {
-                    String time = hour1 + " : " + min1;
-                    ((TextView) d.findViewById(R.id.time_field)).setText(time);
-
-                }, hour, min, true);
-                timePickerDialog.show();
-            });
 
             d.setCancelable(false);
             d.setCanceledOnTouchOutside(false);
@@ -174,6 +131,125 @@ public class MyAccountFragment extends Fragment {
             logoutId.setEnabled(false);
             handleLogout();
         });
+    }
+
+    private void createProfile(Dialog d) {
+        String creationSource = "mobile app";
+        String profilePhotoAddress;
+        String biodataAddress;
+
+        String firstName = ((TextInputEditText) d.findViewById(R.id.firstName)).getText().toString().trim();
+        String middleName = ((TextInputEditText) d.findViewById(R.id.middleName)).getText().toString().trim();
+        String lastName  = ((TextInputEditText) d.findViewById(R.id.lastName)).getText().toString().trim();
+        String email  = ((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim();
+        String mobile1  = ((TextInputEditText) d.findViewById(R.id.mobile1)).getText().toString().trim();
+        String mobile2  = ((TextInputEditText) d.findViewById(R.id.mobile2)).getText().toString().trim();
+        String gender  = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
+        String height = ((TextInputEditText) d.findViewById(R.id.height)).getText().toString().trim();
+        String birthtime = ((TextInputEditText) d.findViewById(R.id.birthtime)).getText().toString().trim();
+        String caste = ((AutoCompleteTextView) d.findViewById(R.id.caste)).getText().toString().trim();
+        String education = ((AutoCompleteTextView) d.findViewById(R.id.education)).getText().toString().trim();
+        String occupation = ((AutoCompleteTextView) d.findViewById(R.id.occupation)).getText().toString().trim();
+        String zodiac = ((AutoCompleteTextView) d.findViewById(R.id.zodiac)).getText().toString().trim();
+        String birthName = ((TextInputEditText) d.findViewById(R.id.birthname)).getText().toString().trim();
+        String bloodGroup = ((AutoCompleteTextView) d.findViewById(R.id.bloodgroup)).getText().toString().trim();
+        String property = ((TextInputEditText) d.findViewById(R.id.property)).getText().toString().trim();
+        String fatherName = ((TextInputEditText) d.findViewById(R.id.fathername)).getText().toString().trim();
+        String motherName = ((TextInputEditText) d.findViewById(R.id.mothername)).getText().toString().trim();
+        String address = ((TextInputEditText) d.findViewById(R.id.address)).getText().toString().trim();
+        String city = ((AutoCompleteTextView) d.findViewById(R.id.city)).getText().toString().trim();
+        String marriageStatus = ((AutoCompleteTextView) d.findViewById(R.id.marriagestatus)).getText().toString().trim();
+        String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
+        String birthday = ((AutoCompleteTextView) d.findViewById(R.id.birthday)).getText().toString().trim();
+        String birthplace = ((AutoCompleteTextView) d.findViewById(R.id.birthplace)).getText().toString().trim();
+        String income = ((AutoCompleteTextView) d.findViewById(R.id.income)).getText().toString().trim();
+        String kuldaivat = ((TextInputEditText) d.findViewById(R.id.kuldaivat)).getText().toString().trim();
+        String devak = ((TextInputEditText) d.findViewById(R.id.devak)).getText().toString().trim();
+        String nakshatra = ((TextInputEditText) d.findViewById(R.id.nakshatra)).getText().toString().trim();
+        String nadi = ((TextInputEditText) d.findViewById(R.id.nadi)).getText().toString().trim();
+        String gan = ((TextInputEditText) d.findViewById(R.id.gan)).getText().toString().trim();
+        String yoni = ((TextInputEditText) d.findViewById(R.id.yoni)).getText().toString().trim();
+        String charan = ((TextInputEditText) d.findViewById(R.id.charan)).getText().toString().trim();
+        String gotra = ((TextInputEditText) d.findViewById(R.id.gotra)).getText().toString().trim();
+        String varn = ((TextInputEditText) d.findViewById(R.id.varn)).getText().toString().trim();
+        String mangal = ((TextInputEditText) d.findViewById(R.id.mangal)).getText().toString().trim();
+        String expectations = ((TextInputEditText) d.findViewById(R.id.expectations)).getText().toString().trim();
+
+        System.out.println("hello");
+
+    }
+
+    private void initArrays(Dialog d) {
+
+        d.findViewById(R.id.birthdate).setOnClickListener(view1 -> {
+            //Date Picker
+            MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+            MaterialDatePicker<Long> picker = builder.build();
+            picker.show(getFragmentManager(), picker.toString());
+            picker.addOnPositiveButtonClickListener(selectedDate -> {
+                // Do something...
+                //Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                //calendar.setTimeInMillis(selection);
+                Date date = new Date(selectedDate);
+                SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                ((TextView) d.findViewById(R.id.birthdate)).setText(simpleFormat.format(date));
+            });
+        });
+        d.findViewById(R.id.birthtime).setOnClickListener(view1 -> {
+            //Time Picker
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR);
+            int min = calendar.get(Calendar.MINUTE);
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(this.getContext(), (timePicker, hour1, min1) -> {
+                String time = hour1 + " : " + min1;
+                ((TextView) d.findViewById(R.id.birthtime)).setText(time);
+
+            }, hour, min, true);
+            timePickerDialog.show();
+        });
+
+
+        String[] bloodGroupArray = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+        ((AutoCompleteTextView) d.findViewById(R.id.bloodgroup)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, bloodGroupArray));
+
+        String[] educationArray = {"B.E.", "B.Sc", "B.Ed", "10th Pass"};
+        ((AutoCompleteTextView) d.findViewById(R.id.education)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, educationArray));
+
+        String[] occupationArray = {"Business", "Job"};
+        ((AutoCompleteTextView) d.findViewById(R.id.occupation)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, occupationArray));
+
+        String[] genderArray = {"male", "female"};
+        ((AutoCompleteTextView) d.findViewById(R.id.gender)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, genderArray));
+
+        String[] dayArray = {"रविवार","सोमवार","मंगळवार","बुधवार","गुरुवार","शुक्रवार","शनिवार"};
+        ((AutoCompleteTextView) d.findViewById(R.id.birthday)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, dayArray));
+
+        String[] marriagestatusArray = {"unmarried", "divorsed","widowed"};
+        ((AutoCompleteTextView) d.findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, marriagestatusArray));
+
+        String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
+        ((AutoCompleteTextView) d.findViewById(R.id.income)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, incomeArray));
+
+        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai"};
+        ((AutoCompleteTextView) d.findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, birthplaceArray));
+        ((AutoCompleteTextView) d.findViewById(R.id.city)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, birthplaceArray));
+
+        String[] zodiacArray = {"मेष | Aries","वृषभ | Taurus","मिथुन | Gemini","कर्क | Cancer","सिंह | Leo","कन्या | Virgo","तुला | Libra",
+                "वृश्चिक | Scorpio","धनु | Sagittarius","मकर | Capricorn","कुंभ | Aquarius","मीन | Pisces"};
+        ((AutoCompleteTextView) d.findViewById(R.id.zodiac)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, zodiacArray));
+
+
+        String[] relationArray = {"बहीण", "भाऊ", "चुलते", "मामा", "आत्या", "मावशी", "आजोबा", "आजी"};
+        ((AutoCompleteTextView) d.findViewById(R.id.relation1)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, relationArray));
+        ((AutoCompleteTextView) d.findViewById(R.id.relation2)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, relationArray));
+        ((AutoCompleteTextView) d.findViewById(R.id.relation3)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, relationArray));
+        ((AutoCompleteTextView) d.findViewById(R.id.relation4)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, relationArray));
+        ((AutoCompleteTextView) d.findViewById(R.id.relation5)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, relationArray));
+
+        String[] casteArray = {"Hindu", "Brahmin"};
+        ((AutoCompleteTextView) d.findViewById(R.id.caste)).setAdapter(new ArrayAdapter(d.getContext(), R.layout.package_list_item, casteArray));
+
     }
 
     private void initUIElements() {
