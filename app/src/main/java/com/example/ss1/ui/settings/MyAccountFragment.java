@@ -1,22 +1,14 @@
 package com.example.ss1.ui.settings;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -31,22 +23,12 @@ import com.example.ss1.activity.SendOtpActivity;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.ApiUtils;
 import com.example.ss1.modal.Customer;
-import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.OrderModal;
-import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class MyAccountFragment extends Fragment {
 

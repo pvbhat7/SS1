@@ -3,9 +3,11 @@ package com.example.ss1.api;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Vibrator;
+import android.util.Base64;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +19,8 @@ import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.modal.Customer;
 import com.github.ybq.android.spinkit.SpinKitView;
+
+import java.io.ByteArrayOutputStream;
 
 public class ApiUtils {
 
@@ -100,6 +104,29 @@ public class ApiUtils {
         d.show();
     }
 
+
+    public static String convertBitmapToString(Bitmap bitmap , int maxSize){
+        bitmap = getResizedBitmap(bitmap , maxSize);
+        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bao);
+        byte[] array = bao.toByteArray();
+        String imgB64 = Base64.encodeToString(array,Base64.DEFAULT);
+        return imgB64;
+    }
+    public static Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float)width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
 
 
 }

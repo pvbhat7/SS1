@@ -3,7 +3,6 @@ package com.example.ss1.modal;
 public class Customer {
     private String profileId;
     private String firstname;
-
     private String middlename;
     private String lastname;
     private String email;
@@ -48,9 +47,25 @@ public class Customer {
     private String relatives;
     private String expectations;
 
+    private String relation1;
+    private String relationname1;
+
+    private String relation2;
+    private String relationname2;
+
+    private String relation3;
+    private String relationname3;
+
+    private String relation4;
+    private String relationname4;
+
+    private String relation5;
+    private String relationname5;
+
     public Customer(){
 
     }
+
 
     public Customer(String creationSource, String profilePhotoAddress, String biodataAddress,
                     String firstName, String middleName, String lastName, String email,
@@ -61,7 +76,7 @@ public class Customer {
                     String marriageStatus, String birthdate, String birthday, String birthplace,
                     String income, String kuldaivat, String devak, String nakshatra, String nadi,
                     String gan, String yoni, String charan, String gotra, String varn,
-                    String mangal, String expectations) {
+                    String mangal, String expectations,String relation1, String relation2, String relation3, String relation4, String relation5, String relationname1, String relationname2, String relationname3, String relationname4, String relationname5) {
         this.creationsource = creationSource;
         this.profilephotoaddress = profilePhotoAddress;
         this.biodataaddress = biodataAddress;
@@ -101,6 +116,16 @@ public class Customer {
         this.varn = varn;
         this.mangal = mangal;
         this.expectations = expectations;
+        this.relation1 = relation1;
+        this.relation2 = relation2;
+        this.relation3 = relation3;
+        this.relation4 = relation4;
+        this.relation5 = relation5;
+        this.relationname1 = relationname1;
+        this.relationname2 = relationname2;
+        this.relationname3 = relationname3;
+        this.relationname4 = relationname4;
+        this.relationname5 = relationname5;
     }
 
     public String getProfileId() {
@@ -461,5 +486,85 @@ public class Customer {
 
     public void setExpectations(String expectations) {
         this.expectations = expectations;
+    }
+
+    public String getRelation1() {
+        return relation1;
+    }
+
+    public void setRelation1(String relation1) {
+        this.relation1 = relation1;
+    }
+
+    public String getRelationname1() {
+        return relationname1;
+    }
+
+    public void setRelationname1(String relationname1) {
+        this.relationname1 = relationname1;
+    }
+
+    public String getRelation2() {
+        return relation2;
+    }
+
+    public void setRelation2(String relation2) {
+        this.relation2 = relation2;
+    }
+
+    public String getRelationname2() {
+        return relationname2;
+    }
+
+    public void setRelationname2(String relationname2) {
+        this.relationname2 = relationname2;
+    }
+
+    public String getRelation3() {
+        return relation3;
+    }
+
+    public void setRelation3(String relation3) {
+        this.relation3 = relation3;
+    }
+
+    public String getRelationname3() {
+        return relationname3;
+    }
+
+    public void setRelationname3(String relationname3) {
+        this.relationname3 = relationname3;
+    }
+
+    public String getRelation4() {
+        return relation4;
+    }
+
+    public void setRelation4(String relation4) {
+        this.relation4 = relation4;
+    }
+
+    public String getRelationname4() {
+        return relationname4;
+    }
+
+    public void setRelationname4(String relationname4) {
+        this.relationname4 = relationname4;
+    }
+
+    public String getRelation5() {
+        return relation5;
+    }
+
+    public void setRelation5(String relation5) {
+        this.relation5 = relation5;
+    }
+
+    public String getRelationname5() {
+        return relationname5;
+    }
+
+    public void setRelationname5(String relationname5) {
+        this.relationname5 = relationname5;
     }
 }

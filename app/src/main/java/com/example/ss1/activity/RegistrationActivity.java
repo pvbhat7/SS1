@@ -1,7 +1,12 @@
 package com.example.ss1.activity;
 
+import android.app.Activity;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -13,12 +18,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.bumptech.glide.Glide;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
+import com.example.ss1.api.ApiUtils;
 import com.example.ss1.modal.Customer;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,23 +35,34 @@ import java.util.Locale;
 
 public class RegistrationActivity extends AppCompatActivity {
 
-    Button save_btn,cancen_btn ;
+    static String clickedImagename , profilePhotoAddressBase64 , biodataAddressBase64;
+
+    public static final int REQUEST_IMAGE = 100;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    Button save_btn, cancen_btn;
     CardView addcard;
     LinearLayout formLayout;
+
+    CircularImageView profilePhotoAddress, biodataAddress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+        initFormData();
+        init();
+        handleOnclickListeners();
 
+    }
 
-            init();
-
+    private void handleOnclickListeners() {
         addcard.setOnClickListener(view -> {
-                formLayout.setVisibility(View.VISIBLE);
-                addcard.setVisibility(View.GONE);
-                initFormData();
-            });
+            profilePhotoAddressBase64 = "";
+            biodataAddressBase64 = "";
+            formLayout.setVisibility(View.VISIBLE);
+            addcard.setVisibility(View.GONE);
+
+        });
 
         save_btn.setOnClickListener(view -> {
             createProfile();
@@ -51,14 +71,27 @@ public class RegistrationActivity extends AppCompatActivity {
             formLayout.setVisibility(View.GONE);
             addcard.setVisibility(View.VISIBLE);
         });
-
+        profilePhotoAddress.setOnClickListener(view -> {
+            clickedImagename = "profilePhotoAddress";
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        });
+        biodataAddress.setOnClickListener(view -> {
+            clickedImagename = "biodataAddress";
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        });
     }
 
-    private void init(){
+    private void init() {
         save_btn = findViewById(R.id.save_btn);
         cancen_btn = findViewById(R.id.cancel_btn);
         addcard = findViewById(R.id.add);
         formLayout = findViewById(R.id.formLayout);
+        profilePhotoAddress = findViewById(R.id.profilePhotoAddress);
+        biodataAddress = findViewById(R.id.biodataAddress);
     }
 
     private void initFormData() {
@@ -104,10 +137,10 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] genderArray = {"male", "female"};
         ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
 
-        String[] dayArray = {"रविवार","सोमवार","मंगळवार","बुधवार","गुरुवार","शुक्रवार","शनिवार"};
+        String[] dayArray = {"रविवार", "सोमवार", "मंगळवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"};
         ((AutoCompleteTextView) findViewById(R.id.birthday)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, dayArray));
 
-        String[] marriagestatusArray = {"unmarried", "divorsed","widowed"};
+        String[] marriagestatusArray = {"unmarried", "divorsed", "widowed"};
         ((AutoCompleteTextView) findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, marriagestatusArray));
 
         String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
@@ -117,8 +150,8 @@ public class RegistrationActivity extends AppCompatActivity {
         ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
         ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
 
-        String[] zodiacArray = {"मेष | Aries","वृषभ | Taurus","मिथुन | Gemini","कर्क | Cancer","सिंह | Leo","कन्या | Virgo","तुला | Libra",
-                "वृश्चिक | Scorpio","धनु | Sagittarius","मकर | Capricorn","कुंभ | Aquarius","मीन | Pisces"};
+        String[] zodiacArray = {"मेष | Aries", "वृषभ | Taurus", "मिथुन | Gemini", "कर्क | Cancer", "सिंह | Leo", "कन्या | Virgo", "तुला | Libra",
+                "वृश्चिक | Scorpio", "धनु | Sagittarius", "मकर | Capricorn", "कुंभ | Aquarius", "मीन | Pisces"};
         ((AutoCompleteTextView) findViewById(R.id.zodiac)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, zodiacArray));
 
 
@@ -136,16 +169,16 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void createProfile() {
         String creationsource = "mobile app";
-        String profilephotoaddress="";
-        String biodataaddress="";
+        String profilephotoaddress = "";
+        String biodataaddress = "";
 
         String firstname = ((TextInputEditText) findViewById(R.id.firstname)).getText().toString().trim();
         String middlename = ((TextInputEditText) findViewById(R.id.middlename)).getText().toString().trim();
-        String lastname  = ((TextInputEditText) findViewById(R.id.lastname)).getText().toString().trim();
-        String email  = ((TextInputEditText) findViewById(R.id.email)).getText().toString().trim();
-        String mobile1  = ((TextInputEditText) findViewById(R.id.mobile1)).getText().toString().trim();
-        String mobile2  = ((TextInputEditText) findViewById(R.id.mobile2)).getText().toString().trim();
-        String gender  = ((AutoCompleteTextView) findViewById(R.id.gender)).getText().toString().trim();
+        String lastname = ((TextInputEditText) findViewById(R.id.lastname)).getText().toString().trim();
+        String email = ((TextInputEditText) findViewById(R.id.email)).getText().toString().trim();
+        String mobile1 = ((TextInputEditText) findViewById(R.id.mobile1)).getText().toString().trim();
+        String mobile2 = ((TextInputEditText) findViewById(R.id.mobile2)).getText().toString().trim();
+        String gender = ((AutoCompleteTextView) findViewById(R.id.gender)).getText().toString().trim();
         String height = ((TextInputEditText) findViewById(R.id.height)).getText().toString().trim();
         String birthtime = ((TextInputEditText) findViewById(R.id.birthtime)).getText().toString().trim();
         String caste = ((AutoCompleteTextView) findViewById(R.id.caste)).getText().toString().trim();
@@ -176,17 +209,65 @@ public class RegistrationActivity extends AppCompatActivity {
         String mangal = ((TextInputEditText) findViewById(R.id.mangal)).getText().toString().trim();
         String expectations = ((TextInputEditText) findViewById(R.id.expectations)).getText().toString().trim();
 
-        Customer customer = new Customer(creationsource, profilephotoaddress, biodataaddress,
+        String relation1 = ((AutoCompleteTextView) findViewById(R.id.relation1)).getText().toString().trim();
+        String relationname1 = ((TextInputEditText) findViewById(R.id.relationname1)).getText().toString().trim();
+
+        String relation2 = ((AutoCompleteTextView) findViewById(R.id.relation2)).getText().toString().trim();
+        String relationname2 = ((TextInputEditText) findViewById(R.id.relationname2)).getText().toString().trim();
+
+        String relation3 = ((AutoCompleteTextView) findViewById(R.id.relation3)).getText().toString().trim();
+        String relationname3 = ((TextInputEditText) findViewById(R.id.relationname3)).getText().toString().trim();
+
+        String relation4 = ((AutoCompleteTextView) findViewById(R.id.relation4)).getText().toString().trim();
+        String relationname4 = ((TextInputEditText) findViewById(R.id.relationname4)).getText().toString().trim();
+
+        String relation5 = ((AutoCompleteTextView) findViewById(R.id.relation5)).getText().toString().trim();
+        String relationname5 = ((TextInputEditText) findViewById(R.id.relationname5)).getText().toString().trim();
+
+        Customer customer = new Customer(creationsource, profilePhotoAddressBase64, biodataAddressBase64,
                 firstname, middlename, lastname, email, mobile1, mobile2, gender, height,
                 birthtime, caste, education, occupation, zodiac, birthName, bloodGroup,
                 property, fatherName, motherName, address, city, marriageStatus, birthdate,
                 birthday, birthplace, income, kuldaivat, devak, nakshatra, nadi, gan, yoni,
-                charan, gotra, varn, mangal, expectations);
+                charan, gotra, varn, mangal, expectations,relation1,relation2,relation3,relation4,relation4,relationname1,relationname2,relationname3,relationname4,relationname5);
 
-        ApiCallUtil.registerProfile(customer,this);
+        ApiCallUtil.registerProfile(customer, this);
         formLayout.setVisibility(View.GONE);
         addcard.setVisibility(View.VISIBLE);
 
     }
-    
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                if(data != null){
+                    //Uri uri = data.getParcelableExtra("path");
+                    Uri uri = data.getData();
+                    try {
+                        // You can update this bitmap to your server
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                        String imgB64 = ApiUtils.convertBitmapToString(bitmap, 500);
+
+
+                        if (clickedImagename != null) {
+                            if(clickedImagename.equalsIgnoreCase("profilePhotoAddress")){
+                                profilePhotoAddressBase64 = imgB64;
+                                Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(profilePhotoAddress);
+                            }
+                            if(clickedImagename.equalsIgnoreCase("biodataAddress")){
+                                biodataAddressBase64 = imgB64;
+                                Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(biodataAddress);
+                            }
+
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 }
