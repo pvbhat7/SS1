@@ -16,6 +16,7 @@ import com.example.ss1.LocalCache;
 import com.example.ss1.ProjectConstants;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
+import com.example.ss1.api.ApiUtils;
 import com.example.ss1.databinding.FragmentMatchesBinding;
 import com.example.ss1.adapters.Level_1_shortprofilecardAdapter;
 import com.example.ss1.modal.Customer;
@@ -46,6 +47,7 @@ public class MatchesFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_matches, container, false);
+        ApiUtils.checkNetworkStatus(this.getActivity());
 
         customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
         

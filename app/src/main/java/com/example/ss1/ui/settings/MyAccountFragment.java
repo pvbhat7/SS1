@@ -63,7 +63,7 @@ public class MyAccountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_myaccountnew, container, false);
-
+        ApiUtils.checkNetworkStatus(this.getActivity());
         try{
             initUIElements();
             initOnClickListeners();

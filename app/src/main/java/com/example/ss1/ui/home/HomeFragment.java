@@ -1,7 +1,9 @@
 package com.example.ss1.ui.home;
 
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,9 +41,12 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    static Activity activity;
+
     public CoordinatorLayout coordinatorLayout;
 
     SpinKitView progressBar;
+
 
     ImageView notification,profilePhoto;
 
@@ -60,9 +66,10 @@ public class HomeFragment extends Fragment {
 
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
-
+        activity = this.getActivity();
         initUIElements();
         initOnclickListener();
+        ApiUtils.checkNetworkStatus(this.getActivity());
 
         syncLoggedInCustomer();
         customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
@@ -82,6 +89,8 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+
+
 
     private void setProfileIcon() {
         if(customer.getProfileId() != null){
@@ -110,7 +119,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initOnclickListener() {
-        level1cardsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        /*level1cardsRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -129,7 +138,7 @@ public class HomeFragment extends Fragment {
                     }
                 }
             }
-        });
+        });*/
 
         notification.setOnClickListener(view -> {
             showNotificationListDialog();
@@ -163,25 +172,23 @@ public class HomeFragment extends Fragment {
         level1CardAdapter.notifyItemInserted(rowsArrayList.size() - 1);
 
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                rowsArrayList.remove(rowsArrayList.size() - 1);
-                int scrollPosition = rowsArrayList.size();
-                level1CardAdapter.notifyItemRemoved(scrollPosition);
-                int currentSize = scrollPosition;
+        handler.postDelayed(() -> {
+            rowsArrayList.remove(rowsArrayList.size() - 1);
+            int scrollPosition = rowsArrayList.size();
+            level1CardAdapter.notifyItemRemoved(scrollPosition);
+            int currentSize = scrollPosition;
 
-                // Next load more option is to be shown after every 10 items.
-                int nextLimit = currentSize + 20;
+            // Next load more option is to be shown after every 10 items.
+            int nextLimit = currentSize + 20;
 
-                while (currentSize - 1 < nextLimit) {
-                    rowsArrayList.add(new Level_1_cardModal(String.valueOf(currentSize), "fname", "lname", "06/09/1994", "age", "address", "0", "0", "0"));
-                    currentSize++;
-                }
+            while (currentSize - 1 < nextLimit) {
+                rowsArrayList.add(new Level_1_cardModal(String.valueOf(currentSize), "fname", "lname", "06/09/1994", "age", "address", "0", "0", "0"));
 
-                level1CardAdapter.notifyDataSetChanged();
-                isLoading = false;
+                currentSize++;
             }
+
+            level1CardAdapter.notifyDataSetChanged();
+            isLoading = false;
         }, 100);
     }
 
@@ -212,7 +219,7 @@ public class HomeFragment extends Fragment {
             if (recyclerView != null) {
                 if (list != null) {
                     rowsArrayList = list;
-                    level1CardAdapter = new Level_1_profilecardAdapter(view, list, this, this.getActivity(), false);
+                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar,view, list, this, this.getActivity(), false);
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);
@@ -220,10 +227,11 @@ public class HomeFragment extends Fragment {
                 else{
                     list = new ArrayList<>();
                     rowsArrayList = list;
-                    level1CardAdapter = new Level_1_profilecardAdapter(view, list, this, this.getActivity(), false);
+                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar,view, list, this, this.getActivity(), false);
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);
+                    ApiUtils.showDialog(this,progressBar,this.getActivity(),R.drawable.searching_gif,"0 profiles found","try again");
                 }
             }
         }
@@ -253,5 +261,10 @@ public class HomeFragment extends Fragment {
         d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         d.show();
     }
+
+    public static Activity getFragmentActivity(){
+        return activity;
+    }
+
 
 }

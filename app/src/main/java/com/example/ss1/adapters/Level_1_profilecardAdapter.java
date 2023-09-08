@@ -43,14 +43,16 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
     Fragment fragment;
     Boolean flag;
     View view;
+    SpinKitView sprogressBar;
 
 
-    public Level_1_profilecardAdapter(View view, List<Level_1_cardModal> itemList, Fragment fragment, Activity activity, boolean flag) {
+    public Level_1_profilecardAdapter(SpinKitView sprogressBar , View view, List<Level_1_cardModal> itemList, Fragment fragment, Activity activity, boolean flag) {
         mItemList = itemList;
         this.activity = activity;
         this.fragment = fragment;
         this.flag = flag;
         this.view = view;
+        this.sprogressBar = sprogressBar;
     }
 
     // Based on the View type we are instantiating the
@@ -257,6 +259,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             notifyDataSetChanged();
             ApiCallUtil.addToNotInterestedProfiles(customer.getProfileId(), obj.getProfileId());
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_IGNORE_PROFILE));
+            ApiCallUtil.getAllProfiles(customer.getProfileId(),fragment, sprogressBar,activity,true);
         }
     }
 

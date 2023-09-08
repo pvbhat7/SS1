@@ -109,7 +109,6 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
-            //HelperUtility.addLastTenDaysCount(list, activity);
             if (list != null && !list.isEmpty()) {
                 Collections.shuffle(list);
 
