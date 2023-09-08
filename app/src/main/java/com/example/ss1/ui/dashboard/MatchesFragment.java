@@ -34,7 +34,6 @@ public class MatchesFragment extends Fragment {
 
     public CardView menu_contactsViewed, menu_shortlistedByYou, menu_likedByYou, menu_ignoredByYou, menu_interestSentByYou;
 
-    private FragmentMatchesBinding binding;
     private View view;
 
     SpinKitView progressBar;
@@ -107,7 +106,6 @@ public class MatchesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 
     public void initRecyclerView(List<Level_1_cardModal> list) {

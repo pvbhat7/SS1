@@ -9,10 +9,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.R;
+import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.github.ybq.android.spinkit.SpinKitView;
 
@@ -88,6 +90,10 @@ public class Level_1_shortprofilecardAdapter extends RecyclerView.Adapter<Recycl
                     .load(obj.getProfilePhotoAddress())
                     .placeholder(R.drawable.oops)
                     .into(holder.profilephoto);
+
+            holder.level1short_cardview.setOnClickListener(view -> {
+                ApiCallUtil.getLevel2Data(obj.getProfileId(), activity, false);
+            });
         }
     }
 
@@ -107,11 +113,12 @@ public class Level_1_shortprofilecardAdapter extends RecyclerView.Adapter<Recycl
         public TextView name;
         public ImageView profilephoto;
 
+        public CardView level1short_cardview;
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
             this.name = itemView.findViewById(R.id.name);
             this.profilephoto = itemView.findViewById(R.id.profilephoto);
-
+            this.level1short_cardview = itemView.findViewById(R.id.level1short_cardview);
         }
     }
 

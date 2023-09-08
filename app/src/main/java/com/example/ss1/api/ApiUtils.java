@@ -80,8 +80,8 @@ public class ApiUtils {
         });
 
 
-        d.setCanceledOnTouchOutside(false);
-        d.setCancelable(false);
+        /*d.setCanceledOnTouchOutside(false);
+        d.setCancelable(false);*/
         d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         d.show();
     }
