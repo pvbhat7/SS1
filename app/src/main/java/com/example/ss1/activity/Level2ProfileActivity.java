@@ -72,12 +72,12 @@ public class Level2ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_level2_profile);
+        setContentView(R.layout.activity_level2_profile_new);
 
-
+        // TODO: 12-Sep-23 <a href="https://www.freepik.com/free-photo/abstract-yellow-sunshine-theme-summer-watercolor-background-illustration-high-resolution-free-photo_26887846.htm#query=texture%20background&position=32&from_view=keyword&track=ais">Image by Sketchepedia</a> on Freepik
         customer = LocalCache.retrieveLoggedInCustomer(this);
 
-        /*set context*/
+        //*set context*//*
         if (ctx == null || ((Level2ProfileActivity) ctx).isDestroyed())
             ctx = this;
 
@@ -88,17 +88,17 @@ public class Level2ProfileActivity extends AppCompatActivity {
             enableDisableContactViewButton = extras.getBoolean("enableDisableContactViewButton");
         }
 
-        initUiElements();
-        handleOnClickListeners();
+        //initUiElements();
+       // handleOnClickListeners();
 
         try {
 
 
             if (vcpid != null) {
-                handleCarosol(vcpid);
-                l2_name.setText(vcpid.getFirstname() + " " + vcpid.getLastname());
-                l2_age.setText(Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(vcpid.getBirthdate()))) / 365 + " yrs , " + vcpid.getCity());
-                profileCardId.setText("Profile id : A" + vcpid.getProfileId());
+                //handleCarosol(vcpid);
+                //l2_name.setText(vcpid.getFirstname() + " " + vcpid.getLastname());
+                //l2_age.setText(Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(vcpid.getBirthdate()))) / 365 + " yrs , " + vcpid.getCity());
+                //profileCardId.setText("Profile id : A" + vcpid.getProfileId());
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -285,7 +285,6 @@ public class Level2ProfileActivity extends AppCompatActivity {
             arr = new String[1];
             arr[0] = level2Modal.getProfilephotoaddress();
         }
-
 
         SliderAdapter sliderAdapter = new SliderAdapter(arr);
 

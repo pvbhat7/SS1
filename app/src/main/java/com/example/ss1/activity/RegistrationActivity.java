@@ -42,8 +42,8 @@ import java.util.Locale;
 
 public class RegistrationActivity extends AppCompatActivity {
 
-    public TextInputEditText cmmobile,email, name, birthname, fathername, birthdate,mothername, mobile1, mobile2, mobile3, mobile4, education, caste, birthtime, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2,relatives,family;
-    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, occupation, zodiac, city, birthday, birthplace, income;
+    public TextInputEditText cmmobile,email, name, birthname, fathername, birthdate,mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2,relatives,family;
+    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, occupation, zodiac, city, birthday, birthplace, income,hour,minute,ampm;
 
     static String clickedImagename , profilePhotoAddressBase64 , biodataAddressBase64;
 
@@ -69,6 +69,15 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void handleFormOnClickListeners() {
+        hour.setOnClickListener(view -> {
+            hideKeyboard(view);
+        });
+        minute.setOnClickListener(view -> {
+            hideKeyboard(view);
+        });
+        ampm.setOnClickListener(view -> {
+            hideKeyboard(view);
+        });
         marriagestatus.setOnClickListener(view -> {
             hideKeyboard(view);
         });
@@ -189,7 +198,9 @@ public class RegistrationActivity extends AppCompatActivity {
         mobile4 = findViewById(R.id.mobile4);
         gender = findViewById(R.id.gender);
         height = findViewById(R.id.height);
-        birthtime = findViewById(R.id.birthtime);
+        hour = findViewById(R.id.hour);
+        minute = findViewById(R.id.minute);
+        ampm = findViewById(R.id.ampm);
         caste = findViewById(R.id.caste);
         religion = findViewById(R.id.religion);
         education = findViewById(R.id.education);
@@ -241,7 +252,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 ((TextView) findViewById(R.id.birthdate)).setText(simpleFormat.format(date));
             });
         });
-        findViewById(R.id.birthtime).setOnClickListener(view1 -> {
+        /*findViewById(R.id.birthtime).setOnClickListener(view1 -> {
             //Time Picker
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR);
@@ -253,7 +264,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
             }, hour, min, true);
             timePickerDialog.show();
-        });
+        });*/
 
 
         String[] bloodGroupArray = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
@@ -267,6 +278,15 @@ public class RegistrationActivity extends AppCompatActivity {
 
         String[] occupationArray = {"Business", "Job"};
         ((AutoCompleteTextView) findViewById(R.id.occupation)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, occupationArray));
+
+        String[] hourArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
+        ((AutoCompleteTextView) findViewById(R.id.hour)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, hourArray));
+
+        String[] minuteArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"};
+        ((AutoCompleteTextView) findViewById(R.id.minute)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, minuteArray));
+
+        String[] ampmArray = {"am", "pm"};
+        ((AutoCompleteTextView) findViewById(R.id.ampm)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, ampmArray));
 
         String[] genderArray = {"male", "female"};
         ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
@@ -320,9 +340,12 @@ public class RegistrationActivity extends AppCompatActivity {
         String relation1 = "Brother";
         String relation2 = "Sister";
 
+        String birthtime = hour.getText().toString().trim() +":"+ minute.getText().toString().trim() +" "+ ampm.getText().toString().trim();
+
+
         Customer customer = new Customer(creationsource, profilePhotoAddressBase64, biodataAddressBase64,
                 firstname, middlename, lastname, email.getText().toString().trim(), mobile1.getText().toString().trim(), mobile2.getText().toString().trim(),mobile3.getText().toString().trim(),mobile4.getText().toString().trim(), gender.getText().toString().trim(), height.getText().toString().trim(),
-                birthtime.getText().toString().trim(), caste.getText().toString().trim(), religion.getText().toString().trim(),education.getText().toString().trim(), occupation.getText().toString().trim(), zodiac.getText().toString().trim(), birthname.getText().toString().trim(), bloodgroup.getText().toString().trim(),
+                birthtime, caste.getText().toString().trim(), religion.getText().toString().trim(),education.getText().toString().trim(), occupation.getText().toString().trim(), zodiac.getText().toString().trim(), birthname.getText().toString().trim(), bloodgroup.getText().toString().trim(),
                 property.getText().toString().trim(), fathername.getText().toString().trim(), mothername.getText().toString().trim(), address.getText().toString().trim(), city.getText().toString().trim(), marriagestatus.getText().toString().trim(), birthdate.getText().toString().trim(),
                 birthday.getText().toString().trim(), birthplace.getText().toString().trim(), income.getText().toString().trim(), kuldaivat.getText().toString().trim(), devak.getText().toString().trim(), nakshatra.getText().toString().trim(), nadi.getText().toString().trim(), gan.getText().toString().trim(), yoni.getText().toString().trim(),
                 charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(),relation1,relation2,relationname1.getText().toString().trim(),relationname2.getText().toString().trim(),relatives.getText().toString().trim(),family.getText().toString().trim());
@@ -377,7 +400,9 @@ public class RegistrationActivity extends AppCompatActivity {
         mobile4.setText("");
         gender.setText("");
         height.setText("");
-        birthtime.setText("");
+        hour.setText("");
+        minute.setText("");
+        ampm.setText("");
         caste.setText("");
         religion.setText("");
         education.setText("");
