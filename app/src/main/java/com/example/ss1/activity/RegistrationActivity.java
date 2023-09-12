@@ -3,13 +3,15 @@ package com.example.ss1.activity;
 import static android.view.View.GONE;
 
 import android.app.Activity;
-import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.R;
@@ -33,14 +36,33 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.internal.ViewUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class RegistrationActivity extends AppCompatActivity {
+
+    public static final String INTENT_IMAGE_PICKER_OPTION = "image_picker_option";
+    public static final String INTENT_ASPECT_RATIO_X = "aspect_ratio_x";
+    public static final String INTENT_ASPECT_RATIO_Y = "aspect_ratio_Y";
+    public static final String INTENT_LOCK_ASPECT_RATIO = "lock_aspect_ratio";
+    public static final String INTENT_IMAGE_COMPRESSION_QUALITY = "compression_quality";
+    public static final String INTENT_SET_BITMAP_MAX_WIDTH_HEIGHT = "set_bitmap_max_width_height";
+    public static final String INTENT_BITMAP_MAX_WIDTH = "max_width";
+    public static final String INTENT_BITMAP_MAX_HEIGHT = "max_height";
+
+
+    public static final int REQUEST_IMAGE_CAPTURE = 0;
+    public static final int REQUEST_GALLERY_IMAGE = 1;
+
+    private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
+    private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
+    private int IMAGE_COMPRESSION = 80;
+    public static String fileName;
 
     public TextInputEditText cmmobile,email, name, birthname, fathername, birthdate,mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2,relatives,family;
     public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, occupation, zodiac, city, birthday, birthplace, income,hour,minute,ampm;
@@ -360,34 +382,52 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST) {
-            if (resultCode == Activity.RESULT_OK) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
                 if(data != null){
-                    //Uri uri = data.getParcelableExtra("path");
-                    Uri uri = data.getData();
-                    try {
-                        // You can update this bitmap to your server
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                        String imgB64 = ApiUtils.convertBitmapToString(bitmap, 500);
 
-
-                        if (clickedImagename != null) {
-                            if(clickedImagename.equalsIgnoreCase("profilePhotoAddress")){
-                                profilePhotoAddressBase64 = imgB64;
-                                Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(profilePhotoAddress);
-                            }
-                            if(clickedImagename.equalsIgnoreCase("biodataAddress")){
-                                biodataAddressBase64 = imgB64;
-                                Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(biodataAddress);
-                            }
-
-                        }
-
-                    } catch (IOException e) {
+                    try{
+                        Uri uri = data.getData();
+                        cropImage(uri);
+                    }
+                    catch (Exception e){
                         e.printStackTrace();
                     }
+
+
                 }
+
+        }
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            Uri uri = UCrop.getOutput(data);
+
+            if (uri != null) {
+                try {
+                    // You can update this bitmap to your server
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                    String imgB64 = ApiUtils.convertBitmapToString(bitmap, 500);
+
+
+                    if (clickedImagename != null) {
+                        if(clickedImagename.equalsIgnoreCase("profilePhotoAddress")){
+                            profilePhotoAddressBase64 = imgB64;
+                            Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(profilePhotoAddress);
+                        }
+                        if(clickedImagename.equalsIgnoreCase("biodataAddress")){
+                            biodataAddressBase64 = imgB64;
+                            Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(biodataAddress);
+                        }
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Handle the case where the cropped image URI is null
             }
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            // Handle the cropping error
+            Throwable cropError = UCrop.getError(data);
         }
     }
 
@@ -437,6 +477,39 @@ public class RegistrationActivity extends AppCompatActivity {
         relatives.setText("");
 
 
-
     }
+
+    private void cropImage(Uri sourceUri) {
+
+        Uri destinationUri = Uri.fromFile(new File(getCacheDir(), queryName(getContentResolver(), sourceUri)));
+        UCrop.Options options = new UCrop.Options();
+        options.setCompressionQuality(IMAGE_COMPRESSION);
+
+        // applying UI theme
+        options.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        options.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        options.setActiveWidgetColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
+        if (lockAspectRatio)
+            options.withAspectRatio(ASPECT_RATIO_X, ASPECT_RATIO_Y);
+
+        if (setBitmapMaxWidthHeight)
+            options.withMaxResultSize(bitmapMaxWidth, bitmapMaxHeight);
+
+        UCrop.of(sourceUri, destinationUri)
+                .withOptions(options)
+                .start(this);
+    }
+
+    private static String queryName(ContentResolver resolver, Uri uri) {
+        Cursor returnCursor =
+                resolver.query(uri, null, null, null, null);
+        assert returnCursor != null;
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        returnCursor.moveToFirst();
+        String name = returnCursor.getString(nameIndex);
+        returnCursor.close();
+        return name;
+    }
+
 }
