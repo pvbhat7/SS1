@@ -7,6 +7,8 @@ import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
+import com.example.ss1.modal.MembershipModal;
+import com.example.ss1.modal.MyMembershipModal;
 import com.example.ss1.modal.NotificationModal;
 import com.example.ss1.modal.OrderModal;
 import com.example.ss1.modal.SingleResponse;
@@ -103,6 +105,16 @@ public interface Api {
 
     @POST("customer/app_submit_register.php")
     Call<SingleResponse> registerNewCustomer(@Body Customer customer);
+
+    @GET("customer/isMobileExists.php")
+    Call<SingleResponse> isMobileExists(@Query("mobile") String mobile);
+
+    // memberships
+    @GET("orders/getMyMemberships.php")
+    Call<List<MyMembershipModal>> getMyMemberships(@Query("cpid") String cpid);
+
+    @GET("membership/all.php")
+    Call<List<MembershipModal>> getAllMembershipPlans();
 
 
 

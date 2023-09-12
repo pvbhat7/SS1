@@ -21,6 +21,7 @@
     <string name="dialog_permission_title">Grant Permissions</string>
     <string name="dialog_permission_message">This app needs permission to use this feature. You can grant them in app settings.</string>
     <string name="go_to_settings">GOTO SETTINGS</string>
+    <string name="buynow">Buy now</string>
 
 
     <string name="name">नाव</string>
@@ -45,7 +46,8 @@
     <string name="kuldaivat">कुलदैवत </string>
     <string name="devak">देवक</string>
 
-    <string name="caste">जात / धर्म </string>
+    <string name="religion">धर्म </string>
+    <string name="caste">जात</string>
     <string name="zodiac">रास</string>
     <string name="nakshatra">नक्षत्र </string>
     <string name="nadi">नाडी</string>
@@ -61,9 +63,11 @@
 
     <string name="fathername">वडिलांचे नाव </string>
     <string name="mothername">आईचे नाव </string>
+    <string name="brother">भाऊ</string>
+    <string name="sister">बहीण</string>
 
-    <string name="sister">बहीण </string>
-    <string name="brother">भाऊ </string>
+
+
     <string name="chulte">चुलते </string>
     <string name="mama">मामा </string>
     <string name="atya">आत्या </string>

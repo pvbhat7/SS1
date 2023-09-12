@@ -19,8 +19,9 @@
 
         <ImageView
             android:id="@+id/d_img"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_gravity="center_horizontal"
             android:foregroundGravity="top" />
 

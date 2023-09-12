@@ -20,10 +20,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ss1.LocalCache;
+import com.example.ss1.ProCoinBottomSheetDialog;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
+import com.example.ss1.api.ApiUtils;
 import com.example.ss1.api.DateApi;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_2_Modal;
@@ -200,10 +203,9 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         viewContactDetailsBtn.setOnClickListener(view -> {
             // check if package exist or not
-            if (customer.getActivepackageId() == null)
-                //showSnackBar("No active membership found :"+customer.getActivePackageId());
-                showDialog("No Active membership", "Please purchase memership to view contact details", null);
-            else {
+            if (customer.getActivepackageId() == null) {
+                new ProCoinBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
+            } else {
 
                 ApiCallUtil.viewContactData(customer.getProfileId(), vcpid.getProfileId(), this);
 
@@ -352,21 +354,6 @@ public class Level2ProfileActivity extends AppCompatActivity {
         } catch (Exception e) {
 
         }
-    }
-
-    public void showDialog(String title, String subTitle, Integer img) {
-        Dialog d = new Dialog(this);
-        d.setContentView(R.layout.nomembership_dialog);
-        //Glide.with(this).asGif().load(img).into((ImageView) d.findViewById(R.id.result_img));
-        ((TextView) d.findViewById(R.id.result_title)).setText(title);
-        if (subTitle.isEmpty()) {
-            ((TextView) d.findViewById(R.id.result_subtitle)).setVisibility(View.GONE);
-        } else
-            ((TextView) d.findViewById(R.id.result_subtitle)).setText(subTitle);
-        d.setCanceledOnTouchOutside(true);
-        d.setCancelable(true);
-        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        d.show();
     }
 
 

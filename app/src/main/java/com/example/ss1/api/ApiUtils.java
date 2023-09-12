@@ -91,8 +91,9 @@ public class ApiUtils {
         Dialog d = new Dialog(activity);
         d.setContentView(R.layout.generic_dialog);
 
-        Glide.with(activity).asGif().load(img).into((ImageView) d.findViewById(R.id.d_img));
-
+        Glide.with(activity)
+                .load(img)
+                .into((ImageView) d.findViewById(R.id.d_img));
         d.findViewById(R.id.d_img);
         ((TextView)d.findViewById(R.id.d_title)).setText(title);
         ((TextView)d.findViewById(R.id.d_subtitle)).setText(subtitle);

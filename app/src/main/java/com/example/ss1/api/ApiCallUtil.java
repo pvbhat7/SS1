@@ -3,9 +3,14 @@ package com.example.ss1.api;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -17,12 +22,16 @@ import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
 import com.example.ss1.activity.Level2ProfileActivity;
+import com.example.ss1.adapters.BuyMembershipAdapter;
 import com.example.ss1.adapters.ContactViewedAdapter;
+import com.example.ss1.adapters.MyMembershipAdapter;
 import com.example.ss1.adapters.NotificationAdapter;
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
+import com.example.ss1.modal.MembershipModal;
+import com.example.ss1.modal.MyMembershipModal;
 import com.example.ss1.modal.NotificationModal;
 import com.example.ss1.modal.OrderModal;
 import com.example.ss1.modal.SingleResponse;
@@ -30,6 +39,7 @@ import com.example.ss1.ui.dashboard.MatchesFragment;
 import com.example.ss1.ui.home.HomeFragment;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.github.ybq.android.spinkit.style.Circle;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -68,6 +78,18 @@ public class ApiCallUtil {
 
     public static void registerProfile(Customer customer, Activity activity) {
         new RegisterNewCustomerTask(customer, activity).execute();
+    }
+
+    public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
+        new ValidateLoginMobileTask(activity, mobile, formLayout, addcard, mobile1,savebtn).execute();
+    }
+
+    public static void getMyMemberships(String cpid, RecyclerView recyclerView, Activity activity) {
+        new GetMyMembershipsTask(cpid, activity,recyclerView).execute();
+    }
+
+    public static void getMembershipPlans(RecyclerView recyclerView, Activity activity) {
+        new GetMembershipPlansTask(activity,recyclerView).execute();
     }
 
 
@@ -127,7 +149,7 @@ public class ApiCallUtil {
 
                 d.stop();
                 progressBar.setVisibility(View.GONE);
-            } else{
+            } else {
                 Log.i("onPostExecute", "list is null");
                 LocalCache.saveLevel1List(new ArrayList<>(), activity);
                 if (override)
@@ -781,15 +803,22 @@ public class ApiCallUtil {
 
         SingleResponse response;
         String error;
+        SpinKitView progressBar ;
+        Circle d = new Circle();
 
         public RegisterNewCustomerTask(Customer customer, Activity activity) {
             this.customer = customer;
             this.activity = activity;
+            progressBar = activity.findViewById(R.id.progressBar);
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if (progressBar != null) {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setIndeterminateDrawable(d);
+            }
         }
 
         protected Void doInBackground(Void... params) {
@@ -804,11 +833,151 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(response != null){
-                ApiUtils.showDialog(activity,R.drawable.success,"Profile created !!!","id : "+response.getResult());
+            if (progressBar != null)
+                progressBar.setVisibility(View.GONE);
+            if (response != null) {
+                MediaPlayer.create(activity, R.raw.done_sound).start();
+                ApiUtils.showDialog(activity, R.drawable.success_icon, "Profile created !!!", "id : " + response.getResult());
+            } else
+                ApiUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);
+        }
+    }
+
+    static class ValidateLoginMobileTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        String mobile;
+        LinearLayout formLayout;
+        CardView addcard;
+        SingleResponse response;
+        String error;
+        TextInputEditText mobile1;
+
+        Button savebtn;
+
+        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1,Button savebtn) {
+            this.activity = activity;
+            this.mobile = mobile;
+            this.formLayout = formLayout;
+            this.addcard = addcard;
+            this.mobile1 = mobile1;
+            this.savebtn = savebtn;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                response = RetrofitClient.getInstance().getApi().isMobileExists(mobile).execute().body();
+            } catch (Exception e) {
+                error = e.getMessage();
             }
-            else
-                ApiUtils.showDialog(activity,R.drawable.failure,"Error occured !!!",error);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (response != null) {
+                if (!response.getResult().equalsIgnoreCase("0")) {
+                    addcard.setVisibility(View.VISIBLE);
+                    ApiUtils.showDialog(activity, R.drawable.failed_icon, "Account exists id:" + response.getResult(), "change mobile number to continue");
+                } else {
+                    // allow registration flow
+                    formLayout.setVisibility(View.VISIBLE);
+                    mobile1.setText(mobile);
+                    mobile1.setEnabled(false);
+                    savebtn.setEnabled(true);
+                    addcard.setVisibility(View.GONE);
+
+                }
+            } else {
+                addcard.setVisibility(View.VISIBLE);
+                ApiUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);
+            }
+        }
+    }
+
+    static class GetMyMembershipsTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        RecyclerView recyclerView;
+        String cpid;
+        MyMembershipAdapter adapter;
+        List<MyMembershipModal> list = new ArrayList<>();
+
+
+        public GetMyMembershipsTask(String cpid, Activity activity, RecyclerView recyclerView) {
+            this.activity = activity;
+            this.cpid = cpid;
+            this.recyclerView = recyclerView;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                list = RetrofitClient.getInstance().getApi().getMyMemberships(cpid).execute().body();
+            } catch (Exception e) {
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (list != null && !list.isEmpty()) {
+                adapter = new MyMembershipAdapter(list, activity);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                recyclerView.setAdapter(adapter);
+            }
+        }
+    }
+
+    static class GetMembershipPlansTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        RecyclerView recyclerView;
+        BuyMembershipAdapter adapter;
+        List<MembershipModal> list = new ArrayList<>();
+        public GetMembershipPlansTask(Activity activity, RecyclerView recyclerView) {
+            this.activity = activity;
+            this.recyclerView = recyclerView;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                list = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (list != null && !list.isEmpty()) {
+                adapter = new BuyMembershipAdapter(list, activity);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                recyclerView.setAdapter(adapter);
+
+
+            }
         }
     }
 

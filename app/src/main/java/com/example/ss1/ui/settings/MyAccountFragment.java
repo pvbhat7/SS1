@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.activity.ContactViewedActivity;
+import com.example.ss1.activity.MyMembershipActivity;
 import com.example.ss1.activity.RegistrationActivity;
 import com.example.ss1.activity.SendOtpActivity;
 import com.example.ss1.api.ApiCallUtil;
@@ -38,7 +39,7 @@ public class MyAccountFragment extends Fragment {
     OrderModal activeOrder;
 
     CardView cb_card;
-    LinearLayout registration_link, logoutId,cb_link;
+    LinearLayout registration_link, logoutId,cb_link,mymembership_link;
     TextView profileHeadingName, profileHeadingmobile, profileHeadingEmail,profileCardId,cb_text;
 
     ImageView sprofilephoto;
@@ -85,6 +86,11 @@ public class MyAccountFragment extends Fragment {
     }
 
     private void initOnClickListeners() {
+        mymembership_link.setOnClickListener(view -> {
+            ApiUtils.vibrateFunction(this.getActivity());
+            Intent intent = new Intent(this.getActivity(), MyMembershipActivity.class);
+            startActivity(intent);
+        });
         registration_link.setOnClickListener(view -> {
             ApiUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
@@ -101,6 +107,8 @@ public class MyAccountFragment extends Fragment {
             logoutId.setEnabled(false);
             handleLogout();
         });
+
+
     }
 
 
@@ -115,6 +123,7 @@ public class MyAccountFragment extends Fragment {
 
         sprofilephoto = view.findViewById(R.id.sprofilephoto);
         registration_link = view.findViewById(R.id.registration_link);
+        mymembership_link = view.findViewById(R.id.mymembership_link);
         cb_link = view.findViewById(R.id.cb_link);
         cb_card = view.findViewById(R.id.cb_card);
         cb_text = view.findViewById(R.id.cb_text);

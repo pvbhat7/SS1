@@ -58,11 +58,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
         <activity
-            android:name=".imageupload.ImagePickerActivity"
+            android:name=".activity.MyMembershipActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
+            android:name=".activity.BuyMembershipActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
         <activity

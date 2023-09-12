@@ -39,7 +39,7 @@
                 android:layout_height="150dp"
                 android:layout_marginTop="20dp"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/progym_icon" />
+                android:src="@drawable/guru" />
 
             <LinearLayout
                 android:layout_width="match_parent"

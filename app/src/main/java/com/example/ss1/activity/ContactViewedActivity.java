@@ -40,10 +40,6 @@ public class ContactViewedActivity extends AppCompatActivity {
             cv_zero.setVisibility(View.VISIBLE);
         }
 
-
-
-
-
         customer = LocalCache.retrieveLoggedInCustomer(this);
 
         ApiCallUtil.getContactViewedProfiles(customer.getProfileId(),adapter,contactviewedRecyclerView,this);
