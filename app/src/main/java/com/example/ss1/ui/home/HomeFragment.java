@@ -162,6 +162,7 @@ public class HomeFragment extends Fragment {
 
     private void showUserProfile() {
         ApiUtils.vibrateFunction(this.getActivity());
+        ApiCallUtil.getLevel2Data(customer.getProfileId(), activity, false);
     }
 
     private void loadMore() {

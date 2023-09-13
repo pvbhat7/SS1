@@ -72,7 +72,7 @@ public class Customer {
                     String birthtime, String caste,String religion, String education, String occupation,
                     String zodiac, String birthName, String bloodGroup, String property,
                     String fatherName, String motherName, String address, String city,
-                    String marriageStatus, String birthdate, String birthday, String birthplace,
+                    String marriageStatus, String birthdate, String birthplace,
                     String income, String kuldaivat, String devak, String nakshatra, String nadi,
                     String gan, String yoni, String charan, String gotra, String varn,
                     String mangal, String expectations,String relation1, String relation2,
@@ -105,7 +105,6 @@ public class Customer {
         this.city = city;
         this.marriagestatus = marriageStatus;
         this.birthdate = birthdate;
-        this.birthday = birthday;
         this.birthplace = birthplace;
         this.income = income;
         this.kuldaivat = kuldaivat;

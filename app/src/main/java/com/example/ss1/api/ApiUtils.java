@@ -22,14 +22,14 @@ import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.modal.Customer;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.github.ybq.android.spinkit.SpinKitView;
 
 import java.io.ByteArrayOutputStream;
 
 public class ApiUtils {
 
-    private static Matrix matrix = new Matrix();
-    private static float scale = 1f;
+    private static float mScaleFactor = 1.0f;
     private static ScaleGestureDetector scaleGestureDetector;
 
     private static ImageView img_pp;
@@ -119,19 +119,19 @@ public class ApiUtils {
     public static void showImageDialog(Activity activity, String img) {
         Dialog d = new Dialog(activity);
         d.setContentView(R.layout.image_dialog);
-        img_pp = d.findViewById(R.id.img);
+        //img_pp = d.findViewById(R.id.img);
         Glide.with(activity)
                 .load(img)
                 .placeholder(R.drawable.oops)
-                .into(img_pp);
+                .into((PhotoView)d.findViewById(R.id.imageView));
 
-        scaleGestureDetector = new ScaleGestureDetector(activity, new ScaleListener());
+        /*scaleGestureDetector = new ScaleGestureDetector(activity, new ScaleListener());
 
        img_pp.setOnTouchListener((View.OnTouchListener) (v, event) -> {
             scaleGestureDetector.onTouchEvent(event);
             return true;
         });
-
+*/
 
         d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         d.show();
@@ -164,17 +164,9 @@ public class ApiUtils {
     private static class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            float scaleFactor = detector.getScaleFactor();
-            scale *= scaleFactor;
-
-            // Limit the scale range (optional)
-            float minScale = 1f;
-            float maxScale = 5f;
-            scale = Math.max(minScale, Math.min(scale, maxScale));
-
-            matrix.setScale(scale, scale);
-            img_pp.setImageMatrix(matrix);
-
+            mScaleFactor *= scaleGestureDetector.getScaleFactor();
+            img_pp.setScaleX(mScaleFactor);
+            img_pp.setScaleY(mScaleFactor);
             return true;
         }
     }

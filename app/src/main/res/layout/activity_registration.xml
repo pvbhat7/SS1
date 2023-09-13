@@ -490,7 +490,7 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <!--<com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -498,9 +498,9 @@
                             android:layout_weight="1"
                             android:hint="@string/birthday">
 
-                            <!-- Inside text input layout add
+                            &lt;!&ndash; Inside text input layout add
                                   an auto complete text view
-                                    and make its input type to none-->
+                                    and make its input type to none&ndash;&gt;
                             <AutoCompleteTextView
                                 android:id="@+id/birthday"
                                 android:text=""
@@ -511,7 +511,7 @@
                                 android:inputType="none"
                                 android:textSize="12dp" />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>-->
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1286,7 +1286,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="90dp"
                             android:singleLine="false"
-                            android:text=""
+                            android:text="आई ,वडील,भाऊ,बहीण"
                             android:textSize="15dp" />
 
                     </com.google.android.material.textfield.TextInputLayout>

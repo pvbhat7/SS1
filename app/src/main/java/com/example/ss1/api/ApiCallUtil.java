@@ -136,7 +136,7 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
-                Collections.shuffle(list);
+                //Collections.shuffle(list);
 
                 if (LocalCache.retrieveLevel1List(activity).isEmpty())
                     ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);

@@ -11,13 +11,21 @@
     android:layout_margin="10dp">
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:id="@+id/img"
-            android:scaleType="matrix"
-            android:src="@drawable/prashant"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"/>
+        android:layout_width="300dp"
+        android:layout_height="500dp">
+       <!-- <ImageView
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="right"
+            android:src="@drawable/failed_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"/>-->
+    <com.github.chrisbanes.photoview.PhotoView
+        android:src="@drawable/prashant"
+        android:scaleType="centerCrop"
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="500dp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
