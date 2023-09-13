@@ -1,27 +1,22 @@
 package com.example.ss1.activity;
 
-import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.ProCoinBottomSheetDialog;
 import com.example.ss1.R;
@@ -36,11 +31,6 @@ import com.google.gson.reflect.TypeToken;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
@@ -50,29 +40,31 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class Level2ProfileActivity extends AppCompatActivity {
 
     public static CoordinatorLayout coordinatorLayout;
-    CardView profileIdCard;
-    Level_2_Modal vcpid;
+    Level_2_Modal profile;
     SliderView sliderView;
     static Context ctx;
     Boolean enableDisableContactViewButton = false;
-    Button viewContactDetailsBtn, l2_whatsappsendmsgbtn, l2_callbtn;
-    TextView l2_name, l2_mobile, l2_email, l2_age, profileCardId;
-    LinearLayout contactSecurityLayout, celebrationLayout, basicdetails_layout, contactdetails_layout, astrodetails_layout, familydetails_layout, partnerdetails_layout, basicdetails_layout_title, contactdetails_layout_title, astrodetails_layout_title, familydetails_layout_title, partnerdetails_layout_title;
-    ImageView basicdetails_img, contactdetails_img, astrodetails_img, familydetails_img, partnerdetails_img;
-
     Customer customer;
+
+    TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address;
+    Button viewContactDetailsBtn;
+    ImageView profilephotoaddress;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_level2_profile_new);
+
+        initUiElements();
+        handleOnClickListeners();
 
         // TODO: 12-Sep-23 <a href="https://www.freepik.com/free-photo/abstract-yellow-sunshine-theme-summer-watercolor-background-illustration-high-resolution-free-photo_26887846.htm#query=texture%20background&position=32&from_view=keyword&track=ais">Image by Sketchepedia</a> on Freepik
         customer = LocalCache.retrieveLoggedInCustomer(this);
@@ -83,123 +75,57 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            vcpid = new Gson().fromJson(extras.getString("level2data"), new TypeToken<Level_2_Modal>() {
-            }.getType());
+            profile = new Gson().fromJson(extras.getString("level2data"), new TypeToken<Level_2_Modal>() {}.getType());
             enableDisableContactViewButton = extras.getBoolean("enableDisableContactViewButton");
         }
 
-        //initUiElements();
-       // handleOnClickListeners();
-
-        try {
 
 
-            if (vcpid != null) {
-                //handleCarosol(vcpid);
-                //l2_name.setText(vcpid.getFirstname() + " " + vcpid.getLastname());
-                //l2_age.setText(Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(vcpid.getBirthdate()))) / 365 + " yrs , " + vcpid.getCity());
-                //profileCardId.setText("Profile id : A" + vcpid.getProfileId());
-            }
-        } catch (Exception e) {
-            System.out.println(e);
+        if (profile != null) {
+            //handleCarosol(profile);
+            Glide.with(this)
+                    .load(profile.getProfilephotoaddress())
+                    .placeholder(R.drawable.oops)
+                    .into(profilephotoaddress);
+            name.setText(profile.getFirstname() + " " + profile.getLastname());
+            String age = getAgeByDOB(profile.getBirthdate());
+            profileid.setText("Profile id : A" + profile.getProfileId());
+            birthdate.setText(profile.getBirthdate()+getAgeByDOB(profile.getBirthdate()));
+            birthtime.setText(profile.getBirthtime());
+            height.setText(profile.getHeight());
+            education.setText(profile.getEducation());
+            occupation.setText(profile.getOccupation());
+            religion.setText(profile.getReligion());
+            caste.setText(profile.getCaste());
+            income.setText(profile.getIncome());
+
+            bloodgroup.setText(profile.getBloodgroup());
+            marriagestatus.setText(profile.getMarriagestatus());
+            birthname.setText(profile.getBirthname());
+            birthplace.setText(profile.getBirthplace());
+            fathername.setText(profile.getFathername());
+            mothername.setText(profile.getMothername());
+            relatives.setText(profile.getRelatives());
+            family.setText(profile.getFamily());
+            city.setText(profile.getCity());
+            address.setText(profile.getAddress());
+
+
         }
 
+    }
 
+    private String getAgeByDOB(String birthdate) {
+        String age = "";
+        try {
+            age = "    ( "+Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(birthdate))) / 365 + " yrs )";
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return age;
     }
 
     private void handleOnClickListeners() {
-
-        basicdetails_layout_title.setOnClickListener(view -> {
-            showHideLayout(basicdetails_img, "1");
-        });
-        contactdetails_layout_title.setOnClickListener(view -> {
-            showHideLayout(contactdetails_img, "2");
-        });
-        astrodetails_layout_title.setOnClickListener(view -> {
-            showHideLayout(astrodetails_img, "3");
-        });
-        familydetails_layout_title.setOnClickListener(view -> {
-            showHideLayout(familydetails_img, "4");
-        });
-        partnerdetails_layout_title.setOnClickListener(view -> {
-            showHideLayout(partnerdetails_img, "5");
-        });
-    }
-
-    private void showHideLayout(ImageView imgView, String layoutSeq) {
-        String tag = String.valueOf(imgView.getTag());
-        if (tag.equalsIgnoreCase("up")) {
-            imgView.setTag("down");
-            imgView.setImageResource(R.drawable.down_icon);
-
-            if (layoutSeq.equalsIgnoreCase("1"))
-                basicdetails_layout.setVisibility(View.GONE);
-            if (layoutSeq.equalsIgnoreCase("2"))
-                contactdetails_layout.setVisibility(View.GONE);
-            if (layoutSeq.equalsIgnoreCase("3"))
-                astrodetails_layout.setVisibility(View.GONE);
-            if (layoutSeq.equalsIgnoreCase("4"))
-                familydetails_layout.setVisibility(View.GONE);
-            if (layoutSeq.equalsIgnoreCase("5"))
-                partnerdetails_layout.setVisibility(View.GONE);
-        } else {
-            imgView.setTag("up");
-            imgView.setImageResource(R.drawable.up_icon);
-
-            if (layoutSeq.equalsIgnoreCase("1"))
-                basicdetails_layout.setVisibility(View.VISIBLE);
-            if (layoutSeq.equalsIgnoreCase("2"))
-                contactdetails_layout.setVisibility(View.VISIBLE);
-            if (layoutSeq.equalsIgnoreCase("3"))
-                astrodetails_layout.setVisibility(View.VISIBLE);
-            if (layoutSeq.equalsIgnoreCase("4"))
-                familydetails_layout.setVisibility(View.VISIBLE);
-            if (layoutSeq.equalsIgnoreCase("5"))
-                partnerdetails_layout.setVisibility(View.VISIBLE);
-        }
-
-
-    }
-
-    private void initUiElements() {
-
-        basicdetails_layout = findViewById(R.id.basicdetails_layout);
-        contactdetails_layout = findViewById(R.id.contactdetails_layout);
-        astrodetails_layout = findViewById(R.id.astrodetails_layout);
-        familydetails_layout = findViewById(R.id.familydetails_layout);
-        partnerdetails_layout = findViewById(R.id.partnerdetails_layout);
-        basicdetails_layout_title = findViewById(R.id.basicdetails_layout_title);
-        contactdetails_layout_title = findViewById(R.id.contactdetails_layout_title);
-        astrodetails_layout_title = findViewById(R.id.astrodetails_layout_title);
-        familydetails_layout_title = findViewById(R.id.familydetails_layout_title);
-        partnerdetails_layout_title = findViewById(R.id.partnerdetails_layout_title);
-
-        basicdetails_img = findViewById(R.id.basicdetails_img);
-        contactdetails_img = findViewById(R.id.contactdetails_img);
-        astrodetails_img = findViewById(R.id.astrodetails_img);
-        familydetails_img = findViewById(R.id.familydetails_img);
-        partnerdetails_img = findViewById(R.id.partnerdetails_img);
-
-        basicdetails_img.setTag("up");
-        contactdetails_img.setTag("up");
-        astrodetails_img.setTag("up");
-        familydetails_img.setTag("up");
-        partnerdetails_img.setTag("up");
-
-
-        profileIdCard = findViewById(R.id.profileIdCard);
-        profileCardId = findViewById(R.id.profileCardId);
-        contactSecurityLayout = findViewById(R.id.contactSecurityLayout);
-        celebrationLayout = findViewById(R.id.celebrationLayout);
-        coordinatorLayout = findViewById(R.id.level2CoordinatorLayout);
-        viewContactDetailsBtn = findViewById(R.id.viewContactDetails);
-        l2_whatsappsendmsgbtn = findViewById(R.id.l2_whatsappsendmsgbtn);
-        l2_callbtn = findViewById(R.id.l2_callbtn);
-        l2_mobile = findViewById(R.id.l2_mobile);
-        l2_email = findViewById(R.id.l2_email);
-        l2_name = findViewById(R.id.l2_name);
-        l2_age = findViewById(R.id.l2_age);
-        sliderView = findViewById(R.id.image_slider);
 
         viewContactDetailsBtn.setOnClickListener(view -> {
             // check if package exist or not
@@ -207,45 +133,29 @@ public class Level2ProfileActivity extends AppCompatActivity {
                 new ProCoinBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
 
-                ApiCallUtil.viewContactData(customer.getProfileId(), vcpid.getProfileId(), this);
-
-                l2_mobile.setText("+91 " + vcpid.getMobile1().toString().trim());
-                l2_email.setText(vcpid.getEmail().trim());
-                viewContactDetailsBtn.setVisibility(View.GONE);
-
-                contactSecurityLayout.setVisibility(View.GONE);
-                celebrationLayout.setVisibility(View.VISIBLE);
-
-                l2_callbtn.setEnabled(true);
-                l2_whatsappsendmsgbtn.setEnabled(true);
+                ApiCallUtil.viewContactData(customer.getProfileId(), profile.getProfileId(), this);
 
                 //showSnackBar("Credit left : 25");
             }
 
         });
-        if (enableDisableContactViewButton) {
-            viewContactDetailsBtn.setVisibility(View.GONE);
-            if (vcpid != null) {
-                l2_mobile.setText("+91 " + vcpid.getMobile1().toString().trim());
-                l2_email.setText(vcpid.getEmail().toString().trim());
-            }
-        } else
-            viewContactDetailsBtn.setVisibility(View.VISIBLE);
 
-        l2_whatsappsendmsgbtn.setOnClickListener(view -> {
-            String uri = "https://wa.me/+91" + vcpid.getMobile1().toString().trim();
+        profilephotoaddress.setOnClickListener(view -> ApiUtils.showImageDialog(Level2ProfileActivity.this,profile.getProfilephotoaddress()));
+
+        /*whatsapp.setOnClickListener(view -> {
+            String uri = "https://wa.me/+91" + profile.getMobile1().toString().trim();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             startActivity(intent);
         });
 
-        l2_callbtn.setOnClickListener(view -> Dexter.withActivity(Level2ProfileActivity.this)
+        call.setOnClickListener(view -> Dexter.withActivity(Level2ProfileActivity.this)
                 .withPermissions(Manifest.permission.CALL_PHONE)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if (report.areAllPermissionsGranted()) {
                             Intent callIntent = new Intent(Intent.ACTION_CALL);
-                            callIntent.setData(Uri.parse("tel:+91" + vcpid.getMobile1().toString().trim()));
+                            callIntent.setData(Uri.parse("tel:+91" + profile.getMobile1().toString().trim()));
                             startActivity(callIntent);
                         }
                     }
@@ -260,14 +170,43 @@ public class Level2ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                /*try {
+                *//*try {
                     layoutToImage(view);
                     imageToPDF();
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
-                }*/
+                }*//*
             }
-        });
+        });*/
+    }
+
+
+    private void initUiElements() {
+
+        profilephotoaddress = findViewById(R.id.profilephotoaddress);
+        profileid= findViewById(R.id.profileid);
+        name= findViewById(R.id.name);
+        coordinatorLayout = findViewById(R.id.level2CoordinatorLayout);
+        //sliderView = findViewById(R.id.image_slider);
+        viewContactDetailsBtn = findViewById(R.id.viewContactDetailsBtn);
+        birthdate = findViewById(R.id.birthdate);
+        birthtime = findViewById(R.id.birthtime);
+        height = findViewById(R.id.height);
+        education = findViewById(R.id.education);
+        occupation = findViewById(R.id.occupation);
+        religion = findViewById(R.id.religion);
+        caste = findViewById(R.id.caste);
+        income = findViewById(R.id.income);
+        bloodgroup = findViewById(R.id.bloodgroup);
+        marriagestatus = findViewById(R.id.marriagestatus);
+        birthname = findViewById(R.id.birthname);
+        birthplace = findViewById(R.id.birthplace);
+        fathername = findViewById(R.id.fathername);
+        mothername = findViewById(R.id.mothername);
+        relatives = findViewById(R.id.relatives);
+        family = findViewById(R.id.family);
+        city = findViewById(R.id.city);
+        address = findViewById(R.id.address);
     }
 
     public static Context getContextObject() {

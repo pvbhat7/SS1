@@ -20,6 +20,8 @@ public class Level_2_Modal {
     private String height;
     private String birthtime;
     private String caste;
+
+    private String religion;
     private String education;
     private String occupation;
     private String zodiac;
@@ -47,6 +49,8 @@ public class Level_2_Modal {
     private String varn;
     private String mangal;
     private String relatives;
+
+    private String family;
     private String expectations;
 
     public ArrayList<Photo> photos;
@@ -418,5 +422,21 @@ public class Level_2_Modal {
 
     public void setFamilyMembers(ArrayList<FamilyMember> familyMembers) {
         this.familyMembers = familyMembers;
+    }
+
+    public String getReligion() {
+        return religion;
+    }
+
+    public void setReligion(String religion) {
+        this.religion = religion;
+    }
+
+    public String getFamily() {
+        return family;
+    }
+
+    public void setFamily(String family) {
+        this.family = family;
     }
 }

@@ -108,7 +108,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
                 holder.profileCardId.setText("Profile id : A"+obj.getProfileId());
 
                 // name
-                holder.name.setText(obj.getFirstname() + " " + obj.getLastname());
+                holder.name.setText(obj.getFirstname().trim() + " " + obj.getLastname().trim());
 
                 // dob
                 Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());

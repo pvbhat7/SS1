@@ -5,9 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Vibrator;
 import android.util.Base64;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +27,13 @@ import com.github.ybq.android.spinkit.SpinKitView;
 import java.io.ByteArrayOutputStream;
 
 public class ApiUtils {
+
+    private static Matrix matrix = new Matrix();
+    private static float scale = 1f;
+    private static ScaleGestureDetector scaleGestureDetector;
+
+    private static ImageView img_pp;
+
 
     public static void vibrateFunction(Activity activity) {
         Vibrator vibe = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
@@ -105,6 +116,27 @@ public class ApiUtils {
         d.show();
     }
 
+    public static void showImageDialog(Activity activity, String img) {
+        Dialog d = new Dialog(activity);
+        d.setContentView(R.layout.image_dialog);
+        img_pp = d.findViewById(R.id.img);
+        Glide.with(activity)
+                .load(img)
+                .placeholder(R.drawable.oops)
+                .into(img_pp);
+
+        scaleGestureDetector = new ScaleGestureDetector(activity, new ScaleListener());
+
+       img_pp.setOnTouchListener((View.OnTouchListener) (v, event) -> {
+            scaleGestureDetector.onTouchEvent(event);
+            return true;
+        });
+
+
+        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        d.show();
+    }
+
 
     public static String convertBitmapToString(Bitmap bitmap , int maxSize){
         bitmap = getResizedBitmap(bitmap , maxSize);
@@ -128,6 +160,25 @@ public class ApiUtils {
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
+
+    private static class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            float scaleFactor = detector.getScaleFactor();
+            scale *= scaleFactor;
+
+            // Limit the scale range (optional)
+            float minScale = 1f;
+            float maxScale = 5f;
+            scale = Math.max(minScale, Math.min(scale, maxScale));
+
+            matrix.setScale(scale, scale);
+            img_pp.setImageMatrix(matrix);
+
+            return true;
+        }
+    }
+
 
 
 }
