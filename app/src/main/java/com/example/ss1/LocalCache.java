@@ -31,6 +31,10 @@ public class LocalCache {
         return customer;
     }
 
+    public static Customer convertJsonToObjectCustomer(String json) {
+        return new Gson().fromJson(json, Customer.class);
+    }
+
     public static String saveActiveOrder(OrderModal orderModal, Activity activity){
         String jsonString = new Gson().toJson(orderModal);
         AppPreference.setStringPref(activity, AppPreference.ACTIVE_ORDER_JSON, AppPreference.ACTIVE_ORDER_JSON,jsonString);

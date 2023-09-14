@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.bumptech.glide.Glide;
@@ -56,6 +57,8 @@ public class Level2ProfileActivity extends AppCompatActivity {
     TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address;
     Button viewContactDetailsBtn;
     ImageView profilephotoaddress;
+
+    CardView editprofile_link;
 
 
     @Override
@@ -178,11 +181,20 @@ public class Level2ProfileActivity extends AppCompatActivity {
                 }*//*
             }
         });*/
+
+        editprofile_link.setOnClickListener(view -> {
+            ApiUtils.vibrateFunction(Level2ProfileActivity.this);
+            Intent intent = new Intent(Level2ProfileActivity.this, RegistrationActivity.class);
+            intent.putExtra("editprofile",true);
+            intent.putExtra("profile",new Gson().toJson(profile));
+
+            startActivity(intent);
+        });
     }
 
 
     private void initUiElements() {
-
+        editprofile_link = findViewById(R.id.editprofile_link);
         profilephotoaddress = findViewById(R.id.profilephotoaddress);
         profileid= findViewById(R.id.profileid);
         name= findViewById(R.id.name);

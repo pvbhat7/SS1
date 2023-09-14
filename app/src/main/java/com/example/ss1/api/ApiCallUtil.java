@@ -77,8 +77,8 @@ public class ApiCallUtil {
         new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment).execute();
     }
 
-    public static void updateProfile(Customer customer, Activity activity) {
-        new UpdateProfileTask(customer, activity).execute();
+    public static void updateProfile(Customer customer, Activity activity,Boolean updateCache) {
+        new UpdateProfileTask(customer, activity , updateCache).execute();
     }
 
     public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
@@ -887,12 +887,13 @@ public class ApiCallUtil {
         Circle d = new Circle();
         List<Level_1_cardModal> list = new ArrayList<>();
 
+        Boolean updateCache;
 
-
-        public UpdateProfileTask(Customer c, Activity activity) {
+        public UpdateProfileTask(Customer c, Activity activity, Boolean updateCache) {
             this.c = c;
             this.activity = activity;
             progressBar = activity.findViewById(R.id.progressBar);
+            this.updateCache = updateCache;
         }
 
         @Override
@@ -907,7 +908,7 @@ public class ApiCallUtil {
         protected Void doInBackground(Void... params) {
             try {
                 loggedInCustomer = RetrofitClient.getInstance().getApi().updateProfile(c).execute().body();
-                if (loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
+                if (updateCache && loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
                     LocalCache.saveLoggedInCustomer(loggedInCustomer.get(0), activity);
                 }
 
@@ -924,7 +925,7 @@ public class ApiCallUtil {
                 progressBar.setVisibility(View.GONE);
 
             MediaPlayer.create(activity, R.raw.done_sound).start();
-            ApiUtils.showDialog(activity, R.drawable.success_icon, "Profile Updated !!!", "");
+            activity.onBackPressed();
         }
     }
 

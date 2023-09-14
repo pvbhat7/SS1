@@ -96,7 +96,7 @@ public class MyAccountFragment extends Fragment {
 
     private void initOnClickListeners() {
         myaccount_profile_card.setOnClickListener(view -> {
-            ApiCallUtil.getLevel2Data(customer.getProfileId(), this.getActivity(), false);
+            //ApiCallUtil.getLevel2Data(customer.getProfileId(), this.getActivity(), false);
         });
         editprofile_link.setOnClickListener(view -> {
             ApiUtils.vibrateFunction(this.getActivity());

@@ -66,6 +66,8 @@ public class RegistrationActivity extends AppCompatActivity {
     Customer customer;
 
     Boolean editprofile = false;
+    String profile ;
+    Boolean updateCache = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +79,11 @@ public class RegistrationActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             editprofile = extras.getBoolean("editprofile");
+            profile = extras.getString("profile");
+            if(profile != null && !profile.isEmpty()){
+                customer = LocalCache.convertJsonToObjectCustomer(profile);
+                updateCache = false;
+            }
         }
 
 
@@ -107,9 +114,15 @@ public class RegistrationActivity extends AppCompatActivity {
         mobile4.setText(customer.getMobile4());
         gender.setText(customer.getGender());
         height.setText(customer.getHeight());
-        /*hour.setText(customer.get());
-        minute.setText(customer.getEmail());
-        ampm.setText(customer.getEmail());*/
+        if(customer.getBirthtime() != null && !customer.getBirthtime().isEmpty()){
+            String birthtime = customer.getBirthtime();// 01:01 am
+            String[] arr1 = birthtime.split(":");
+            String[] arr2 = arr1[1].split(" ");
+            hour.setText(arr1[0]);
+            minute.setText(arr2[0]);
+            ampm.setText(arr2[1]);
+        }
+
         caste.setText(customer.getCaste());
         religion.setText(customer.getReligion());
         education.setText(customer.getEducation());
@@ -137,7 +150,7 @@ public class RegistrationActivity extends AppCompatActivity {
         varn.setText(customer.getVarn());
         mangal.setText(customer.getMangal());
         expectations.setText(customer.getExpectations());
-        name.setText(customer.getFirstname() + " " + customer.getMiddlename() + " " + customer.getLastname());
+        name.setText((customer.getFirstname()) + " " + (customer.getMiddlename() != null ? customer.getMiddlename() : "") + " " + (customer.getLastname() != null ? customer.getLastname() : ""));
         relationname1.setText(customer.getRelationname1());
         relationname2.setText(customer.getRelationname2());
         relatives.setText(customer.getRelatives());
@@ -355,7 +368,7 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] hourArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
         ((AutoCompleteTextView) findViewById(R.id.hour)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, hourArray));
 
-        String[] minuteArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"};
+        String[] minuteArray = {"00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"};
         ((AutoCompleteTextView) findViewById(R.id.minute)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, minuteArray));
 
         String[] ampmArray = {"am", "pm"};
@@ -409,6 +422,8 @@ public class RegistrationActivity extends AppCompatActivity {
         String relation2 = "Sister";
 
         String birthtime = hour.getText().toString().trim() + ":" + minute.getText().toString().trim() + " " + ampm.getText().toString().trim();
+        if(birthtime.equalsIgnoreCase(":"))
+            birthtime = "";
 
 
         Customer c = new Customer(creationsource, profilePhotoAddressBase64, biodataAddressBase64,
@@ -420,7 +435,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         if (editprofile) {
             c.setProfileId(customer.getProfileId());
-            ApiCallUtil.updateProfile(c, this);
+            ApiCallUtil.updateProfile(c, this, updateCache);
         } else
             ApiCallUtil.registerProfile(c, this, false, null);
         nullifyformdata();
