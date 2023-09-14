@@ -28,6 +28,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
+import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.ApiUtils;
@@ -51,30 +52,94 @@ public class RegistrationActivity extends AppCompatActivity {
     private int IMAGE_COMPRESSION = 80;
     public static String fileName;
 
-    public TextInputEditText cmmobile,email, name, birthname, fathername, birthdate,mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2,relatives,family;
-    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, occupation, zodiac, city, birthplace, income,hour,minute,ampm;
+    public TextInputEditText cmmobile, email, name, birthname, fathername, birthdate, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2, relatives, family;
+    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, occupation, zodiac, city, birthplace, income, hour, minute, ampm;
 
-    static String clickedImagename , profilePhotoAddressBase64 , biodataAddressBase64;
+    static String clickedImagename, profilePhotoAddressBase64, biodataAddressBase64;
 
-    public static final int REQUEST_IMAGE = 100,PICK_IMAGE_REQUEST = 1;
-    Button save_btn, cancen_btn,cmbtn;
+    public static final int PICK_IMAGE_REQUEST = 1;
+    Button save_btn, cancel_btn, cmbtn;
     CardView addcard;
-    LinearLayout formLayout,cmlayout;
+    LinearLayout formLayout, cmlayout;
     CircularImageView profilePhotoAddress, biodataAddress;
+
+    Customer customer;
+
+    Boolean editprofile = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        customer = LocalCache.retrieveLoggedInCustomer(this);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            editprofile = extras.getBoolean("editprofile");
+        }
+
+
         init();
         initFormData();
         handleOnclickListeners();
         handleFormOnClickListeners();
 
-        cmlayout.setVisibility(GONE);
-        addcard.setVisibility(View.VISIBLE);
-        formLayout.setVisibility(GONE);
+        if (editprofile) {
+            formLayout.setVisibility(View.VISIBLE);
+            cancel_btn.setVisibility(GONE);
+            preFillFormData();
+        } else {
+            cmlayout.setVisibility(GONE);
+            addcard.setVisibility(View.VISIBLE);
+            formLayout.setVisibility(GONE);
+        }
+    }
 
+    private void preFillFormData() {
+        Glide.with(this).load(customer.getProfilephotoaddress()).placeholder(R.drawable.oops).into(profilePhotoAddress);
+        email.setText(customer.getEmail());
+        mobile1.setText(customer.getMobile1());
+        mobile2.setText(customer.getMobile2());
+        mobile3.setText(customer.getMobile3());
+        mobile4.setText(customer.getMobile4());
+        gender.setText(customer.getGender());
+        height.setText(customer.getHeight());
+        /*hour.setText(customer.get());
+        minute.setText(customer.getEmail());
+        ampm.setText(customer.getEmail());*/
+        caste.setText(customer.getCaste());
+        religion.setText(customer.getReligion());
+        education.setText(customer.getEducation());
+        occupation.setText(customer.getOccupation());
+        zodiac.setText(customer.getZodiac());
+        birthname.setText(customer.getBirthname());
+        bloodgroup.setText(customer.getBloodgroup());
+        property.setText(customer.getProperty());
+        fathername.setText(customer.getFathername());
+        mothername.setText(customer.getMothername());
+        address.setText(customer.getAddress());
+        city.setText(customer.getCity());
+        marriagestatus.setText(customer.getMarriagestatus());
+        birthdate.setText(customer.getBirthdate());
+        birthplace.setText(customer.getBirthplace());
+        income.setText(customer.getIncome());
+        kuldaivat.setText(customer.getKuldaivat());
+        devak.setText(customer.getDevak());
+        nakshatra.setText(customer.getNakshatra());
+        nadi.setText(customer.getNadi());
+        gan.setText(customer.getGan());
+        yoni.setText(customer.getYoni());
+        charan.setText(customer.getCharan());
+        gotra.setText(customer.getGotra());
+        varn.setText(customer.getVarn());
+        mangal.setText(customer.getMangal());
+        expectations.setText(customer.getExpectations());
+        name.setText(customer.getFirstname() + " " + customer.getMiddlename() + " " + customer.getLastname());
+        relationname1.setText(customer.getRelationname1());
+        relationname2.setText(customer.getRelationname2());
+        relatives.setText(customer.getRelatives());
+        family.setText(customer.getFamily());
     }
 
     private void handleFormOnClickListeners() {
@@ -144,14 +209,14 @@ public class RegistrationActivity extends AppCompatActivity {
             ViewUtils.hideKeyboard(view);
             cmlayout.setVisibility(GONE);
             String mobile = ((TextInputEditText) findViewById(R.id.cmmobile)).getText().toString().trim();
-            ApiCallUtil.validateLoginMobile(this,mobile,formLayout,addcard,mobile1,save_btn);
+            ApiCallUtil.validateLoginMobile(this, mobile, formLayout, addcard, mobile1, save_btn);
         });
 
         save_btn.setOnClickListener(view -> {
             save_btn.setEnabled(false);
             createProfile();
         });
-        cancen_btn.setOnClickListener(view -> {
+        cancel_btn.setOnClickListener(view -> {
             nullifyformdata();
             formLayout.setVisibility(GONE);
             addcard.setVisibility(View.VISIBLE);
@@ -190,7 +255,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void init() {
         save_btn = findViewById(R.id.save_btn);
-        cancen_btn = findViewById(R.id.cancel_btn);
+        cancel_btn = findViewById(R.id.cancel_btn);
         addcard = findViewById(R.id.add);
         formLayout = findViewById(R.id.formLayout);
         profilePhotoAddress = findViewById(R.id.profilePhotoAddress);
@@ -276,7 +341,7 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] bloodGroupArray = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
         ((AutoCompleteTextView) findViewById(R.id.bloodgroup)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, bloodGroupArray));
 
-        String[] heightArray = {"4 feet | 121 cm","4 feet 1 inch | 124 cm","4 feet 2 inches | 127 cm","4 feet 3 inches | 130 cm","4 feet 4 inches | 132 cm","4 feet 5 inches | 135 cm","4 feet 6 inches | 138 cm","4 feet 7 inches | 140 cm","4 feet 8 inches | 143 cm","4 feet 9 inches | 145 cm","4 feet 10 inches | 148 cm","4 feet 11 inches | 151 cm","5 feet | 152 cm","5 feet 1 inch | 155 cm","5 feet 2 inches | 157 cm","5 feet 3 inches | 160 cm","5 feet 4 inches | 163 cm","5 feet 5 inches | 165 cm","5 feet 6 inches | 168 cm","5 feet 7 inches | 170 cm","5 feet 8 inches | 173 cm","5 feet 9 inches | 175 cm","5 feet 10 inches | 178 cm","5 feet 11 inches | 180 cm","6 feet | 183 cm","6 feet 1 inch | 185 cm","6 feet 2 inches | 188 cm","6 feet 3 inches | 191 cm","6 feet 4 inches | 193 cm","6 feet 5 inches | 196 cm","6 feet 6 inches | 198 cm","6 feet 7 inches | 201 cm","6 feet 8 inches | 203 cm","6 feet 9 inches | 206 cm","6 feet 10 inches | 208 cm","6 feet 11 inches | 211 cm","7 feet | 213 cm","7 feet 1 inch | 216 cm","7 feet 2 inches | 218 cm","7 feet 3 inches | 221 cm","7 feet 4 inches | 224 cm","7 feet 5 inches | 226 cm","7 feet 6 inches | 229 cm","7 feet 7 inches | 231 cm","7 feet 8 inches | 234 cm","7 feet 9 inches | 237 cm","7 feet 10 inches | 239 cm","7 feet 11 inches | 242 cm"};
+        String[] heightArray = {"4 feet | 121 cm", "4 feet 1 inch | 124 cm", "4 feet 2 inches | 127 cm", "4 feet 3 inches | 130 cm", "4 feet 4 inches | 132 cm", "4 feet 5 inches | 135 cm", "4 feet 6 inches | 138 cm", "4 feet 7 inches | 140 cm", "4 feet 8 inches | 143 cm", "4 feet 9 inches | 145 cm", "4 feet 10 inches | 148 cm", "4 feet 11 inches | 151 cm", "5 feet | 152 cm", "5 feet 1 inch | 155 cm", "5 feet 2 inches | 157 cm", "5 feet 3 inches | 160 cm", "5 feet 4 inches | 163 cm", "5 feet 5 inches | 165 cm", "5 feet 6 inches | 168 cm", "5 feet 7 inches | 170 cm", "5 feet 8 inches | 173 cm", "5 feet 9 inches | 175 cm", "5 feet 10 inches | 178 cm", "5 feet 11 inches | 180 cm", "6 feet | 183 cm", "6 feet 1 inch | 185 cm", "6 feet 2 inches | 188 cm", "6 feet 3 inches | 191 cm", "6 feet 4 inches | 193 cm", "6 feet 5 inches | 196 cm", "6 feet 6 inches | 198 cm", "6 feet 7 inches | 201 cm", "6 feet 8 inches | 203 cm", "6 feet 9 inches | 206 cm", "6 feet 10 inches | 208 cm", "6 feet 11 inches | 211 cm", "7 feet | 213 cm", "7 feet 1 inch | 216 cm", "7 feet 2 inches | 218 cm", "7 feet 3 inches | 221 cm", "7 feet 4 inches | 224 cm", "7 feet 5 inches | 226 cm", "7 feet 6 inches | 229 cm", "7 feet 7 inches | 231 cm", "7 feet 8 inches | 234 cm", "7 feet 9 inches | 237 cm", "7 feet 10 inches | 239 cm", "7 feet 11 inches | 242 cm"};
         ((AutoCompleteTextView) findViewById(R.id.height)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, heightArray));
 
         /*String[] educationArray = {"B.E.", "B.Sc", "B.Ed", "10th Pass"};
@@ -298,13 +363,13 @@ public class RegistrationActivity extends AppCompatActivity {
         ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
 
 
-        String[] marriagestatusArray = {"single","married", "divorsed", "widowed"};
+        String[] marriagestatusArray = {"single", "married", "divorsed", "widowed"};
         ((AutoCompleteTextView) findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, marriagestatusArray));
 
         String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
         ((AutoCompleteTextView) findViewById(R.id.income)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, incomeArray));
 
-        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai","satara","sangli"};
+        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli"};
         ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
         ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
 
@@ -313,7 +378,7 @@ public class RegistrationActivity extends AppCompatActivity {
         ((AutoCompleteTextView) findViewById(R.id.zodiac)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, zodiacArray));
 
 
-         String[] religionArray = {"Hindu", "Brahmin","Muslim","Cristian","sikh","jain"};
+        String[] religionArray = {"Hindu", "Brahmin", "Muslim", "Cristian", "sikh", "jain"};
         ((AutoCompleteTextView) findViewById(R.id.religion)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, religionArray));
 
     }
@@ -324,37 +389,38 @@ public class RegistrationActivity extends AppCompatActivity {
         String biodataaddress = "";
 
         String name = ((TextInputEditText) findViewById(R.id.name)).getText().toString().trim();
-        String firstname = "",middlename = "",lastname = "";
+        String firstname = "", middlename = "", lastname = "";
         String[] nameArr = name.split(" ");
-        if(nameArr.length == 1) {
+        if (nameArr.length == 1) {
             firstname = nameArr[0];
-        }
-        else if(nameArr.length == 2){
+        } else if (nameArr.length == 2) {
             firstname = nameArr[0];
             lastname = nameArr[1];
-        }
-        else if(nameArr.length == 3) {
+        } else if (nameArr.length == 3) {
             firstname = nameArr[0];
             middlename = nameArr[1];
             lastname = nameArr[2];
-        }
-        else
-            firstname =  name;
+        } else
+            firstname = name;
 
         String relation1 = "Brother";
         String relation2 = "Sister";
 
-        String birthtime = hour.getText().toString().trim() +":"+ minute.getText().toString().trim() +" "+ ampm.getText().toString().trim();
+        String birthtime = hour.getText().toString().trim() + ":" + minute.getText().toString().trim() + " " + ampm.getText().toString().trim();
 
 
-        Customer customer = new Customer(creationsource, profilePhotoAddressBase64, biodataAddressBase64,
-                firstname, middlename, lastname, email.getText().toString().trim(), mobile1.getText().toString().trim(), mobile2.getText().toString().trim(),mobile3.getText().toString().trim(),mobile4.getText().toString().trim(), gender.getText().toString().trim(), height.getText().toString().trim(),
-                birthtime, caste.getText().toString().trim(), religion.getText().toString().trim(),education.getText().toString().trim(), occupation.getText().toString().trim(), zodiac.getText().toString().trim(), birthname.getText().toString().trim(), bloodgroup.getText().toString().trim(),
+        Customer c = new Customer(creationsource, profilePhotoAddressBase64, biodataAddressBase64,
+                firstname, middlename, lastname, email.getText().toString().trim(), mobile1.getText().toString().trim(), mobile2.getText().toString().trim(), mobile3.getText().toString().trim(), mobile4.getText().toString().trim(), gender.getText().toString().trim(), height.getText().toString().trim(),
+                birthtime, caste.getText().toString().trim(), religion.getText().toString().trim(), education.getText().toString().trim(), occupation.getText().toString().trim(), zodiac.getText().toString().trim(), birthname.getText().toString().trim(), bloodgroup.getText().toString().trim(),
                 property.getText().toString().trim(), fathername.getText().toString().trim(), mothername.getText().toString().trim(), address.getText().toString().trim(), city.getText().toString().trim(), marriagestatus.getText().toString().trim(), birthdate.getText().toString().trim(),
                 birthplace.getText().toString().trim(), income.getText().toString().trim(), kuldaivat.getText().toString().trim(), devak.getText().toString().trim(), nakshatra.getText().toString().trim(), nadi.getText().toString().trim(), gan.getText().toString().trim(), yoni.getText().toString().trim(),
-                charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(),relation1,relation2,relationname1.getText().toString().trim(),relationname2.getText().toString().trim(),relatives.getText().toString().trim(),family.getText().toString().trim());
+                charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(), relation1, relation2, relationname1.getText().toString().trim(), relationname2.getText().toString().trim(), relatives.getText().toString().trim(), family.getText().toString().trim());
 
-        ApiCallUtil.registerProfile(customer, this,false,null);
+        if (editprofile) {
+            c.setProfileId(customer.getProfileId());
+            ApiCallUtil.updateProfile(c, this);
+        } else
+            ApiCallUtil.registerProfile(c, this, false, null);
         nullifyformdata();
         cmmobile.setText("");
         formLayout.setVisibility(GONE);
@@ -365,18 +431,17 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-                if(data != null){
+            if (data != null) {
 
-                    try{
-                        Uri uri = data.getData();
-                        cropImage(uri);
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-
+                try {
+                    Uri uri = data.getData();
+                    cropImage(uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+
+            }
 
         }
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
@@ -390,11 +455,11 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
                     if (clickedImagename != null) {
-                        if(clickedImagename.equalsIgnoreCase("profilePhotoAddress")){
+                        if (clickedImagename.equalsIgnoreCase("profilePhotoAddress")) {
                             profilePhotoAddressBase64 = imgB64;
                             Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(profilePhotoAddress);
                         }
-                        if(clickedImagename.equalsIgnoreCase("biodataAddress")){
+                        if (clickedImagename.equalsIgnoreCase("biodataAddress")) {
                             biodataAddressBase64 = imgB64;
                             Glide.with(this).load(uri.toString()).placeholder(R.drawable.progym_icon).into(biodataAddress);
                         }
@@ -413,7 +478,7 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-    public void nullifyformdata(){
+    public void nullifyformdata() {
         name.setText("");
         email.setText("");
         mobile1.setText("");

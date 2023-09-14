@@ -106,6 +106,9 @@ public interface Api {
     @POST("customer/app_submit_register.php")
     Call<SingleResponse> registerNewCustomer(@Body Customer customer);
 
+    @POST("customer/updateProfile.php")
+    Call<List<Customer>> updateProfile(@Body Customer customer);
+
     @GET("customer/isMobileExists.php")
     Call<SingleResponse> isMobileExists(@Query("mobile") String mobile);
 

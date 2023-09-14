@@ -77,6 +77,10 @@ public class ApiCallUtil {
         new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment).execute();
     }
 
+    public static void updateProfile(Customer customer, Activity activity) {
+        new UpdateProfileTask(customer, activity).execute();
+    }
+
     public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
         new ValidateLoginMobileTask(activity, mobile, formLayout, addcard, mobile1, savebtn).execute();
     }
@@ -868,6 +872,59 @@ public class ApiCallUtil {
                 ApiUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);
 
 
+        }
+    }
+
+    static class UpdateProfileTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        Customer c;
+        List<Customer> loggedInCustomer;
+
+        SingleResponse response;
+        String error;
+        SpinKitView progressBar;
+        Circle d = new Circle();
+        List<Level_1_cardModal> list = new ArrayList<>();
+
+
+
+        public UpdateProfileTask(Customer c, Activity activity) {
+            this.c = c;
+            this.activity = activity;
+            progressBar = activity.findViewById(R.id.progressBar);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (progressBar != null) {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setIndeterminateDrawable(d);
+            }
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                loggedInCustomer = RetrofitClient.getInstance().getApi().updateProfile(c).execute().body();
+                if (loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
+                    LocalCache.saveLoggedInCustomer(loggedInCustomer.get(0), activity);
+                }
+
+            } catch (Exception e) {
+                error = e.getMessage();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (progressBar != null)
+                progressBar.setVisibility(View.GONE);
+
+            MediaPlayer.create(activity, R.raw.done_sound).start();
+            ApiUtils.showDialog(activity, R.drawable.success_icon, "Profile Updated !!!", "");
         }
     }
 

@@ -99,9 +99,10 @@ public class MyAccountFragment extends Fragment {
             ApiCallUtil.getLevel2Data(customer.getProfileId(), this.getActivity(), false);
         });
         editprofile_link.setOnClickListener(view -> {
-            /*ApiUtils.vibrateFunction(this.getActivity());
+            ApiUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
-            startActivity(intent);*/
+            intent.putExtra("editprofile",true);
+            startActivity(intent);
         });
         mymembership_link.setOnClickListener(view -> {
             ApiUtils.vibrateFunction(this.getActivity());
