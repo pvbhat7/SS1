@@ -3,8 +3,6 @@ package com.example.ss1.api;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -44,7 +42,6 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -76,20 +73,20 @@ public class ApiCallUtil {
         new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView, activity).execute();
     }
 
-    public static void registerProfile(Customer customer, Activity activity) {
-        new RegisterNewCustomerTask(customer, activity).execute();
+    public static void registerProfile(Customer customer, Activity activity, Boolean onboardNewUser, Fragment fragment) {
+        new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment).execute();
     }
 
     public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
-        new ValidateLoginMobileTask(activity, mobile, formLayout, addcard, mobile1,savebtn).execute();
+        new ValidateLoginMobileTask(activity, mobile, formLayout, addcard, mobile1, savebtn).execute();
     }
 
     public static void getMyMemberships(String cpid, RecyclerView recyclerView, Activity activity) {
-        new GetMyMembershipsTask(cpid, activity,recyclerView).execute();
+        new GetMyMembershipsTask(cpid, activity, recyclerView).execute();
     }
 
     public static void getMembershipPlans(RecyclerView recyclerView, Activity activity) {
-        new GetMembershipPlansTask(activity,recyclerView).execute();
+        new GetMembershipPlansTask(activity, recyclerView).execute();
     }
 
 
@@ -264,7 +261,7 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
                 Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list size  " + list.size() + " time is " + new Date());
-                activity.startActivity(new Intent(activity, Level2ProfileActivity.class).putExtra("level2data", new Gson().toJson(list.get(0))).putExtra("enableDisableContactViewButton", flag));
+                activity.startActivity(new Intent(activity, Level2ProfileActivity.class).putExtra("level2data", new Gson().toJson(list.get(0))).putExtra("editprofile", flag));
             } else
                 Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list is null  time is " + new Date());
         }
@@ -358,7 +355,7 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "GetCountLeftTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
-            if (flag && !response_list.isEmpty()) {
+            if (flag && response_list != null && !response_list.isEmpty()) {
                 LocalCache.saveActiveOrder(response_list.get(0), activity);
                 OrderModal activeOrder = LocalCache.retrieveActiveOrder(activity);
                 if (activeOrder != null && activeOrder.getId() != null) {
@@ -799,17 +796,25 @@ public class ApiCallUtil {
     static class RegisterNewCustomerTask extends AsyncTask<Void, Void, Void> {
 
         Activity activity;
-        Customer customer;
+        Customer c;
+        List<Customer> loggedInCustomer;
 
         SingleResponse response;
         String error;
-        SpinKitView progressBar ;
+        SpinKitView progressBar;
         Circle d = new Circle();
+        List<Level_1_cardModal> list = new ArrayList<>();
 
-        public RegisterNewCustomerTask(Customer customer, Activity activity) {
-            this.customer = customer;
+        Boolean onboardNewUser = false;
+
+        Fragment fragment;
+
+        public RegisterNewCustomerTask(Customer c, Activity activity, Boolean onboardNewUser, Fragment fragment) {
+            this.c = c;
             this.activity = activity;
             progressBar = activity.findViewById(R.id.progressBar);
+            this.onboardNewUser = onboardNewUser;
+            this.fragment = fragment;
         }
 
         @Override
@@ -823,7 +828,17 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                response = RetrofitClient.getInstance().getApi().registerNewCustomer(customer).execute().body();
+                response = RetrofitClient.getInstance().getApi().registerNewCustomer(c).execute().body();
+                if (onboardNewUser) {
+                    if (response != null && !response.getResult().equalsIgnoreCase("0")) {
+                        loggedInCustomer = RetrofitClient.getInstance().getApi().getCustomerByMobile(c.getMobile1()).execute().body();
+                        if (loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
+                            LocalCache.saveLoggedInCustomer(loggedInCustomer.get(0), activity);
+                            list = RetrofitClient.getInstance().getApi().getAllCustomerProfiles(loggedInCustomer.get(0).getProfileId()).execute().body();
+                        }
+                    }
+                }
+
             } catch (Exception e) {
                 error = e.getMessage();
             }
@@ -833,13 +848,26 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (progressBar != null)
+            if (progressBar != null && !onboardNewUser)
                 progressBar.setVisibility(View.GONE);
-            if (response != null) {
+
+            if (response != null && !response.getResult().equalsIgnoreCase("0")) {
                 MediaPlayer.create(activity, R.raw.done_sound).start();
                 ApiUtils.showDialog(activity, R.drawable.success_icon, "Profile created !!!", "id : " + response.getResult());
+
+                if (onboardNewUser) {
+                    if (list != null && !list.isEmpty()) {
+                        //Collections.shuffle(list);
+                        LocalCache.saveLevel1List(list, activity);
+                        ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+                        if (progressBar != null)
+                            progressBar.setVisibility(View.GONE);
+                    }
+                }
             } else
                 ApiUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);
+
+
         }
     }
 
@@ -855,7 +883,7 @@ public class ApiCallUtil {
 
         Button savebtn;
 
-        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1,Button savebtn) {
+        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
             this.activity = activity;
             this.mobile = mobile;
             this.formLayout = formLayout;
@@ -871,7 +899,8 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                response = RetrofitClient.getInstance().getApi().isMobileExists(mobile).execute().body();
+                //response = RetrofitClient.getInstance().getApi().isMobileExists(mobile).execute().body();
+                response = RetrofitClient.getInstance().getApi().isMobileExistsAll(mobile).execute().body();
             } catch (Exception e) {
                 error = e.getMessage();
             }
@@ -948,6 +977,7 @@ public class ApiCallUtil {
         RecyclerView recyclerView;
         BuyMembershipAdapter adapter;
         List<MembershipModal> list = new ArrayList<>();
+
         public GetMembershipPlansTask(Activity activity, RecyclerView recyclerView) {
             this.activity = activity;
             this.recyclerView = recyclerView;

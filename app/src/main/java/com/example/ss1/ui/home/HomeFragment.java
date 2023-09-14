@@ -10,7 +10,10 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -29,12 +32,17 @@ import com.example.ss1.api.ApiUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -45,7 +53,7 @@ public class HomeFragment extends Fragment {
     SpinKitView progressBar;
 
 
-    ImageView notification,profilePhoto;
+    ImageView notification, profilePhoto;
 
     CardView searchProfiles;
 
@@ -72,25 +80,79 @@ public class HomeFragment extends Fragment {
         customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
         level1list = LocalCache.retrieveLevel1List(this.getActivity());
 
+        if (customer.getProfileId() == null)
+            onboardNewUser();
+
 
         setProfileIcon();
 
-        if(!level1list.isEmpty()){
+        if (!level1list.isEmpty()) {
             initLevel_1_CardProfilesRecyclerView(level1list);
         }
 
-        ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),false);
-
-
-
+        if (customer.getProfileId() != null)
+            ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), false);
 
         return view;
     }
 
+    private void onboardNewUser() {
+        ApiUtils.vibrateFunction(this.getActivity());
+        Dialog d = new Dialog(this.getActivity());
+        d.setContentView(R.layout.onboarding_dialog);
+
+        String[] genderArray = {"male", "female"};
+        ((AutoCompleteTextView) d.findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, genderArray));
+
+        d.findViewById(R.id.birthdate).setOnClickListener(view1 -> {
+            //Date Picker
+            MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+            MaterialDatePicker<Long> picker = builder.build();
+            picker.show(this.getActivity().getSupportFragmentManager(), picker.toString());
+            picker.addOnPositiveButtonClickListener(selectedDate -> {
+
+                Date date = new Date(selectedDate);
+                SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                ((TextView) d.findViewById(R.id.birthdate)).setText(simpleFormat.format(date));
+            });
+        });
+
+        d.findViewById(R.id.create_profile_btn).setOnClickListener(view -> {
+            d.dismiss();
+            String mobile = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+91", "");
+            String name = ((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim();
+            String firstname = "", middlename = "", lastname = "";
+            String[] nameArr = name.split(" ");
+            if (nameArr.length == 1) {
+                firstname = nameArr[0];
+            } else if (nameArr.length == 2) {
+                firstname = nameArr[0];
+                lastname = nameArr[1];
+            } else if (nameArr.length == 3) {
+                firstname = nameArr[0];
+                middlename = nameArr[1];
+                lastname = nameArr[2];
+            } else
+                firstname = name;
+
+            String email = ((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim();
+            String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
+            String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
+
+            Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate,"0");
+            ApiCallUtil.registerProfile(c, getFragmentActivity(),true,this);
+        });
+
+
+        d.setCanceledOnTouchOutside(false);
+        d.setCancelable(false);
+        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        d.show();
+    }
 
 
     private void setProfileIcon() {
-        if(customer.getProfileId() != null){
+        if (customer != null && customer.getProfileId() != null) {
             Glide.with(this.getActivity())
                     .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.prashant)
                     .placeholder(R.drawable.oops)
@@ -101,18 +163,18 @@ public class HomeFragment extends Fragment {
     private void syncLoggedInCustomer() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            ApiCallUtil.updateLoggedInCustomerDetails(this.getActivity(),user.getPhoneNumber().replace("+91",""));
+            ApiCallUtil.updateLoggedInCustomerDetails(this.getActivity(), user.getPhoneNumber().replace("+91", ""));
         }
     }
 
     private void initUIElements() {
-        profilePhoto =  view.findViewById(R.id.profilePhoto);
+        profilePhoto = view.findViewById(R.id.profilePhoto);
         coordinatorLayout = view.findViewById(R.id.level1CoordinatorLayout);
         progressBar = view.findViewById(R.id.progressBar);
         level1cardsRecyclerView = view.findViewById(R.id.level1cardsRecyclerView);
         notification = view.findViewById(R.id.notification);
         searchProfiles = view.findViewById(R.id.searchProfiles);
-        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.refreshLayout);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
     }
 
     private void initOnclickListener() {
@@ -148,7 +210,7 @@ public class HomeFragment extends Fragment {
         // Refresh  the layout
         swipeRefreshLayout.setOnRefreshListener(
                 () -> {
-                    ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),true);
+                    ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
                     swipeRefreshLayout.setRefreshing(false);
                 }
         );
@@ -208,7 +270,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ApiCallUtil.getAllProfiles(customer.getProfileId(),this, progressBar,this.getActivity(),true);
+        ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
     }
 
     public void initLevel_1_CardProfilesRecyclerView(List<Level_1_cardModal> list) {
@@ -217,19 +279,18 @@ public class HomeFragment extends Fragment {
             if (recyclerView != null) {
                 if (list != null) {
                     rowsArrayList = list;
-                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar,view, list, this, this.getActivity(), false);
+                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity(), false);
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);
-                }
-                else{
+                } else {
                     list = new ArrayList<>();
                     rowsArrayList = list;
-                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar,view, list, this, this.getActivity(), false);
+                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity(), false);
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);
-                    ApiUtils.showSearchingDialog(this,progressBar,this.getActivity(),R.drawable.searching_gif,"0 profiles found","try again");
+                    ApiUtils.showSearchingDialog(this, progressBar, this.getActivity(), R.drawable.searching_gif, "0 profiles found", "try again");
                 }
             }
         }
@@ -247,12 +308,13 @@ public class HomeFragment extends Fragment {
         snackbar.show();
     }
 
-    public void showNotificationListDialog(){
+    public void showNotificationListDialog() {
         ApiUtils.vibrateFunction(this.getActivity());
         Dialog d = new Dialog(this.getActivity());
         d.setContentView(R.layout.notificationlist_dialog);
 
-        ApiCallUtil.getUserNotifications(this.getActivity() , d);
+        d.setContentView(R.layout.notificationlist_dialog);
+        ApiCallUtil.getUserNotifications(this.getActivity(), d);
 
         d.setCanceledOnTouchOutside(true);
         d.setCancelable(true);
@@ -260,7 +322,7 @@ public class HomeFragment extends Fragment {
         d.show();
     }
 
-    public static Activity getFragmentActivity(){
+    public static Activity getFragmentActivity() {
         return activity;
     }
 

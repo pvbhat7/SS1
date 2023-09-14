@@ -58,11 +58,25 @@ public class Customer {
 
     private String relation2;
     private String relationname2;
+    private String isAdmin;
+
+    private String is_verified;
 
 
 
     public Customer(){
 
+    }
+
+    public Customer(String firstname ,String middlename , String lastname , String mobile , String email , String gender , String birthdate,String is_verified){
+        this.firstname = firstname;
+        this.middlename = middlename;
+        this.lastname = lastname;
+        this.mobile1 = mobile;
+        this.email = email;
+        this.gender = gender;
+        this.birthdate = birthdate;
+        this.is_verified = is_verified;
     }
 
 
@@ -550,5 +564,21 @@ public class Customer {
 
     public void setFamily(String family) {
         this.family = family;
+    }
+
+    public String getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(String isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public String getIs_verified() {
+        return is_verified;
+    }
+
+    public void setIs_verified(String is_verified) {
+        this.is_verified = is_verified;
     }
 }

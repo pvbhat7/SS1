@@ -45,6 +45,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
     View view;
     SpinKitView sprogressBar;
 
+    Customer customer;
+
 
     public Level_1_profilecardAdapter(SpinKitView sprogressBar , View view, List<Level_1_cardModal> itemList, Fragment fragment, Activity activity, boolean flag) {
         mItemList = itemList;
@@ -53,6 +55,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
         this.flag = flag;
         this.view = view;
         this.sprogressBar = sprogressBar;
+        this.customer = LocalCache.retrieveLoggedInCustomer(activity);
     }
 
     // Based on the View type we are instantiating the
@@ -149,23 +152,30 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
 
                 holder.profilephoto.setOnClickListener(view -> {
 
+                    if(customer.getIs_verified() != null && customer.getIs_verified().equalsIgnoreCase("2"))
                     ApiCallUtil.getLevel2Data(obj.getProfileId(), activity, flag);
+                    else
+                        ((HomeFragment)fragment).showSnackBar("Complete your profile to view "+obj.getFirstname()+"'s profile");
 
                 });
 
                 holder.like.setOnClickListener(view -> {
+                    holder.like.setEnabled(false);
                     handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.LIKE);
                 });
 
                 holder.shortlist.setOnClickListener(view -> {
+                    holder.shortlist.setEnabled(false);
                     handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.SHORTLIST);
                 });
 
                 holder.sendinterest.setOnClickListener(view -> {
+                    holder.sendinterest.setEnabled(false);
                     handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.SEND_INTEREST);
                 });
 
                 holder.ignore.setOnClickListener(view -> {
+                    holder.ignore.setEnabled(false);
                     handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.IGNORE);
                 });
 

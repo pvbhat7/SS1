@@ -38,8 +38,8 @@ public class MyAccountFragment extends Fragment {
 
     OrderModal activeOrder;
 
-    CardView cb_card;
-    LinearLayout registration_link, logoutId,cb_link,mymembership_link;
+    CardView cb_card,registraton_card,myaccount_profile_card;
+    LinearLayout registration_link, logoutId,cb_link,mymembership_link,editprofile_link;
     TextView profileHeadingName, profileHeadingmobile, profileHeadingEmail,profileCardId,cb_text;
 
     ImageView sprofilephoto;
@@ -55,6 +55,15 @@ public class MyAccountFragment extends Fragment {
             customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
             activeOrder = LocalCache.retrieveActiveOrder(this.getActivity());
 
+
+            if(customer != null){
+                if(customer.getIsAdmin() != null && customer.getIsAdmin().equalsIgnoreCase("1"))
+                    registraton_card.setVisibility(View.VISIBLE);
+                else
+                    registraton_card.setVisibility(View.GONE);
+            }
+            else
+                registraton_card.setVisibility(View.GONE);
 
 
             profileHeadingName.setText(customer.getFirstname()+" "+customer.getLastname());
@@ -86,6 +95,14 @@ public class MyAccountFragment extends Fragment {
     }
 
     private void initOnClickListeners() {
+        myaccount_profile_card.setOnClickListener(view -> {
+            ApiCallUtil.getLevel2Data(customer.getProfileId(), this.getActivity(), false);
+        });
+        editprofile_link.setOnClickListener(view -> {
+            /*ApiUtils.vibrateFunction(this.getActivity());
+            Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
+            startActivity(intent);*/
+        });
         mymembership_link.setOnClickListener(view -> {
             ApiUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), MyMembershipActivity.class);
@@ -120,10 +137,14 @@ public class MyAccountFragment extends Fragment {
         profileHeadingmobile = view.findViewById(R.id.profileHeadingmobile);
         profileHeadingEmail = view.findViewById(R.id.profileHeadingEmail);
         profileCardId = view.findViewById(R.id.profileCardId);
+        registraton_card = view.findViewById(R.id.registraton_card);
+        myaccount_profile_card = view.findViewById(R.id.myaccount_profile_card);
 
         sprofilephoto = view.findViewById(R.id.sprofilephoto);
         registration_link = view.findViewById(R.id.registration_link);
         mymembership_link = view.findViewById(R.id.mymembership_link);
+        editprofile_link = view.findViewById(R.id.editprofile_link);
+
         cb_link = view.findViewById(R.id.cb_link);
         cb_card = view.findViewById(R.id.cb_card);
         cb_text = view.findViewById(R.id.cb_text);
@@ -131,13 +152,12 @@ public class MyAccountFragment extends Fragment {
 
 
         logoutId = view.findViewById(R.id.logoutId);
-        CircularImageView cView = view.findViewById(R.id.sprofilephoto);
 
-        if (cView != null) {
+        if (sprofilephoto != null) {
             Glide.with(this.getActivity())
                     .load(R.drawable.prashant)
                     .placeholder(R.drawable.oops)
-                    .into(cView);
+                    .into(sprofilephoto);
         }
     }
 

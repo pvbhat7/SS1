@@ -46,19 +46,6 @@ import java.util.Locale;
 
 public class RegistrationActivity extends AppCompatActivity {
 
-    public static final String INTENT_IMAGE_PICKER_OPTION = "image_picker_option";
-    public static final String INTENT_ASPECT_RATIO_X = "aspect_ratio_x";
-    public static final String INTENT_ASPECT_RATIO_Y = "aspect_ratio_Y";
-    public static final String INTENT_LOCK_ASPECT_RATIO = "lock_aspect_ratio";
-    public static final String INTENT_IMAGE_COMPRESSION_QUALITY = "compression_quality";
-    public static final String INTENT_SET_BITMAP_MAX_WIDTH_HEIGHT = "set_bitmap_max_width_height";
-    public static final String INTENT_BITMAP_MAX_WIDTH = "max_width";
-    public static final String INTENT_BITMAP_MAX_HEIGHT = "max_height";
-
-
-    public static final int REQUEST_IMAGE_CAPTURE = 0;
-    public static final int REQUEST_GALLERY_IMAGE = 1;
-
     private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
     private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
     private int IMAGE_COMPRESSION = 80;
@@ -367,7 +354,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 birthplace.getText().toString().trim(), income.getText().toString().trim(), kuldaivat.getText().toString().trim(), devak.getText().toString().trim(), nakshatra.getText().toString().trim(), nadi.getText().toString().trim(), gan.getText().toString().trim(), yoni.getText().toString().trim(),
                 charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(),relation1,relation2,relationname1.getText().toString().trim(),relationname2.getText().toString().trim(),relatives.getText().toString().trim(),family.getText().toString().trim());
 
-        ApiCallUtil.registerProfile(customer, this);
+        ApiCallUtil.registerProfile(customer, this,false,null);
         nullifyformdata();
         cmmobile.setText("");
         formLayout.setVisibility(GONE);

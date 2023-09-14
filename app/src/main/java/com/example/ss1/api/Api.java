@@ -109,6 +109,9 @@ public interface Api {
     @GET("customer/isMobileExists.php")
     Call<SingleResponse> isMobileExists(@Query("mobile") String mobile);
 
+    @GET("customer/isMobileExistsAll.php")
+    Call<SingleResponse> isMobileExistsAll(@Query("mobile") String mobile);
+
     // memberships
     @GET("orders/getMyMemberships.php")
     Call<List<MyMembershipModal>> getMyMemberships(@Query("cpid") String cpid);

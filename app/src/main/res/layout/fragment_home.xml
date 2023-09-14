@@ -75,7 +75,7 @@
                         android:layout_height="match_parent"
                         android:fontFamily="@font/roboto_bold"
                         android:gravity="center_vertical"
-                        android:text="Search profiles"
+                        android:text=""
                         android:textAlignment="center"
                         android:textColor="@color/black" />
 

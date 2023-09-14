@@ -27,6 +27,8 @@
                 android:orientation="vertical">
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/myaccount_profile_card"
+                    android:clickable="true"
                     android:layout_width="fill_parent"
                     android:layout_height="130dp"
                     android:layout_marginTop="20dp"
@@ -135,6 +137,7 @@
 
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/registraton_card"
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
@@ -171,6 +174,52 @@
                                 android:fontFamily="@font/comic_bold"
                                 android:layout_gravity="center_vertical"
                                 android:text="Registration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/editprofile_card"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="10dp"
+                    android:layout_width="fill_parent"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="false"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/editprofile_link"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_marginLeft="10dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/editprofile_icon"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"/>
+                            <TextView
+                                android:textColor="@color/black"
+                                android:layout_marginLeft="25dp"
+                                android:textSize="16dp"
+                                android:fontFamily="@font/comic_bold"
+                                android:layout_gravity="center_vertical"
+                                android:text="Edit Profile"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
                         </LinearLayout>
