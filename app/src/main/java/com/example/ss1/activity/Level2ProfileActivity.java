@@ -54,9 +54,10 @@ public class Level2ProfileActivity extends AppCompatActivity {
     Boolean enableDisableContactViewButton = false;
     Customer customer;
 
-    TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address;
+    TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address,expectations,kuldaivat,zodiac,varn,nakshatra,nadi ,gan ,yoni ,charan ,gotra ,mangal ;
+
     Button viewContactDetailsBtn;
-    ImageView profilephotoaddress;
+    ImageView profilephotoaddresss;
 
     CardView editprofile_link;
 
@@ -85,11 +86,11 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
 
         if (profile != null) {
-            //handleCarosol(profile);
+            //handleCarosol(profile.getProfilephotoaddress() , profile.getBiodataaddress());
             Glide.with(this)
                     .load(profile.getProfilephotoaddress())
                     .placeholder(R.drawable.oops)
-                    .into(profilephotoaddress);
+                    .into((ImageView) findViewById(R.id.profilephotoaddresss));
             name.setText(profile.getFirstname() + " " + profile.getLastname());
             String age = getAgeByDOB(profile.getBirthdate());
             profileid.setText("Profile id : A" + profile.getProfileId());
@@ -112,6 +113,16 @@ public class Level2ProfileActivity extends AppCompatActivity {
             family.setText(profile.getFamily());
             city.setText(profile.getCity());
             address.setText(profile.getAddress());
+            kuldaivat.setText(profile.getKuldaivat());
+            zodiac.setText(profile.getZodiac());
+            varn.setText(profile.getVarn());
+            nakshatra.setText(profile.getNakshatra());
+            nadi.setText(profile.getNadi());
+            gan.setText(profile.getGan());
+            yoni.setText(profile.getYoni());
+            charan.setText(profile.getCharan());
+            gotra.setText(profile.getGotra());
+            mangal.setText(profile.getMangal());
 
 
         }
@@ -143,7 +154,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         });
 
-        profilephotoaddress.setOnClickListener(view -> ApiUtils.showImageDialog(Level2ProfileActivity.this,profile.getProfilephotoaddress()));
+        profilephotoaddresss.setOnClickListener(view -> ApiUtils.showImageDialog(Level2ProfileActivity.this,profile.getProfilephotoaddress()));
 
         /*whatsapp.setOnClickListener(view -> {
             String uri = "https://wa.me/+91" + profile.getMobile1().toString().trim();
@@ -195,7 +206,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
     private void initUiElements() {
         editprofile_link = findViewById(R.id.editprofile_link);
-        profilephotoaddress = findViewById(R.id.profilephotoaddress);
+        profilephotoaddresss = findViewById(R.id.profilephotoaddresss);
         profileid= findViewById(R.id.profileid);
         name= findViewById(R.id.name);
         coordinatorLayout = findViewById(R.id.level2CoordinatorLayout);
@@ -219,30 +230,45 @@ public class Level2ProfileActivity extends AppCompatActivity {
         family = findViewById(R.id.family);
         city = findViewById(R.id.city);
         address = findViewById(R.id.address);
+
+        expectations = findViewById(R.id.expectations);
+        kuldaivat = findViewById(R.id.kuldaivat);
+        zodiac = findViewById(R.id.zodiac);
+        nakshatra = findViewById(R.id.nakshatra);
+        varn = findViewById(R.id.varn);
+        nadi = findViewById(R.id.nadi);
+        gan = findViewById(R.id.gan);
+        yoni = findViewById(R.id.yoni);
+        charan = findViewById(R.id.charan);
+        gotra = findViewById(R.id.gotra);
+        mangal = findViewById(R.id.mangal);
+
+
+
+
+
     }
 
     public static Context getContextObject() {
         return ctx;
     }
 
-    private void handleCarosol(Level_2_Modal level2Modal) {
-        String[] arr;
-        if (level2Modal.getPhotos() != null) {
-            arr = new String[level2Modal.getPhotos().size()];
-            for (int i = 0; i < level2Modal.getPhotos().size(); i++) {
-                arr[i] = level2Modal.getPhotos().get(i).getImageAddress();
-            }
-        } else {
-            arr = new String[1];
-            arr[0] = level2Modal.getProfilephotoaddress();
+    private void handleCarosol(String img1 , String img2) {
+        try{
+            String[] arr = new String[2];
+            arr[0] = img1;
+            arr[1] = img2;
+
+            SliderAdapter sliderAdapter = new SliderAdapter(arr);
+
+            sliderView.setSliderAdapter(sliderAdapter);
+            sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
+            sliderView.setSliderTransformAnimation(SliderAnimations.DEPTHTRANSFORMATION);
+            sliderView.startAutoCycle();
         }
-
-        SliderAdapter sliderAdapter = new SliderAdapter(arr);
-
-        sliderView.setSliderAdapter(sliderAdapter);
-        sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
-        sliderView.setSliderTransformAnimation(SliderAnimations.DEPTHTRANSFORMATION);
-        sliderView.startAutoCycle();
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

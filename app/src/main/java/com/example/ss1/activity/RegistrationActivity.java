@@ -107,6 +107,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void preFillFormData() {
         Glide.with(this).load(customer.getProfilephotoaddress()).placeholder(R.drawable.oops).into(profilePhotoAddress);
+        Glide.with(this).load(customer.getBiodataaddress()).placeholder(R.drawable.oops).into(biodataAddress);
         email.setText(customer.getEmail());
         mobile1.setText(customer.getMobile1());
         mobile2.setText(customer.getMobile2());
@@ -117,10 +118,16 @@ public class RegistrationActivity extends AppCompatActivity {
         if(customer.getBirthtime() != null && !customer.getBirthtime().isEmpty()){
             String birthtime = customer.getBirthtime();// 01:01 am
             String[] arr1 = birthtime.split(":");
-            String[] arr2 = arr1[1].split(" ");
-            hour.setText(arr1[0]);
-            minute.setText(arr2[0]);
-            ampm.setText(arr2[1]);
+
+            if(arr1.length == 2){
+                hour.setText(arr1[0]);
+                String[] arr2 = arr1[1].split(" ");
+                if(arr2.length == 2){
+                    minute.setText(arr2[0]);
+                    ampm.setText(arr2[1]);
+                }
+            }
+
         }
 
         caste.setText(customer.getCaste());

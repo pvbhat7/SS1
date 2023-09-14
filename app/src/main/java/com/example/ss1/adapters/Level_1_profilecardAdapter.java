@@ -114,9 +114,11 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
                 holder.name.setText(obj.getFirstname().trim() + " " + obj.getLastname().trim());
 
                 // dob
-                Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());
+                Date dob ;
+                dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());
                 int daysleft = DateApi.daysDiff(new Date(), dob);
                 holder.age.setText(Math.abs(daysleft) / 365 + " yrs");
+
 
                 // photo
                 Glide.with(activity)

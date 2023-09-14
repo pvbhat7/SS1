@@ -17,7 +17,9 @@ public class AppPreference {
     }
 
     public static final String getStringPref(Context context, String prefName, String key) {
-        SharedPreferences sp = context.getSharedPreferences(prefName, 0);
+        SharedPreferences sp = null;
+        if(context != null)
+        sp = context.getSharedPreferences(prefName, 0);
         return sp.getString(key, "");
     }
 
