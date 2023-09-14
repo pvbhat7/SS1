@@ -8,6 +8,7 @@ public class AppPreference {
     public static final String CUSTOMER_JSON = "customerJson";
     public static final String ACTIVE_ORDER_JSON = "ActiveOrderJson";
     public static final String LEVEL_1_LIST_JSON = "Level1ListJson";
+    public static final String CONTACT_VIEWED_LIST_JSON = "ContactViewedListJson";
 
     public static final void setStringPref(Context context, String prefKey, String key, String value) {
         SharedPreferences sp = context.getSharedPreferences(prefKey, 0);

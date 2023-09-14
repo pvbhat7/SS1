@@ -224,7 +224,7 @@ public class HomeFragment extends Fragment {
 
     private void showUserProfile() {
         ApiUtils.vibrateFunction(this.getActivity());
-        ApiCallUtil.getLevel2Data(customer.getProfileId(), activity, false);
+        ApiCallUtil.getLevel2Data(customer.getProfileId(), activity);
     }
 
     private void loadMore() {
@@ -279,14 +279,14 @@ public class HomeFragment extends Fragment {
             if (recyclerView != null) {
                 if (list != null) {
                     rowsArrayList = list;
-                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity(), false);
+                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity());
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);
                 } else {
                     list = new ArrayList<>();
                     rowsArrayList = list;
-                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity(), false);
+                    level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity());
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);

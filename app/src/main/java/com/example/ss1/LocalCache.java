@@ -2,6 +2,7 @@ package com.example.ss1;
 
 import android.app.Activity;
 
+import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.OrderModal;
@@ -62,6 +63,23 @@ public class LocalCache {
         String jsonString = (String) AppPreference.getStringPref(activity, AppPreference.LEVEL_1_LIST_JSON, AppPreference.LEVEL_1_LIST_JSON);
         if (!jsonString.isEmpty()){
             Type type = new TypeToken<ArrayList<Level_1_cardModal>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static String saveContactViewedList(List<ContactViewedModal> list, Activity activity){
+        String jsonString = new Gson().toJson(list);
+        AppPreference.setStringPref(activity, AppPreference.CONTACT_VIEWED_LIST_JSON, AppPreference.CONTACT_VIEWED_LIST_JSON,jsonString);
+        return jsonString;
+    }
+
+    public static List<ContactViewedModal> retrieveContactViewedList(Activity activity) {
+        List<ContactViewedModal> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.CONTACT_VIEWED_LIST_JSON, AppPreference.CONTACT_VIEWED_LIST_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<ContactViewedModal>>() {}.getType();
             Gson gson = new Gson();
             list = gson.fromJson(jsonString, type);
         }

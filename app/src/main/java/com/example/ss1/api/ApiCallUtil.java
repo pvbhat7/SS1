@@ -223,9 +223,9 @@ public class ApiCallUtil {
 
     // get level 2 data
 
-    public static void getLevel2Data(String cpid, Activity activity, Boolean flag) {
+    public static void getLevel2Data(String cpid, Activity activity) {
         ApiUtils.vibrateFunction(activity);
-        new GetLevel2DataTask(cpid, activity, flag).execute();
+        new GetLevel2DataTask(cpid, activity).execute();
     }
 
     static class GetLevel2DataTask extends AsyncTask<Void, Void, Void> {
@@ -233,13 +233,13 @@ public class ApiCallUtil {
         String cpid;
         Activity activity;
 
-        Boolean flag;
         List<Level_2_Modal> list = new ArrayList<>();
+        List<ContactViewedModal> contactviewedlist = new ArrayList<>();
 
-        public GetLevel2DataTask(String cpid, Activity activity, Boolean flag) {
+
+        public GetLevel2DataTask(String cpid, Activity activity) {
             this.cpid = cpid;
             this.activity = activity;
-            this.flag = flag;
         }
 
         @Override
@@ -252,6 +252,10 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "GetLevel2DataTask doInBackground calling...");
             try {
                 list = RetrofitClient.getInstance().getApi().getLevel2DataByCPID(cpid).execute().body();
+                // TODO: 14-Sep-23 prepare single rest api
+                Customer c = LocalCache.retrieveLoggedInCustomer(activity);
+                //contactviewedlist = RetrofitClient.getInstance().getApi().getContactViewedProfiles(c.getProfileId()).execute().body();
+
 
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetLevel2DataTask doInBackground error" + e);
@@ -264,8 +268,19 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
+
+                // set iscontactViewed
+                list.get(0).setContactViewed(false);
+                contactviewedlist = LocalCache.retrieveContactViewedList(activity);
+                if(contactviewedlist != null && contactviewedlist.size() > 0){
+                    for(ContactViewedModal modal : contactviewedlist){
+                        if(modal.getVcpid().equalsIgnoreCase(cpid))
+                            list.get(0).setContactViewed(true);
+                    }
+                }
+
                 Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list size  " + list.size() + " time is " + new Date());
-                activity.startActivity(new Intent(activity, Level2ProfileActivity.class).putExtra("level2data", new Gson().toJson(list.get(0))).putExtra("editprofile", flag));
+                activity.startActivity(new Intent(activity, Level2ProfileActivity.class).putExtra("level2data", new Gson().toJson(list.get(0))));
             } else
                 Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list is null  time is " + new Date());
         }
@@ -348,7 +363,7 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "GetCountLeftTask doInBackground calling...");
             try {
                 response_list = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
-
+                LocalCache.saveContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body() , activity);
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetCountLeftTask doInBackground error" + e.toString());
             }
@@ -611,6 +626,11 @@ public class ApiCallUtil {
                 if (customer != null && !customer.isEmpty()) {
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());
                     LocalCache.saveLoggedInCustomer(customer.get(0), activity);
+
+                    if(LocalCache.retrieveContactViewedList(activity).isEmpty()) {
+                        List<ContactViewedModal> contactViewedModals = RetrofitClient.getInstance().getApi().getContactViewedProfiles(customer.get(0).getProfileId()).execute().body();
+                        LocalCache.saveContactViewedList(contactViewedModals, activity);
+                    }
                 }
             } catch (Exception e) {
                 Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground error" + e);

@@ -67,7 +67,7 @@ public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdap
             Glide.with(activity)
                     .load(obj.getPhoto())
                     .into(holder.cv_photo);
-            holder.cv_card.setOnClickListener(view -> ApiCallUtil.getLevel2Data(obj.getVcpid(), activity, false));
+            holder.cv_card.setOnClickListener(view -> ApiCallUtil.getLevel2Data(obj.getVcpid(), activity));
 
             holder.cv_whatstappicon.setOnClickListener(view -> {
                 String uri = "https://wa.me/+91" + obj.getMobile().toString().trim();

@@ -195,7 +195,7 @@ public class OldLevel2ProfileActivity extends AppCompatActivity {
 
         viewContactDetailsBtn.setOnClickListener(view -> {
             // check if package exist or not
-            if (customer.getActivepackageId() == null) {
+            if (customer.getActivepackageid() == null) {
                 new ProCoinBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
 

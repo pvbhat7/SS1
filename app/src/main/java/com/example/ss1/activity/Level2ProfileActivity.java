@@ -54,12 +54,12 @@ public class Level2ProfileActivity extends AppCompatActivity {
     Boolean enableDisableContactViewButton = false;
     Customer customer;
 
-    TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address,expectations,kuldaivat,zodiac,varn,nakshatra,nadi ,gan ,yoni ,charan ,gotra ,mangal ;
+    TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address,expectations,kuldaivat,zodiac,varn,nakshatra,nadi ,gan ,yoni ,charan ,gotra ,mangal,email,mobile1,mobile2,mobile3 ;
 
     Button viewContactDetailsBtn;
     ImageView profilephotoaddresss;
 
-    CardView editprofile_link;
+    CardView editprofile_link,contact_card;
 
 
     @Override
@@ -86,6 +86,14 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
 
         if (profile != null) {
+            if(profile.getContactViewed()){
+                viewContactDetailsBtn.setVisibility(View.GONE);
+                contact_card.setVisibility(View.VISIBLE);
+            }
+            else{
+                viewContactDetailsBtn.setVisibility(View.VISIBLE);
+                contact_card.setVisibility(View.GONE);
+            }
             //handleCarosol(profile.getProfilephotoaddress() , profile.getBiodataaddress());
             Glide.with(this)
                     .load(profile.getProfilephotoaddress())
@@ -124,6 +132,11 @@ public class Level2ProfileActivity extends AppCompatActivity {
             gotra.setText(profile.getGotra());
             mangal.setText(profile.getMangal());
 
+            email.setText(profile.getEmail());
+            mobile1.setText(profile.getMobile1());
+            mobile2.setText(profile.getMobile2());
+            mobile3.setText(profile.getMobile3());
+
 
         }
 
@@ -142,11 +155,14 @@ public class Level2ProfileActivity extends AppCompatActivity {
     private void handleOnClickListeners() {
 
         viewContactDetailsBtn.setOnClickListener(view -> {
+
             // check if package exist or not
-            if (customer.getActivepackageId() == null) {
+            if (customer.getActivepackageid() == null) {
                 new ProCoinBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
-
+                viewContactDetailsBtn.setEnabled(false);
+                viewContactDetailsBtn.setVisibility(View.GONE);
+                contact_card.setVisibility(View.VISIBLE);
                 ApiCallUtil.viewContactData(customer.getProfileId(), profile.getProfileId(), this);
 
                 //showSnackBar("Credit left : 25");
@@ -205,6 +221,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
 
     private void initUiElements() {
+        contact_card = findViewById(R.id.contact_card);
         editprofile_link = findViewById(R.id.editprofile_link);
         profilephotoaddresss = findViewById(R.id.profilephotoaddresss);
         profileid= findViewById(R.id.profileid);
@@ -243,6 +260,11 @@ public class Level2ProfileActivity extends AppCompatActivity {
         gotra = findViewById(R.id.gotra);
         mangal = findViewById(R.id.mangal);
 
+        email = findViewById(R.id.email);
+        mobile1 = findViewById(R.id.mobile1);
+        mobile2 = findViewById(R.id.mobile2);
+        mobile3 = findViewById(R.id.mobile3);
+
 
 
 
@@ -280,10 +302,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
     public void showSnackBar(String content) {
         Snackbar snackbar = Snackbar
                 .make(coordinatorLayout, content, Snackbar.LENGTH_LONG)
-                .setAction("OK", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                    }
+                .setAction("OK", view -> {
                 });
         snackbar.show();
     }

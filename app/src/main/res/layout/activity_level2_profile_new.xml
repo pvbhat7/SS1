@@ -13,63 +13,64 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <LinearLayout
-        android:gravity="right"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-        <!--Header-->
-        <androidx.cardview.widget.CardView
-            android:layout_width="140dp"
-            android:layout_height="30dp"
-            android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="10dp">
-
-
-            <TextView
-                android:id="@+id/profileid"
-                android:background="@color/yellow"
-                android:layout_width="140dp"
-                android:layout_height="match_parent"
-                android:fontFamily="@font/comic_simple"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:text=""
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textSize="12dp"
-                android:visibility="visible" />
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:id="@+id/editprofile_link"
-            android:layout_marginLeft="10dp"
-            android:layout_width="50dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_gravity="right"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="10dp">
+            android:gravity="right"
+            android:orientation="horizontal">
+            <!--Header-->
+            <androidx.cardview.widget.CardView
+                android:layout_width="140dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp">
 
-            <ImageView
-                android:src="@drawable/pencil_icon"
+
+                <TextView
+                    android:id="@+id/profileid"
+                    android:layout_width="140dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/yellow"
+                    android:fontFamily="@font/comic_simple"
+                    android:gravity="center_vertical"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="12dp"
+                    android:visibility="visible" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/editprofile_link"
                 android:layout_width="50dp"
-                android:layout_height="50dp"/>
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
+                android:layout_height="50dp"
+                android:layout_gravity="right"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="10dp">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/pencil_icon" />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
 
 
         <androidx.cardview.widget.CardView
-            android:layout_gravity="center"
             android:layout_width="280dp"
             android:layout_height="280dp"
+            android:layout_gravity="center"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
@@ -85,25 +86,24 @@
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
-              <!--<com.smarteist.autoimageslider.SliderView
-                      android:id="@+id/image_slider"
-                    android:clickable="true"
-                      android:layout_width="wrap_content"
-                      android:layout_height="200dp"
-                      app:sliderAnimationDuration="800"
-                      app:sliderAutoCycleDirection="back_and_forth"
-                      app:sliderAutoCycleEnabled="true"
-                      app:sliderIndicatorAnimationDuration="800"
-                      app:sliderIndicatorGravity="center_horizontal|bottom"
-                      app:sliderIndicatorMargin="15dp"
-                      app:sliderIndicatorOrientation="horizontal"
-                      app:sliderIndicatorPadding="3dp"
-                      app:sliderIndicatorRadius="2dp"
-                      app:sliderIndicatorSelectedColor="#5A5A5A"
-                      app:sliderIndicatorUnselectedColor="#FFF"
-                      app:sliderScrollTimeInSec="3"
-                      app:sliderStartAutoCycle="true" />-->
-
+                <!--<com.smarteist.autoimageslider.SliderView
+                        android:id="@+id/image_slider"
+                      android:clickable="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="200dp"
+                        app:sliderAnimationDuration="800"
+                        app:sliderAutoCycleDirection="back_and_forth"
+                        app:sliderAutoCycleEnabled="true"
+                        app:sliderIndicatorAnimationDuration="800"
+                        app:sliderIndicatorGravity="center_horizontal|bottom"
+                        app:sliderIndicatorMargin="15dp"
+                        app:sliderIndicatorOrientation="horizontal"
+                        app:sliderIndicatorPadding="3dp"
+                        app:sliderIndicatorRadius="2dp"
+                        app:sliderIndicatorSelectedColor="#5A5A5A"
+                        app:sliderIndicatorUnselectedColor="#FFF"
+                        app:sliderScrollTimeInSec="3"
+                        app:sliderStartAutoCycle="true" />-->
 
 
                 <ImageView
@@ -111,15 +111,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:layout_gravity="center"
-                    android:clickable="true"/>
+                    android:clickable="true" />
 
                 <LinearLayout
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/name"
                         android:layout_width="wrap_content"
@@ -130,16 +131,143 @@
                         android:text=""
                         android:textAlignment="center"
                         android:textColor="@color/black"
-                       android:textSize="25dp" />
+                        android:textSize="25dp" />
+
                     <ImageView
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/verified_icon"
-                        android:layout_marginLeft="5dp"
                         android:layout_width="25dp"
-                        android:layout_height="25dp"/>
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:src="@drawable/verified_icon" />
                 </LinearLayout>
 
 
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/contact_card"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <LinearLayout
+                    android:id="@+id/call1_link"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/call_icon"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"/>
+                    <TextView
+                        android:textColor="@color/black"
+                        android:textSize="7dp"
+                        android:text="mobile 1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/call2_link"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@drawable/call_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"/>
+                    <TextView
+                        android:textColor="@color/black"
+                        android:textSize="7dp"
+                        android:text="mobile 2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/whatsapp_link"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@drawable/whatsapp_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"/>
+                    <TextView
+                        android:textColor="@color/black"
+                        android:textSize="7dp"
+                        android:text="whatsapp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/insta_link"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@drawable/insta_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"/>
+                    <TextView
+                        android:textColor="@color/black"
+                        android:textSize="7dp"
+                        android:text="instagram"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/email_link"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@drawable/email"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"/>
+                    <TextView
+                        android:textColor="@color/black"
+                        android:textSize="7dp"
+                        android:text="email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -171,11 +299,11 @@
             tools:context=".diet_recyclerview.DietFragment">
 
             <LinearLayout
-                android:layout_marginRight="5dp"
-                android:layout_marginLeft="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -184,10 +312,10 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/birthdate"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -211,16 +339,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/birthtime"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -244,16 +373,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/height"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -277,16 +407,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/education"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -310,16 +441,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/occupation"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -343,16 +475,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/income"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -376,16 +509,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/religion"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -409,16 +543,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/caste"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -456,10 +591,10 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/bloodgroup"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -483,16 +618,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="marriage status"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -516,16 +652,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/navrasnav"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -549,16 +686,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/birthplace"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -596,10 +734,10 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/fathername"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -623,16 +761,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/mothername"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -656,16 +795,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/relatives"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -689,16 +829,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="family"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -722,16 +863,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/expectation"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -768,10 +910,10 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="city"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -795,16 +937,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="address"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -842,10 +985,10 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/kuldaivat"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -869,16 +1012,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/zodiac"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -902,16 +1046,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/varn"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -935,16 +1080,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/nakshatra"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -968,16 +1114,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/nadi"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -1001,16 +1148,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/gan"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -1034,16 +1182,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/yoni"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -1067,16 +1216,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/charan"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -1100,16 +1250,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/gotra"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -1133,16 +1284,17 @@
                         android:textColor="@color/black"
                         android:textSize="15dp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:fontFamily="@font/roboto_bold"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="@string/mangal"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -1167,6 +1319,147 @@
                         android:textSize="15dp" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="20dp"
+                    android:background="@color/colorDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="email"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:text=":"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="mobile 1"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:text=":"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/mobile1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="mobile 2"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:text=":"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/mobile2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="mobile 3"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:text=":"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/mobile3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+                </LinearLayout>
 
                 <View
                     android:layout_width="fill_parent"

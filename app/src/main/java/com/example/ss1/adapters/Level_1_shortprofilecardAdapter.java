@@ -92,7 +92,7 @@ public class Level_1_shortprofilecardAdapter extends RecyclerView.Adapter<Recycl
                     .into(holder.profilephoto);
 
             holder.level1short_cardview.setOnClickListener(view -> {
-                ApiCallUtil.getLevel2Data(obj.getProfileId(), activity, false);
+                ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
             });
         }
     }

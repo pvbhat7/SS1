@@ -41,18 +41,16 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
 
     Activity activity;
     Fragment fragment;
-    Boolean flag;
     View view;
     SpinKitView sprogressBar;
 
     Customer customer;
 
 
-    public Level_1_profilecardAdapter(SpinKitView sprogressBar , View view, List<Level_1_cardModal> itemList, Fragment fragment, Activity activity, boolean flag) {
+    public Level_1_profilecardAdapter(SpinKitView sprogressBar , View view, List<Level_1_cardModal> itemList, Fragment fragment, Activity activity) {
         mItemList = itemList;
         this.activity = activity;
         this.fragment = fragment;
-        this.flag = flag;
         this.view = view;
         this.sprogressBar = sprogressBar;
         this.customer = LocalCache.retrieveLoggedInCustomer(activity);
@@ -155,7 +153,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
                 holder.profilephoto.setOnClickListener(view -> {
 
                     if(customer.getIs_verified() != null && customer.getIs_verified().equalsIgnoreCase("2"))
-                    ApiCallUtil.getLevel2Data(obj.getProfileId(), activity, flag);
+                    ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
                     else
                         ((HomeFragment)fragment).showSnackBar("Complete your profile to view "+obj.getFirstname()+"'s profile");
 

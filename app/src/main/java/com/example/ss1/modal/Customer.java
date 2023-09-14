@@ -14,7 +14,7 @@ public class Customer {
     private String creationdate;
     private String creationsource;
     private String discontinue;
-    private String activepackageId;
+    private String activepackageid;
     private String profilephotoaddress;
     private String biodataaddress;
     private String height;
@@ -228,12 +228,12 @@ public class Customer {
         this.discontinue = discontinue;
     }
 
-    public String getActivepackageId() {
-        return activepackageId;
+    public String getActivepackageid() {
+        return activepackageid;
     }
 
-    public void setActivepackageId(String activepackageId) {
-        this.activepackageId = activepackageId;
+    public void setActivepackageid(String activepackageid) {
+        this.activepackageid = activepackageid;
     }
 
     public String getProfilephotoaddress() {

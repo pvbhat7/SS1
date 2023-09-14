@@ -68,7 +68,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 if (obj.getIs_viewed().equalsIgnoreCase("0"))
                     ApiCallUtil.updateViewedNotificationState(String.valueOf(obj.getId()));
                 dialog.dismiss();
-                ApiCallUtil.getLevel2Data(obj.getVcpid(), activity, false);
+                ApiCallUtil.getLevel2Data(obj.getVcpid(), activity);
             });
 
         }

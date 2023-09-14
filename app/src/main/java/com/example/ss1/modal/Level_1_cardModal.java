@@ -14,6 +14,8 @@ public class Level_1_cardModal {
 
     private String isInterestsent;
 
+    private String isViewed;
+
     private String profilephotoaddress;
 
 
@@ -99,5 +101,13 @@ public class Level_1_cardModal {
 
     public void setProfilephotoaddress(String profilephotoaddress) {
         this.profilephotoaddress = profilephotoaddress;
+    }
+
+    public String getIsViewed() {
+        return isViewed;
+    }
+
+    public void setIsViewed(String isViewed) {
+        this.isViewed = isViewed;
     }
 }

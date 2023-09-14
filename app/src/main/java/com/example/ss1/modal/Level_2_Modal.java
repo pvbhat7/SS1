@@ -4,12 +4,17 @@ import java.util.ArrayList;
 
 public class Level_2_Modal {
 
+    private Boolean isContactViewed;
     private String profileId;
     private String firstname;
     private String lastname;
     private String email;
     private String mobile1;
     private String mobile2;
+
+    private String mobile3;
+
+    private String mobile4;
     private String gender;
     private String creationdate;
     private String creationsource;
@@ -438,5 +443,29 @@ public class Level_2_Modal {
 
     public void setFamily(String family) {
         this.family = family;
+    }
+
+    public String getMobile3() {
+        return mobile3;
+    }
+
+    public void setMobile3(String mobile3) {
+        this.mobile3 = mobile3;
+    }
+
+    public String getMobile4() {
+        return mobile4;
+    }
+
+    public void setMobile4(String mobile4) {
+        this.mobile4 = mobile4;
+    }
+
+    public Boolean getContactViewed() {
+        return isContactViewed;
+    }
+
+    public void setContactViewed(Boolean contactViewed) {
+        isContactViewed = contactViewed;
     }
 }

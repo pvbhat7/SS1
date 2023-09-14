@@ -172,6 +172,7 @@ public class MyAccountFragment extends Fragment {
             LocalCache.saveLoggedInCustomer(new Customer(), this.getActivity());
             LocalCache.saveActiveOrder(new OrderModal(), this.getActivity());
             LocalCache.saveLevel1List(new ArrayList<>(), this.getActivity());
+            LocalCache.saveContactViewedList(new ArrayList<>(), this.getActivity());
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this.getActivity(), SendOtpActivity.class);
             intent.putExtra("logout", true);
