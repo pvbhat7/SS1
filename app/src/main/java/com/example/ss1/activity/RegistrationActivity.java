@@ -81,9 +81,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
         init();
-        initFormData();
-        handleOnclickListeners();
-        handleFormOnClickListeners();
+
 
         if (editprofile) {
             formLayout.setVisibility(View.VISIBLE);
@@ -94,6 +92,10 @@ public class RegistrationActivity extends AppCompatActivity {
             addcard.setVisibility(View.VISIBLE);
             formLayout.setVisibility(GONE);
         }
+
+        initFormData();
+        handleOnclickListeners();
+        handleFormOnClickListeners();
     }
 
     private void preFillFormData() {
