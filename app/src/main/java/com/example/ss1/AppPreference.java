@@ -10,6 +10,8 @@ public class AppPreference {
     public static final String LEVEL_1_LIST_JSON = "Level1ListJson";
     public static final String CONTACT_VIEWED_LIST_JSON = "ContactViewedListJson";
 
+    public static final String GENDER_STAT_JSON = "genderStatJson";
+
     public static final void setStringPref(Context context, String prefKey, String key, String value) {
         SharedPreferences sp = context.getSharedPreferences(prefKey, 0);
         SharedPreferences.Editor edit = sp.edit();

@@ -59,7 +59,6 @@ public class RegistrationActivity extends AppCompatActivity {
 
     public static final int PICK_IMAGE_REQUEST = 1;
     Button save_btn, cancel_btn, cmbtn;
-    CardView addcard;
     LinearLayout formLayout, cmlayout;
     CircularImageView profilePhotoAddress, biodataAddress;
 
@@ -73,6 +72,7 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+        init();
 
         customer = LocalCache.retrieveLoggedInCustomer(this);
 
@@ -87,16 +87,14 @@ public class RegistrationActivity extends AppCompatActivity {
         }
 
 
-        init();
-
-
         if (editprofile) {
             formLayout.setVisibility(View.VISIBLE);
             cancel_btn.setVisibility(GONE);
             preFillFormData();
         } else {
-            cmlayout.setVisibility(GONE);
-            addcard.setVisibility(View.VISIBLE);
+            profilePhotoAddressBase64 = "";
+            biodataAddressBase64 = "";
+            cmlayout.setVisibility(View.VISIBLE);
             formLayout.setVisibility(GONE);
         }
 
@@ -220,18 +218,13 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void handleOnclickListeners() {
 
-        addcard.setOnClickListener(view -> {
-            profilePhotoAddressBase64 = "";
-            biodataAddressBase64 = "";
-            cmlayout.setVisibility(View.VISIBLE);
-            addcard.setVisibility(GONE);
-        });
+
 
         cmbtn.setOnClickListener(view -> {
             ViewUtils.hideKeyboard(view);
             cmlayout.setVisibility(GONE);
             String mobile = ((TextInputEditText) findViewById(R.id.cmmobile)).getText().toString().trim();
-            ApiCallUtil.validateLoginMobile(this, mobile, formLayout, addcard, mobile1, save_btn);
+            ApiCallUtil.validateLoginMobile(this, mobile, formLayout, cmlayout, mobile1, save_btn);
         });
 
         save_btn.setOnClickListener(view -> {
@@ -241,7 +234,7 @@ public class RegistrationActivity extends AppCompatActivity {
         cancel_btn.setOnClickListener(view -> {
             nullifyformdata();
             formLayout.setVisibility(GONE);
-            addcard.setVisibility(View.VISIBLE);
+            cmlayout.setVisibility(View.VISIBLE);
         });
         profilePhotoAddress.setOnClickListener(view -> {
             clickedImagename = "profilePhotoAddress";
@@ -278,7 +271,6 @@ public class RegistrationActivity extends AppCompatActivity {
     private void init() {
         save_btn = findViewById(R.id.save_btn);
         cancel_btn = findViewById(R.id.cancel_btn);
-        addcard = findViewById(R.id.add);
         formLayout = findViewById(R.id.formLayout);
         profilePhotoAddress = findViewById(R.id.profilePhotoAddress);
         biodataAddress = findViewById(R.id.biodataAddress);
@@ -381,7 +373,7 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] ampmArray = {"am", "pm"};
         ((AutoCompleteTextView) findViewById(R.id.ampm)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, ampmArray));
 
-        String[] genderArray = {"male", "female"};
+        String[] genderArray = {"female", "male"};
         ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
 
 
@@ -448,7 +440,7 @@ public class RegistrationActivity extends AppCompatActivity {
         nullifyformdata();
         cmmobile.setText("");
         formLayout.setVisibility(GONE);
-        addcard.setVisibility(View.VISIBLE);
+        cmlayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -545,7 +537,8 @@ public class RegistrationActivity extends AppCompatActivity {
         relationname2.setText("");
         //family.setText("");
         relatives.setText("");
-
+        profilePhotoAddressBase64 = "";
+        biodataAddressBase64 = "";
 
     }
 

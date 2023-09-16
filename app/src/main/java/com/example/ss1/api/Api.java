@@ -5,6 +5,7 @@ import android.os.TestLooperManager;
 
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.GenderStat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
 import com.example.ss1.modal.MembershipModal;
@@ -122,6 +123,11 @@ public interface Api {
     @GET("membership/all.php")
     Call<List<MembershipModal>> getAllMembershipPlans();
 
+    @GET("getAdminCode.php")
+    Call<SingleResponse> getAdminCode();
+
+    @GET("customer/getGenderStats.php")
+    Call<List<GenderStat>> getGenderStats();
 
 
 }

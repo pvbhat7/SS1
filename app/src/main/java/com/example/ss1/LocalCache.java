@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.GenderStat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.OrderModal;
 import com.google.gson.Gson;
@@ -80,6 +81,23 @@ public class LocalCache {
         String jsonString = AppPreference.getStringPref(activity, AppPreference.CONTACT_VIEWED_LIST_JSON, AppPreference.CONTACT_VIEWED_LIST_JSON);
         if (!jsonString.isEmpty()){
             Type type = new TypeToken<ArrayList<ContactViewedModal>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static String saveGenderStat(List<GenderStat> list, Activity activity){
+        String jsonString = new Gson().toJson(list);
+        AppPreference.setStringPref(activity, AppPreference.GENDER_STAT_JSON, AppPreference.GENDER_STAT_JSON,jsonString);
+        return jsonString;
+    }
+
+    public static List<GenderStat> retrieveGenderStat(Activity activity) {
+        List<GenderStat> list = new ArrayList<>();
+        String jsonString = (String) AppPreference.getStringPref(activity, AppPreference.GENDER_STAT_JSON, AppPreference.GENDER_STAT_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<GenderStat>>() {}.getType();
             Gson gson = new Gson();
             list = gson.fromJson(jsonString, type);
         }

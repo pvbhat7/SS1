@@ -1,7 +1,12 @@
 package com.example.ss1.ui.settings;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +17,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
+import com.example.ss1.activity.AdminZoneActivity;
 import com.example.ss1.activity.ContactViewedActivity;
 import com.example.ss1.activity.MyMembershipActivity;
 import com.example.ss1.activity.RegistrationActivity;
@@ -25,9 +32,10 @@ import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.ApiUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.OrderModal;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
 
@@ -38,9 +46,10 @@ public class MyAccountFragment extends Fragment {
 
     OrderModal activeOrder;
 
-    CardView cb_card,registraton_card,myaccount_profile_card;
-    LinearLayout registration_link, logoutId,cb_link,mymembership_link,editprofile_link;
-    TextView profileHeadingName, profileHeadingmobile, profileHeadingEmail,profileCardId,cb_text;
+    static CoordinatorLayout coordinatorLayout;
+    CardView cb_card, adminzone_card, myaccount_profile_card;
+    LinearLayout adminzone_link, logoutId, cb_link, mymembership_link, editprofile_link;
+    TextView profileHeadingName, profileHeadingmobile, profileHeadingEmail, profileCardId, cb_text;
 
     ImageView sprofilephoto;
 
@@ -48,7 +57,7 @@ public class MyAccountFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_myaccountnew, container, false);
         ApiUtils.checkNetworkStatus(this.getActivity());
-        try{
+        try {
             initUIElements();
             initOnClickListeners();
             syncLoggedInCustomer();
@@ -56,38 +65,35 @@ public class MyAccountFragment extends Fragment {
             activeOrder = LocalCache.retrieveActiveOrder(this.getActivity());
 
 
-            if(customer != null){
-                if(customer.getIsAdmin() != null && customer.getIsAdmin().equalsIgnoreCase("1"))
-                    registraton_card.setVisibility(View.VISIBLE);
+            if (customer != null) {
+                if (customer.getIsAdmin() != null && customer.getIsAdmin().equalsIgnoreCase("1"))
+                    adminzone_card.setVisibility(View.VISIBLE);
                 else
-                    registraton_card.setVisibility(View.GONE);
-            }
-            else
-                registraton_card.setVisibility(View.GONE);
+                    adminzone_card.setVisibility(View.GONE);
+            } else
+                adminzone_card.setVisibility(View.GONE);
 
 
-            profileHeadingName.setText(customer.getFirstname()+" "+customer.getLastname());
-            profileHeadingmobile.setText("+91 "+customer.getMobile1());
+            profileHeadingName.setText(customer.getFirstname() + " " + customer.getLastname());
+            profileHeadingmobile.setText("+91 " + customer.getMobile1());
             profileHeadingEmail.setText(customer.getEmail());
-            profileCardId.setText("Profile id : A"+customer.getProfileId());
+            profileCardId.setText("Profile id : A" + customer.getProfileId());
             Glide.with(this.getActivity())
                     .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.prashant)
                     .placeholder(R.drawable.oops)
                     .into(sprofilephoto);
 
             // handle contact balance
-            if(activeOrder != null && activeOrder.getId() != null){
+            if (activeOrder != null && activeOrder.getId() != null) {
                 int balance = Integer.parseInt(activeOrder.getMaxCount()) - Integer.parseInt(activeOrder.getUsedCount());
                 cb_card.setVisibility(View.VISIBLE);
-                cb_text.setText("Contact Balance : "+balance);
-            }
-            else
+                cb_text.setText("Contact Balance : " + balance);
+            } else
                 cb_card.setVisibility(View.GONE);
 
-            ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity(),cb_card,cb_text,true);
-        }
-        catch (Exception e){
-            Log.i("ss_nw_call","ErrorAla : myaccountfragment"+e.getMessage());
+            ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity(), cb_card, cb_text, true);
+        } catch (Exception e) {
+            Log.i("ss_nw_call", "ErrorAla : myaccountfragment" + e.getMessage());
         }
 
 
@@ -101,7 +107,7 @@ public class MyAccountFragment extends Fragment {
         editprofile_link.setOnClickListener(view -> {
             ApiUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
-            intent.putExtra("editprofile",true);
+            intent.putExtra("editprofile", true);
             startActivity(intent);
         });
         mymembership_link.setOnClickListener(view -> {
@@ -109,10 +115,45 @@ public class MyAccountFragment extends Fragment {
             Intent intent = new Intent(this.getActivity(), MyMembershipActivity.class);
             startActivity(intent);
         });
-        registration_link.setOnClickListener(view -> {
-            ApiUtils.vibrateFunction(this.getActivity());
-            Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
-            startActivity(intent);
+        adminzone_link.setOnClickListener(view -> {
+            Dialog d = new Dialog(this.getActivity());
+            d.setContentView(R.layout.admin_zone_access_dialog);
+            d.findViewById(R.id.submitAdminCodeBtn).setOnClickListener(view1 -> {
+                String inputCode = ((TextInputEditText) d.findViewById(R.id.adminCodeField)).getText().toString().trim();
+                if (inputCode.isEmpty()) {
+                    d.findViewById(R.id.errorcode).setVisibility(View.VISIBLE);
+                    ((TextView) d.findViewById(R.id.errorcode)).setText("Please entry pin");
+                } else {
+                    ApiCallUtil.validateAdminCode(d, inputCode, this.getActivity());
+                }
+            });
+
+            ((TextInputEditText) d.findViewById(R.id.adminCodeField)).addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                    if (s.length() > 0)
+                    {
+                        d.findViewById(R.id.errorcode).setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        d.findViewById(R.id.errorcode).setVisibility(View.VISIBLE);
+                        ((TextView) d.findViewById(R.id.errorcode)).setText("Please entry pin");
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                }
+            });
+
+
+            d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            d.show();
         });
 
         cb_link.setOnClickListener(view -> {
@@ -130,26 +171,23 @@ public class MyAccountFragment extends Fragment {
     }
 
 
-
-
-
     private void initUIElements() {
+        coordinatorLayout = view.findViewById(R.id.coordinatorLayout);
         profileHeadingName = view.findViewById(R.id.profileHeadingName);
         profileHeadingmobile = view.findViewById(R.id.profileHeadingmobile);
         profileHeadingEmail = view.findViewById(R.id.profileHeadingEmail);
         profileCardId = view.findViewById(R.id.profileCardId);
-        registraton_card = view.findViewById(R.id.registraton_card);
+        adminzone_card = view.findViewById(R.id.adminzone_card);
         myaccount_profile_card = view.findViewById(R.id.myaccount_profile_card);
 
         sprofilephoto = view.findViewById(R.id.sprofilephoto);
-        registration_link = view.findViewById(R.id.registration_link);
+        adminzone_link = view.findViewById(R.id.adminzone_link);
         mymembership_link = view.findViewById(R.id.mymembership_link);
         editprofile_link = view.findViewById(R.id.editprofile_link);
 
         cb_link = view.findViewById(R.id.cb_link);
         cb_card = view.findViewById(R.id.cb_card);
         cb_text = view.findViewById(R.id.cb_text);
-
 
 
         logoutId = view.findViewById(R.id.logoutId);
@@ -184,8 +222,19 @@ public class MyAccountFragment extends Fragment {
     private void syncLoggedInCustomer() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            ApiCallUtil.updateLoggedInCustomerDetails(this.getActivity(),user.getPhoneNumber().replace("+91",""));
+            ApiCallUtil.updateLoggedInCustomerDetails(this.getActivity(), user.getPhoneNumber().replace("+91", ""));
         }
+    }
+
+    public static void showSnackBar(String content) {
+        Snackbar snackbar = Snackbar
+                .make(coordinatorLayout, content, Snackbar.LENGTH_LONG)
+                .setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+        snackbar.show();
     }
 
 }

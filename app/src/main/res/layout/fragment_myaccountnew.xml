@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/profileFragmentCoordinatorLayout"
+    android:id="@+id/coordinatorLayout"
     tools:context=".MainActivity"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -137,7 +137,7 @@
 
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/registraton_card"
+                    android:id="@+id/adminzone_card"
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
@@ -154,7 +154,7 @@
                         android:orientation="vertical">
 
                         <LinearLayout
-                            android:id="@+id/registration_link"
+                            android:id="@+id/adminzone_link"
                             android:clickable="true"
                             android:focusable="true"
                             android:background="?attr/selectableItemBackground"
@@ -164,7 +164,7 @@
                             <ImageView
                                 android:layout_marginLeft="10dp"
                                 android:layout_gravity="center_vertical"
-                                android:src="@drawable/editprofile_icon"
+                                android:src="@drawable/star_golden"
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
                             <TextView
@@ -173,7 +173,7 @@
                                 android:textSize="16dp"
                                 android:fontFamily="@font/comic_bold"
                                 android:layout_gravity="center_vertical"
-                                android:text="Registration"
+                                android:text="Admin Zone"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
                         </LinearLayout>

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
+import com.example.ss1.activity.AdminZoneActivity;
 import com.example.ss1.activity.Level2ProfileActivity;
 import com.example.ss1.adapters.BuyMembershipAdapter;
 import com.example.ss1.adapters.ContactViewedAdapter;
@@ -26,6 +27,7 @@ import com.example.ss1.adapters.MyMembershipAdapter;
 import com.example.ss1.adapters.NotificationAdapter;
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.GenderStat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
 import com.example.ss1.modal.MembershipModal;
@@ -35,6 +37,7 @@ import com.example.ss1.modal.OrderModal;
 import com.example.ss1.modal.SingleResponse;
 import com.example.ss1.ui.dashboard.MatchesFragment;
 import com.example.ss1.ui.home.HomeFragment;
+import com.example.ss1.ui.settings.MyAccountFragment;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.github.ybq.android.spinkit.style.Circle;
 import com.google.android.material.textfield.TextInputEditText;
@@ -81,8 +84,16 @@ public class ApiCallUtil {
         new UpdateProfileTask(customer, activity , updateCache).execute();
     }
 
-    public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
-        new ValidateLoginMobileTask(activity, mobile, formLayout, addcard, mobile1, savebtn).execute();
+    public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, Button savebtn) {
+        new ValidateLoginMobileTask(activity, mobile, formLayout, cmLayout, mobile1, savebtn).execute();
+    }
+
+    public static void validateAdminCode(Dialog d , String inputCode,Activity activity) {
+        new ValidateAdminCodeTask(d,inputCode,activity).execute();
+    }
+
+    public static void syncGenderStats(Activity activity) {
+        new SyncGenderStatsTask(activity).execute();
     }
 
     public static void getMyMemberships(String cpid, RecyclerView recyclerView, Activity activity) {
@@ -954,18 +965,18 @@ public class ApiCallUtil {
         Activity activity;
         String mobile;
         LinearLayout formLayout;
-        CardView addcard;
+        LinearLayout cmLayout;
         SingleResponse response;
         String error;
         TextInputEditText mobile1;
 
         Button savebtn;
 
-        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, CardView addcard, TextInputEditText mobile1, Button savebtn) {
+        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, Button savebtn) {
             this.activity = activity;
             this.mobile = mobile;
             this.formLayout = formLayout;
-            this.addcard = addcard;
+            this.cmLayout = cmLayout;
             this.mobile1 = mobile1;
             this.savebtn = savebtn;
         }
@@ -990,7 +1001,7 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             if (response != null) {
                 if (!response.getResult().equalsIgnoreCase("0")) {
-                    addcard.setVisibility(View.VISIBLE);
+                    cmLayout.setVisibility(View.VISIBLE);
                     ApiUtils.showDialog(activity, R.drawable.failed_icon, "Account exists id:" + response.getResult(), "change mobile number to continue");
                 } else {
                     // allow registration flow
@@ -998,11 +1009,10 @@ public class ApiCallUtil {
                     mobile1.setText(mobile);
                     mobile1.setEnabled(false);
                     savebtn.setEnabled(true);
-                    addcard.setVisibility(View.GONE);
-
+                    cmLayout.setVisibility(View.GONE);
                 }
             } else {
-                addcard.setVisibility(View.VISIBLE);
+                cmLayout.setVisibility(View.VISIBLE);
                 ApiUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);
             }
         }
@@ -1085,6 +1095,97 @@ public class ApiCallUtil {
                 recyclerView.setAdapter(adapter);
 
 
+            }
+        }
+    }
+
+    static class ValidateAdminCodeTask extends AsyncTask<Void, Void, Void> {
+
+        String inputCode ;
+        SingleResponse obj;
+        Dialog d;
+
+        Activity activity;
+
+        public ValidateAdminCodeTask(Dialog d , String inputCode, Activity activity) {
+            this.inputCode = inputCode;
+            this.d = d;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                obj = RetrofitClient.getInstance().getApi().getAdminCode().execute().body();
+
+            } catch (Exception e) {
+                Log.i("local_logs", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(obj != null){
+                if(inputCode.equalsIgnoreCase(obj.getResult())){
+                    d.dismiss();
+                   activity.startActivity(new Intent(activity, AdminZoneActivity.class));
+                }
+                else{
+                    d.findViewById(R.id.errorcode).setVisibility(View.VISIBLE);
+                    ((TextView)d.findViewById(R.id.errorcode)).setText("wrong pin entered , try again");
+                }
+            }
+            else{
+                ((TextView)d.findViewById(R.id.errorcode)).setText("wrong pin entered , try again");
+            }
+        }
+    }
+
+
+    static class SyncGenderStatsTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        List<GenderStat> list;
+
+        public SyncGenderStatsTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                list = RetrofitClient.getInstance().getApi().getGenderStats().execute().body();
+
+            } catch (Exception e) {
+                Log.i("local_logs", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(list != null){
+               LocalCache.saveGenderStat(list,activity);
+               String malecount  = "0", femalecount = "0";
+               for(GenderStat g : list){
+                   if(g.getGender().equalsIgnoreCase("male"))
+                       malecount = g.getCount();
+                   else if(g.getGender().equalsIgnoreCase("female"))
+                       femalecount = g.getCount();
+               }
+                ((TextView)activity.findViewById(R.id.totalmalecount)).setText(malecount);
+                ((TextView)activity.findViewById(R.id.totalfemalecount)).setText(femalecount);
             }
         }
     }

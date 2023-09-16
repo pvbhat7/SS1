@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:layout_margin="20dp"
+    android:background="@color/white"
+    android:foregroundGravity="center_horizontal"
+    app:cardCornerRadius="15dp"
+    app:layout_anchorGravity="center_horizontal"
+    tools:context=".MainActivity">
+
+
+    <LinearLayout
+        android:gravity="center"
+        android:foregroundGravity="center"
+        android:layout_gravity="center"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="Enter Admin Pin"
+            android:textAlignment="center">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/adminCodeField"
+                android:maxLength="4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="true"
+                android:inputType="number"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="15dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/errorcode"
+            android:visibility="gone"
+            android:layout_margin="5dp"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textColor="@color/red"
+            android:text=""
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/submitAdminCodeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:text="login" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
