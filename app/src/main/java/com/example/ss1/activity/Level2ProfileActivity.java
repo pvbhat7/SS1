@@ -3,10 +3,8 @@ package com.example.ss1.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,7 +17,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
-import com.example.ss1.ProCoinBottomSheetDialog;
+import com.example.ss1.BuyMembershipBottomSheetDialog;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.ApiUtils;
@@ -158,7 +156,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
             // check if package exist or not
             if (customer.getActivepackageid() == null) {
-                new ProCoinBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
+                new BuyMembershipBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
                 viewContactDetailsBtn.setEnabled(false);
                 viewContactDetailsBtn.setVisibility(View.GONE);

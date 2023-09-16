@@ -19,7 +19,7 @@ import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.example.ss1.LocalCache;
-import com.example.ss1.ProCoinBottomSheetDialog;
+import com.example.ss1.BuyMembershipBottomSheetDialog;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.modal.Customer;
@@ -196,7 +196,7 @@ public class OldLevel2ProfileActivity extends AppCompatActivity {
         viewContactDetailsBtn.setOnClickListener(view -> {
             // check if package exist or not
             if (customer.getActivepackageid() == null) {
-                new ProCoinBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
+                new BuyMembershipBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
 
                 ApiCallUtil.viewContactData(customer.getProfileId(), profile.getProfileId(), this);

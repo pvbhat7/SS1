@@ -27,6 +27,7 @@ import com.example.ss1.adapters.MyMembershipAdapter;
 import com.example.ss1.adapters.NotificationAdapter;
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.FilterModal;
 import com.example.ss1.modal.GenderStat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
@@ -94,6 +95,10 @@ public class ApiCallUtil {
 
     public static void syncGenderStats(Activity activity) {
         new SyncGenderStatsTask(activity).execute();
+    }
+
+    public static void filterProfiles(Activity activity,Fragment fragment , FilterModal modal) {
+        new GetFilteredLevel1DataTask(activity,fragment,modal).execute();
     }
 
     public static void getMyMemberships(String cpid, RecyclerView recyclerView, Activity activity) {
@@ -1187,6 +1192,48 @@ public class ApiCallUtil {
                 ((TextView)activity.findViewById(R.id.totalmalecount)).setText(malecount);
                 ((TextView)activity.findViewById(R.id.totalfemalecount)).setText(femalecount);
             }
+        }
+    }
+
+    static class GetFilteredLevel1DataTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        List<Level_1_cardModal> list;
+
+        FilterModal filter;
+
+        Fragment fragment;
+
+
+        public GetFilteredLevel1DataTask(Activity activity , Fragment fragment , FilterModal filter) {
+            this.filter = filter;
+            this.activity = activity;
+            this.fragment = fragment;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                list = RetrofitClient.getInstance().getApi().getFilteredLevel1Profiles(filter).execute().body();
+
+            } catch (Exception e) {
+                Log.i("local_logs", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            ApiUtils.searchProfileBottomSheetDialog.dismiss();
+            ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+            if(list != null && !list.isEmpty())
+            LocalCache.saveLevel1List(list, activity);
+
         }
     }
 

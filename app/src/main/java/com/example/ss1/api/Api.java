@@ -5,6 +5,7 @@ import android.os.TestLooperManager;
 
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.FilterModal;
 import com.example.ss1.modal.GenderStat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
@@ -32,6 +33,9 @@ public interface Api {
     // GET LEVEL 1 DATA
     @GET("level1_view/all.php")
     Call<List<Level_1_cardModal>> getAllCustomerProfiles(@Query("cpid") String cpid);
+
+    @POST("level1_view/allFiltered.php")
+    Call<List<Level_1_cardModal>> getFilteredLevel1Profiles(@Body FilterModal modal);
 
     // GET LEVEL 2 DATA
     @GET("level2_view/byCustomerProfileId.php")
@@ -128,6 +132,8 @@ public interface Api {
 
     @GET("customer/getGenderStats.php")
     Call<List<GenderStat>> getGenderStats();
+
+
 
 
 }

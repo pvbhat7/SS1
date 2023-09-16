@@ -24,8 +24,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.example.ss1.BuyMembershipBottomSheetDialog;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
+import com.example.ss1.SearchProfileBottomSheetDialog;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.adapters.Level_1_profilecardAdapter;
 import com.example.ss1.api.ApiUtils;
@@ -220,6 +222,9 @@ public class HomeFragment extends Fragment {
 
     private void searchProfiles() {
         ApiUtils.vibrateFunction(this.getActivity());
+        SearchProfileBottomSheetDialog searchProfileBottomSheetDialog = new SearchProfileBottomSheetDialog(this.getActivity(),this);
+        ApiUtils.searchProfileBottomSheetDialog = searchProfileBottomSheetDialog;
+        searchProfileBottomSheetDialog.show(this.getActivity().getSupportFragmentManager(), "ModalBottomSheet");
     }
 
     private void showUserProfile() {

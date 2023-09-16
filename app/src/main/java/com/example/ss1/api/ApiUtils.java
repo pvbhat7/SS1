@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
+import com.example.ss1.SearchProfileBottomSheetDialog;
 import com.example.ss1.modal.Customer;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -29,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 
 public class ApiUtils {
 
+    public static SearchProfileBottomSheetDialog searchProfileBottomSheetDialog;
     private static float mScaleFactor = 1.0f;
     private static ScaleGestureDetector scaleGestureDetector;
 
