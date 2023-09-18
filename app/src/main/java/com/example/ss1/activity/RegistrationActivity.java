@@ -24,14 +24,13 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
-import com.example.ss1.api.ApiUtils;
+import com.example.ss1.api.HelperUtils;
 import com.example.ss1.modal.Customer;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.internal.ViewUtils;
@@ -74,7 +73,7 @@ public class RegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration);
         init();
 
-        customer = LocalCache.retrieveLoggedInCustomer(this);
+        customer = LocalCache.getLoggedInCustomer(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -467,7 +466,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 try {
                     // You can update this bitmap to your server
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                    String imgB64 = ApiUtils.convertBitmapToString(bitmap, 500);
+                    String imgB64 = HelperUtils.convertBitmapToString(bitmap, 500);
 
 
                     if (clickedImagename != null) {

@@ -23,13 +23,12 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
-import com.example.ss1.activity.AdminZoneActivity;
 import com.example.ss1.activity.ContactViewedActivity;
 import com.example.ss1.activity.MyMembershipActivity;
 import com.example.ss1.activity.RegistrationActivity;
 import com.example.ss1.activity.SendOtpActivity;
 import com.example.ss1.api.ApiCallUtil;
-import com.example.ss1.api.ApiUtils;
+import com.example.ss1.api.HelperUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.OrderModal;
 import com.google.android.material.snackbar.Snackbar;
@@ -56,13 +55,13 @@ public class MyAccountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_myaccountnew, container, false);
-        ApiUtils.checkNetworkStatus(this.getActivity());
+        HelperUtils.checkNetworkStatus(this.getActivity());
         try {
             initUIElements();
             initOnClickListeners();
             syncLoggedInCustomer();
-            customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
-            activeOrder = LocalCache.retrieveActiveOrder(this.getActivity());
+            customer = LocalCache.getLoggedInCustomer(this.getActivity());
+            activeOrder = LocalCache.getActiveOrder(this.getActivity());
 
 
             if (customer != null) {
@@ -105,13 +104,13 @@ public class MyAccountFragment extends Fragment {
             //ApiCallUtil.getLevel2Data(customer.getProfileId(), this.getActivity(), false);
         });
         editprofile_link.setOnClickListener(view -> {
-            ApiUtils.vibrateFunction(this.getActivity());
+            HelperUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
             intent.putExtra("editprofile", true);
             startActivity(intent);
         });
         mymembership_link.setOnClickListener(view -> {
-            ApiUtils.vibrateFunction(this.getActivity());
+            HelperUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), MyMembershipActivity.class);
             startActivity(intent);
         });
@@ -119,6 +118,7 @@ public class MyAccountFragment extends Fragment {
             Dialog d = new Dialog(this.getActivity());
             d.setContentView(R.layout.admin_zone_access_dialog);
             d.findViewById(R.id.submitAdminCodeBtn).setOnClickListener(view1 -> {
+                d.findViewById(R.id.submitAdminCodeBtn).setEnabled(false);
                 String inputCode = ((TextInputEditText) d.findViewById(R.id.adminCodeField)).getText().toString().trim();
                 if (inputCode.isEmpty()) {
                     d.findViewById(R.id.errorcode).setVisibility(View.VISIBLE);
@@ -137,10 +137,12 @@ public class MyAccountFragment extends Fragment {
                 public void onTextChanged(CharSequence s, int i, int i1, int i2) {
                     if (s.length() > 0)
                     {
+                        d.findViewById(R.id.submitAdminCodeBtn).setEnabled(true);
                         d.findViewById(R.id.errorcode).setVisibility(View.GONE);
                     }
                     else
                     {
+                        d.findViewById(R.id.submitAdminCodeBtn).setEnabled(false);
                         d.findViewById(R.id.errorcode).setVisibility(View.VISIBLE);
                         ((TextView) d.findViewById(R.id.errorcode)).setText("Please entry pin");
                     }
@@ -157,7 +159,7 @@ public class MyAccountFragment extends Fragment {
         });
 
         cb_link.setOnClickListener(view -> {
-            ApiUtils.vibrateFunction(this.getActivity());
+            HelperUtils.vibrateFunction(this.getActivity());
             Intent intent = new Intent(this.getActivity(), ContactViewedActivity.class);
             startActivity(intent);
         });
@@ -206,11 +208,11 @@ public class MyAccountFragment extends Fragment {
     }
 
     public void handleLogout() {
-        if (ApiUtils.isConnected()) {
-            LocalCache.saveLoggedInCustomer(new Customer(), this.getActivity());
-            LocalCache.saveActiveOrder(new OrderModal(), this.getActivity());
-            LocalCache.saveLevel1List(new ArrayList<>(), this.getActivity());
-            LocalCache.saveContactViewedList(new ArrayList<>(), this.getActivity());
+        if (HelperUtils.isConnected()) {
+            LocalCache.setLoggedInCustomer(new Customer(), this.getActivity());
+            LocalCache.setActiveOrder(new OrderModal(), this.getActivity());
+            LocalCache.setLevel1List(new ArrayList<>(), this.getActivity());
+            LocalCache.setContactViewedList(new ArrayList<>(), this.getActivity());
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this.getActivity(), SendOtpActivity.class);
             intent.putExtra("logout", true);

@@ -22,9 +22,8 @@ import androidx.cardview.widget.CardView;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
-import com.example.ss1.api.ApiUtils;
+import com.example.ss1.api.HelperUtils;
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.github.ybq.android.spinkit.style.Circle;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -91,11 +90,11 @@ public class SendOtpActivity extends AppCompatActivity {
         });
 
         buttonGetOtp.setOnClickListener(view -> {
-            if (!ApiUtils.isConnected()) {
+            if (!HelperUtils.isConnected()) {
                 Toast.makeText(SendOtpActivity.this, "NO INTERNET", Toast.LENGTH_SHORT).show();
             } else {
                 hideKeyboard(view);
-                ApiUtils.vibrateFunction(SendOtpActivity.this);
+                HelperUtils.vibrateFunction(SendOtpActivity.this);
                 if (inputMobile.getText().toString().trim().isEmpty()) {
                     Toast.makeText(SendOtpActivity.this, "Enter mobile", Toast.LENGTH_SHORT).show();
                     return;

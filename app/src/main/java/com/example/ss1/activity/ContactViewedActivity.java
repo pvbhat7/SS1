@@ -29,7 +29,7 @@ public class ContactViewedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_viewed);
-        activeOrder = LocalCache.retrieveActiveOrder(this);
+        activeOrder = LocalCache.getActiveOrder(this);
         initUiElements();
 
 
@@ -40,7 +40,7 @@ public class ContactViewedActivity extends AppCompatActivity {
             cv_zero.setVisibility(View.VISIBLE);
         }
 
-        customer = LocalCache.retrieveLoggedInCustomer(this);
+        customer = LocalCache.getLoggedInCustomer(this);
 
         ApiCallUtil.getContactViewedProfiles(customer.getProfileId(),adapter,contactviewedRecyclerView,this);
     }

@@ -5,6 +5,8 @@ public class Level_1_cardModal {
     private String profileId;
     private String firstname;
     private String lastname;
+
+    private String gender;
     private String dob;
     private String age;
 
@@ -109,5 +111,13 @@ public class Level_1_cardModal {
 
     public void setIsViewed(String isViewed) {
         this.isViewed = isViewed;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

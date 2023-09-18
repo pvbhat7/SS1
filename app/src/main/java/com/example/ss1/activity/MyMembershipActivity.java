@@ -20,7 +20,7 @@ public class MyMembershipActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mymembership);
 
-        customer = LocalCache.retrieveLoggedInCustomer(this);
+        customer = LocalCache.getLoggedInCustomer(this);
 
         RecyclerView mymembership_recyclerview = findViewById(R.id.mymembership_recyclerview);
         ApiCallUtil.getMyMemberships(customer.getProfileId(),mymembership_recyclerview,this);

@@ -1,5 +1,8 @@
 package com.example.ss1.modal;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class MembershipModal {
 
     private String id;
@@ -46,5 +49,16 @@ public class MembershipModal {
 
     public void setCount(String count) {
         this.count = count;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.getDescription();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return super.equals(obj);
     }
 }

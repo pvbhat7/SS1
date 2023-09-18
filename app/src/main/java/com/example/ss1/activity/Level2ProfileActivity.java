@@ -20,7 +20,7 @@ import com.example.ss1.LocalCache;
 import com.example.ss1.BuyMembershipBottomSheetDialog;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
-import com.example.ss1.api.ApiUtils;
+import com.example.ss1.api.HelperUtils;
 import com.example.ss1.api.DateApi;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_2_Modal;
@@ -69,7 +69,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
         handleOnClickListeners();
 
         // TODO: 12-Sep-23 <a href="https://www.freepik.com/free-photo/abstract-yellow-sunshine-theme-summer-watercolor-background-illustration-high-resolution-free-photo_26887846.htm#query=texture%20background&position=32&from_view=keyword&track=ais">Image by Sketchepedia</a> on Freepik
-        customer = LocalCache.retrieveLoggedInCustomer(this);
+        customer = LocalCache.getLoggedInCustomer(this);
 
         //*set context*//*
         if (ctx == null || ((Level2ProfileActivity) ctx).isDestroyed())
@@ -168,7 +168,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         });
 
-        profilephotoaddresss.setOnClickListener(view -> ApiUtils.showImageDialog(Level2ProfileActivity.this,profile.getProfilephotoaddress()));
+        profilephotoaddresss.setOnClickListener(view -> HelperUtils.showImageDialog(Level2ProfileActivity.this,profile.getProfilephotoaddress()));
 
         /*whatsapp.setOnClickListener(view -> {
             String uri = "https://wa.me/+91" + profile.getMobile1().toString().trim();
@@ -208,7 +208,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
         });*/
 
         editprofile_link.setOnClickListener(view -> {
-            ApiUtils.vibrateFunction(Level2ProfileActivity.this);
+            HelperUtils.vibrateFunction(Level2ProfileActivity.this);
             Intent intent = new Intent(Level2ProfileActivity.this, RegistrationActivity.class);
             intent.putExtra("editprofile",true);
             intent.putExtra("profile",new Gson().toJson(profile));

@@ -11,17 +11,11 @@ import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ss1.api.ApiCallUtil;
-import com.example.ss1.api.ApiUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.FilterModal;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -71,7 +65,7 @@ public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
             String maxHeight_ = "" , minHeight_  = "" , minAge_ = "" , maxAge_ = "";
             minAge_ = minAge.getText().toString().trim();
             maxAge_ = maxAge.getText().toString().trim();
-            Customer c = LocalCache.retrieveLoggedInCustomer(this.getActivity());
+            Customer c = LocalCache.getLoggedInCustomer(this.getActivity());
             String[] parts1 = minHeight.getText().toString().trim().split("\\|");
             String[] parts2 = maxHeight.getText().toString().trim().split("\\|");
 

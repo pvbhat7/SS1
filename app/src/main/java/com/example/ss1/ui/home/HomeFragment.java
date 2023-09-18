@@ -24,13 +24,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
-import com.example.ss1.BuyMembershipBottomSheetDialog;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.SearchProfileBottomSheetDialog;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.adapters.Level_1_profilecardAdapter;
-import com.example.ss1.api.ApiUtils;
+import com.example.ss1.api.HelperUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -76,11 +75,11 @@ public class HomeFragment extends Fragment {
         activity = this.getActivity();
         initUIElements();
         initOnclickListener();
-        ApiUtils.checkNetworkStatus(this.getActivity());
+        HelperUtils.checkNetworkStatus(this.getActivity());
 
         syncLoggedInCustomer();
-        customer = LocalCache.retrieveLoggedInCustomer(this.getActivity());
-        level1list = LocalCache.retrieveLevel1List(this.getActivity());
+        customer = LocalCache.getLoggedInCustomer(this.getActivity());
+        level1list = LocalCache.getLevel1List(this.getActivity());
 
         if (customer.getProfileId() == null)
             onboardNewUser();
@@ -99,7 +98,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void onboardNewUser() {
-        ApiUtils.vibrateFunction(this.getActivity());
+        HelperUtils.vibrateFunction(this.getActivity());
         Dialog d = new Dialog(this.getActivity());
         d.setContentView(R.layout.onboarding_dialog);
 
@@ -221,14 +220,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void searchProfiles() {
-        ApiUtils.vibrateFunction(this.getActivity());
+        HelperUtils.vibrateFunction(this.getActivity());
         SearchProfileBottomSheetDialog searchProfileBottomSheetDialog = new SearchProfileBottomSheetDialog(this.getActivity(),this);
-        ApiUtils.searchProfileBottomSheetDialog = searchProfileBottomSheetDialog;
+        HelperUtils.searchProfileBottomSheetDialog = searchProfileBottomSheetDialog;
         searchProfileBottomSheetDialog.show(this.getActivity().getSupportFragmentManager(), "ModalBottomSheet");
     }
 
     private void showUserProfile() {
-        ApiUtils.vibrateFunction(this.getActivity());
+        HelperUtils.vibrateFunction(this.getActivity());
         ApiCallUtil.getLevel2Data(customer.getProfileId(), activity);
     }
 
@@ -295,7 +294,7 @@ public class HomeFragment extends Fragment {
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
                     recyclerView.setAdapter(level1CardAdapter);
-                    ApiUtils.showSearchingDialog(this, progressBar, this.getActivity(), R.drawable.searching_gif, "0 profiles found", "try again");
+                    HelperUtils.showSearchingDialog(this, progressBar, this.getActivity(), R.drawable.searching_gif, "0 profiles found", "try again");
                 }
             }
         }
@@ -314,7 +313,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void showNotificationListDialog() {
-        ApiUtils.vibrateFunction(this.getActivity());
+        HelperUtils.vibrateFunction(this.getActivity());
         Dialog d = new Dialog(this.getActivity());
         d.setContentView(R.layout.notificationlist_dialog);
 

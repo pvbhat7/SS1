@@ -1,11 +1,10 @@
 package com.example.ss1.adapters;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -14,32 +13,35 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
+import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
-import com.example.ss1.modal.MembershipModal;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.List;
 
-public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.ViewHolder> {
+public class SearchedMembersAdapter extends RecyclerView.Adapter<SearchedMembersAdapter.ViewHolder> {
 
 
-    private List<Level_1_cardModal> mItemList;
+    private List<Customer> mItemList;
 
     Activity activity;
 
+    Dialog d;
 
-    public AllMembersAdapter(List<Level_1_cardModal> itemList, Activity activity) {
+
+    public SearchedMembersAdapter(Dialog d, List<Customer> itemList, Activity activity) {
         mItemList = itemList;
         this.activity = activity;
+        this.d = d;
     }
 
     // Based on the View type we are instantiating the
     // ViewHolder in the onCreateViewHolder() method
     @Override
-    public AllMembersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SearchedMembersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View listItem = layoutInflater.inflate(R.layout.allmembers_list, parent, false);
-        AllMembersAdapter.ViewHolder viewHolder = new AllMembersAdapter.ViewHolder(listItem);
+        SearchedMembersAdapter.ViewHolder viewHolder = new SearchedMembersAdapter.ViewHolder(listItem);
         return viewHolder;
     }
 
@@ -47,8 +49,8 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
     // are checking the type of ViewHolder
     // instance and populating the row accordingly
     @Override
-    public void onBindViewHolder(AllMembersAdapter.ViewHolder holder, int position) {
-        final Level_1_cardModal obj = mItemList.get(position);
+    public void onBindViewHolder(SearchedMembersAdapter.ViewHolder holder, int position) {
+        final Customer obj = mItemList.get(position);
         if (obj != null) {
 
             holder.name.setText(obj.getFirstname()+" "+obj.getLastname());
@@ -58,7 +60,13 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
                     .placeholder(R.drawable.oops)
                     .into(holder.photo);
 
-            holder.card.setOnClickListener(view -> ApiCallUtil.getLevel2Data(obj.getProfileId(), activity));
+            holder.card.setOnClickListener(view -> {
+                ((TextView)d.findViewById(R.id.selectedProfileName)).setText(obj.getFirstname()+" "+obj.getLastname());
+                ((TextView)d.findViewById(R.id.selectedProfileId)).setText(obj.getProfileId());
+            });
+
+
+
         }
     }
 

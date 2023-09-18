@@ -20,7 +20,7 @@ import com.example.ss1.ProjectConstants;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.DateApi;
-import com.example.ss1.api.ApiUtils;
+import com.example.ss1.api.HelperUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.NotificationModal;
@@ -53,7 +53,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
         this.fragment = fragment;
         this.view = view;
         this.sprogressBar = sprogressBar;
-        this.customer = LocalCache.retrieveLoggedInCustomer(activity);
+        this.customer = LocalCache.getLoggedInCustomer(activity);
     }
 
     // Based on the View type we are instantiating the
@@ -227,8 +227,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
     }
 
     private void handleActionClick(Activity activity, ItemViewHolder holder, Fragment fragment, Level_1_cardModal obj, int position, String action) {
-        Customer customer = LocalCache.retrieveLoggedInCustomer(activity);
-        ApiUtils.vibrateFunction(activity);
+        Customer customer = LocalCache.getLoggedInCustomer(activity);
+        HelperUtils.vibrateFunction(activity);
 
         if (action.equalsIgnoreCase(ProjectConstants.LIKE)) {
             Glide.with(activity)
@@ -241,7 +241,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addToLikedProfiles(customer.getProfileId(), obj.getProfileId());
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_LIKE_PROFILE));
         } else if (action.equalsIgnoreCase(ProjectConstants.SHORTLIST)) {
-            ApiUtils.vibrateFunction(activity);
+            HelperUtils.vibrateFunction(activity);
             Glide.with(activity)
                     .load(R.drawable.star_golden)
                     .placeholder(R.drawable.star_white)
@@ -252,7 +252,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addToShortListedProfiles(customer.getProfileId(), obj.getProfileId());
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_SHORTLIST_PROFILE));
         } else if (action.equalsIgnoreCase(ProjectConstants.SEND_INTEREST)) {
-            ApiUtils.vibrateFunction(activity);
+            HelperUtils.vibrateFunction(activity);
             Glide.with(activity)
                     .load(R.drawable.interestsent)
                     .placeholder(R.drawable.star_white)
@@ -264,7 +264,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_SEND_INTEREST));
         } else if (action.equalsIgnoreCase(ProjectConstants.IGNORE)) {
             ((HomeFragment) fragment).showSnackBar("Profile removed");
-            ApiUtils.vibrateFunction(activity);
+            HelperUtils.vibrateFunction(activity);
             mItemList.remove(position);
             notifyDataSetChanged();
             ApiCallUtil.addToNotInterestedProfiles(customer.getProfileId(), obj.getProfileId());

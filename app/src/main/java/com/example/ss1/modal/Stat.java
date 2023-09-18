@@ -1,6 +1,6 @@
 package com.example.ss1.modal;
 
-public class GenderStat {
+public class Stat {
 
     public String gender;
     public String count;

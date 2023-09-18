@@ -5,13 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Vibrator;
 import android.util.Base64;
-import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,10 +22,15 @@ import com.example.ss1.SearchProfileBottomSheetDialog;
 import com.example.ss1.modal.Customer;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.Locale;
 
-public class ApiUtils {
+public class HelperUtils {
 
     public static SearchProfileBottomSheetDialog searchProfileBottomSheetDialog;
     private static float mScaleFactor = 1.0f;
@@ -57,7 +59,7 @@ public class ApiUtils {
     }
 
     public static void checkNetworkStatus(Activity activity) {
-        if(!ApiUtils.isConnected())
+        if(!HelperUtils.isConnected())
             showNoInternetDialog(activity);
     }
 
@@ -79,7 +81,7 @@ public class ApiUtils {
     }
 
     public static void showSearchingDialog(Fragment fragment , SpinKitView progressBar, Activity activity, int img, String title, String btnTitle) {
-        Customer customer = LocalCache.retrieveLoggedInCustomer(activity);
+        Customer customer = LocalCache.getLoggedInCustomer(activity);
         Dialog d = new Dialog(activity);
         d.setContentView(R.layout.searching_dialog);
 
@@ -173,6 +175,10 @@ public class ApiUtils {
         }
     }
 
+    public static String addDaysToDate(String inputDate,String days){
+        Date outputDate = Date.from(new Date(inputDate).toInstant().plus(Integer.parseInt(days), ChronoUnit.DAYS));
+        return new SimpleDateFormat("dd/MM/yyyy", Locale.US).format(outputDate);
+    }
 
 
 }

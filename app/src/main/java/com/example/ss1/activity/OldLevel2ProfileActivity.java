@@ -67,7 +67,7 @@ public class OldLevel2ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_level2_profile_new);
 
         // TODO: 12-Sep-23 <a href="https://www.freepik.com/free-photo/abstract-yellow-sunshine-theme-summer-watercolor-background-illustration-high-resolution-free-photo_26887846.htm#query=texture%20background&position=32&from_view=keyword&track=ais">Image by Sketchepedia</a> on Freepik
-        customer = LocalCache.retrieveLoggedInCustomer(this);
+        customer = LocalCache.getLoggedInCustomer(this);
 
         //*set context*//*
         if (ctx == null || ((OldLevel2ProfileActivity) ctx).isDestroyed())

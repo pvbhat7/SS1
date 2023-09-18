@@ -1,12 +1,10 @@
 package com.example.ss1.api;
 
 
-import android.os.TestLooperManager;
-
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.FilterModal;
-import com.example.ss1.modal.GenderStat;
+import com.example.ss1.modal.Stat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
 import com.example.ss1.modal.MembershipModal;
@@ -16,7 +14,6 @@ import com.example.ss1.modal.OrderModal;
 import com.example.ss1.modal.SingleResponse;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -108,6 +105,12 @@ public interface Api {
     @GET("customer/byMobile.php")
     Call<List<Customer>> getCustomerByMobile(@Query("mobile") String mobile);
 
+    @GET("customer/byCpid.php")
+    Call<List<Customer>> getCustomerByCpid(@Query("cpid") String mobile);
+
+    @GET("customer/byName.php")
+    Call<List<Customer>> getCustomerByName(@Query("name") String mobile);
+
     @POST("customer/app_submit_register.php")
     Call<SingleResponse> registerNewCustomer(@Body Customer customer);
 
@@ -124,14 +127,17 @@ public interface Api {
     @GET("orders/getMyMemberships.php")
     Call<List<MyMembershipModal>> getMyMemberships(@Query("cpid") String cpid);
 
+    @POST("orders/assignMembership.php")
+    Call<SingleResponse> assignMembership(@Body OrderModal orderModal);
+
     @GET("membership/all.php")
     Call<List<MembershipModal>> getAllMembershipPlans();
 
     @GET("getAdminCode.php")
     Call<SingleResponse> getAdminCode();
 
-    @GET("customer/getGenderStats.php")
-    Call<List<GenderStat>> getGenderStats();
+    @GET("customer/getStats.php")
+    Call<List<Stat>> getStats();
 
 
 
