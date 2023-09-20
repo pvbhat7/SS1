@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -128,8 +130,23 @@ public class AdminZoneActivity extends AppCompatActivity {
                 SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
                 ((TextInputEditText) d.findViewById(R.id.txnDate)).setText(simpleFormat.format(date));
             });
+
         });
 
+        ((TextInputEditText) d.findViewById(R.id.txnDate)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                validateAssignMembershipForm(d);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
         d.findViewById(R.id.searchFilter).setOnClickListener(view12 -> {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(d.getCurrentFocus().getWindowToken(), 0);
@@ -154,8 +171,11 @@ public class AdminZoneActivity extends AppCompatActivity {
             ((TextView) d.findViewById(R.id.count)).setText("Contacts : " + obj.getCount());
             ((TextView) d.findViewById(R.id.days)).setText("Days " + obj.getDays());
             ((TextView) d.findViewById(R.id.membershipId)).setText(obj.getId());
+            validateAssignMembershipForm(d);
 
-
+        });
+        ((AutoCompleteTextView) d.findViewById(R.id.paymentmode)).setOnItemClickListener((parent, arg1, pos, id) -> {
+            validateAssignMembershipForm(d);
         });
 
         d.findViewById(R.id.cancelBtn).setOnClickListener(view13 -> d.dismiss());
@@ -178,6 +198,19 @@ public class AdminZoneActivity extends AppCompatActivity {
             d.dismiss();
             ApiCallUtil.assignMembership(o,activity);
         });
+
+    }
+
+    private void validateAssignMembershipForm(Dialog d){
+
+        if( !((AutoCompleteTextView)d.findViewById(R.id.selectplan)).getText().toString().trim().isEmpty()
+            && !((AutoCompleteTextView)d.findViewById(R.id.paymentmode)).getText().toString().trim().isEmpty()
+                && !((TextInputEditText)d.findViewById(R.id.txnDate)).getText().toString().trim().isEmpty()
+                && !((TextView)d.findViewById(R.id.selectedProfileName)).getText().toString().trim().isEmpty()
+                && !((TextView)d.findViewById(R.id.selectedProfileId)).getText().toString().trim().isEmpty())
+            d.findViewById(R.id.submitBtn).setEnabled(true);
+        else
+            d.findViewById(R.id.submitBtn).setEnabled(false);
 
     }
 }

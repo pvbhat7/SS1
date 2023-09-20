@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -15,6 +16,7 @@ import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.Level_1_cardModal;
+import com.google.android.material.textfield.TextInputEditText;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.List;
@@ -63,6 +65,16 @@ public class SearchedMembersAdapter extends RecyclerView.Adapter<SearchedMembers
             holder.card.setOnClickListener(view -> {
                 ((TextView)d.findViewById(R.id.selectedProfileName)).setText(obj.getFirstname()+" "+obj.getLastname());
                 ((TextView)d.findViewById(R.id.selectedProfileId)).setText(obj.getProfileId());
+
+                if( !((AutoCompleteTextView)d.findViewById(R.id.selectplan)).getText().toString().trim().isEmpty()
+                        && !((AutoCompleteTextView)d.findViewById(R.id.paymentmode)).getText().toString().trim().isEmpty()
+                        && !((TextInputEditText)d.findViewById(R.id.txnDate)).getText().toString().trim().isEmpty()
+                        && !((TextView)d.findViewById(R.id.selectedProfileName)).getText().toString().trim().isEmpty()
+                        && !((TextView)d.findViewById(R.id.selectedProfileId)).getText().toString().trim().isEmpty())
+                    d.findViewById(R.id.submitBtn).setEnabled(true);
+                else
+                    d.findViewById(R.id.submitBtn).setEnabled(false);
+
             });
 
 

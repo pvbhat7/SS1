@@ -3,6 +3,7 @@ package com.example.ss1.activity;
 import static android.view.View.GONE;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -51,8 +52,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private int IMAGE_COMPRESSION = 80;
     public static String fileName;
 
-    public TextInputEditText cmmobile, email, name, birthname, fathername, birthdate, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2, relatives, family;
-    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, occupation, zodiac, city, birthplace, income, hour, minute, ampm;
+    public TextInputEditText cmmobile, email, name, birthname, fathername, birthdate,occupation, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2, relatives, family;
+    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, zodiac, city, birthplace, income, hour, minute, ampm;
 
     static String clickedImagename, profilePhotoAddressBase64, biodataAddressBase64;
 
@@ -88,6 +89,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         if (editprofile) {
             formLayout.setVisibility(View.VISIBLE);
+            findViewById(R.id.save_btn).setEnabled(true);
             cancel_btn.setVisibility(GONE);
             preFillFormData();
         } else {
@@ -190,9 +192,7 @@ public class RegistrationActivity extends AppCompatActivity {
         education.setOnClickListener(view -> {
             hideKeyboard(view);
         });
-        occupation.setOnClickListener(view -> {
-            hideKeyboard(view);
-        });
+
         income.setOnClickListener(view -> {
             hideKeyboard(view);
         });
@@ -210,9 +210,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
+        imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
     }
 
     private void handleOnclickListeners() {
@@ -259,6 +257,41 @@ public class RegistrationActivity extends AppCompatActivity {
                     cmbtn.setEnabled(true);
                 else
                     cmbtn.setEnabled(false);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+        ((AutoCompleteTextView) findViewById(R.id.height)).setOnItemClickListener((parent, arg1, pos, id) -> {
+            validateForm();
+        });
+        ((AutoCompleteTextView) findViewById(R.id.gender)).setOnItemClickListener((parent, arg1, pos, id) -> {
+            validateForm();
+        });
+        ((TextInputEditText) findViewById(R.id.name)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                validateForm();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        ((TextInputEditText) findViewById(R.id.birthdate)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                validateForm();
             }
 
             @Override
@@ -360,8 +393,6 @@ public class RegistrationActivity extends AppCompatActivity {
         /*String[] educationArray = {"B.E.", "B.Sc", "B.Ed", "10th Pass"};
         ((AutoCompleteTextView) findViewById(R.id.education)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, educationArray));*/
 
-        String[] occupationArray = {"Business", "Job"};
-        ((AutoCompleteTextView) findViewById(R.id.occupation)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, occupationArray));
 
         String[] hourArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
         ((AutoCompleteTextView) findViewById(R.id.hour)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, hourArray));
@@ -375,14 +406,13 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] genderArray = {"female", "male"};
         ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
 
-
         String[] marriagestatusArray = {"single", "married", "divorsed", "widowed"};
         ((AutoCompleteTextView) findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, marriagestatusArray));
 
         String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
         ((AutoCompleteTextView) findViewById(R.id.income)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, incomeArray));
 
-        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli"};
+        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli","solapur"};
         ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
         ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
 
@@ -393,6 +423,8 @@ public class RegistrationActivity extends AppCompatActivity {
 
         String[] religionArray = {"Hindu", "Brahmin", "Muslim", "Cristian", "sikh", "jain"};
         ((AutoCompleteTextView) findViewById(R.id.religion)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, religionArray));
+        ((TextInputEditText)findViewById(R.id.caste)).setText("मराठा  96 कोळी");
+
 
     }
 
@@ -572,6 +604,23 @@ public class RegistrationActivity extends AppCompatActivity {
         String name = returnCursor.getString(nameIndex);
         returnCursor.close();
         return name;
+    }
+
+    private void validateForm(){
+
+        if(!editprofile){
+            if( !((TextInputEditText)findViewById(R.id.name)).getText().toString().trim().isEmpty()
+                    && !((AutoCompleteTextView)findViewById(R.id.height)).getText().toString().trim().isEmpty()
+                    && !((AutoCompleteTextView)findViewById(R.id.gender)).getText().toString().trim().isEmpty()
+                    && !((TextInputEditText)findViewById(R.id.birthdate)).getText().toString().trim().isEmpty())
+                findViewById(R.id.save_btn).setEnabled(true);
+            else
+                findViewById(R.id.save_btn).setEnabled(false);
+        }
+        else
+            findViewById(R.id.save_btn).setEnabled(true);
+
+
     }
 
 }

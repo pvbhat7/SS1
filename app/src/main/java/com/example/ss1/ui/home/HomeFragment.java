@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,6 +102,7 @@ public class HomeFragment extends Fragment {
     private void onboardNewUser() {
         HelperUtils.vibrateFunction(this.getActivity());
         Dialog d = new Dialog(this.getActivity());
+
         d.setContentView(R.layout.onboarding_dialog);
 
         String[] genderArray = {"male", "female"};
@@ -142,6 +145,52 @@ public class HomeFragment extends Fragment {
 
             Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate,"0");
             ApiCallUtil.registerProfile(c, getFragmentActivity(),true,this);
+        });
+
+        ((TextInputEditText) d.findViewById(R.id.name)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                validateOnBoardingForm(d);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        ((TextInputEditText) d.findViewById(R.id.email)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                validateOnBoardingForm(d);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        ((TextInputEditText) d.findViewById(R.id.birthdate)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                validateOnBoardingForm(d);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        ((AutoCompleteTextView) d.findViewById(R.id.gender)).setOnItemClickListener((parent, arg1, pos, id) -> {
+            validateOnBoardingForm(d);
         });
 
 
@@ -328,6 +377,18 @@ public class HomeFragment extends Fragment {
 
     public static Activity getFragmentActivity() {
         return activity;
+    }
+
+    private void validateOnBoardingForm(Dialog d){
+
+        if( !((TextInputEditText)d.findViewById(R.id.name)).getText().toString().trim().isEmpty()
+                && !((TextInputEditText)d.findViewById(R.id.email)).getText().toString().trim().isEmpty()
+                && !((AutoCompleteTextView)d.findViewById(R.id.gender)).getText().toString().trim().isEmpty()
+                && !((TextInputEditText)d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty())
+            d.findViewById(R.id.create_profile_btn).setEnabled(true);
+        else
+            d.findViewById(R.id.create_profile_btn).setEnabled(false);
+
     }
 
 

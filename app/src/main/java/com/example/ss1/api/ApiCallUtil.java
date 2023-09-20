@@ -1025,7 +1025,7 @@ public class ApiCallUtil {
                     formLayout.setVisibility(View.VISIBLE);
                     mobile1.setText(mobile);
                     mobile1.setEnabled(false);
-                    savebtn.setEnabled(true);
+                    //savebtn.setEnabled(true);
                     cmLayout.setVisibility(View.GONE);
                 }
             } else {

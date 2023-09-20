@@ -213,6 +213,8 @@ public class MyAccountFragment extends Fragment {
             LocalCache.setActiveOrder(new OrderModal(), this.getActivity());
             LocalCache.setLevel1List(new ArrayList<>(), this.getActivity());
             LocalCache.setContactViewedList(new ArrayList<>(), this.getActivity());
+            LocalCache.setMembershipList(new ArrayList<>( ), this.getActivity());
+            LocalCache.setGenderStat(new ArrayList<>( ), this.getActivity());
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this.getActivity(), SendOtpActivity.class);
             intent.putExtra("logout", true);
