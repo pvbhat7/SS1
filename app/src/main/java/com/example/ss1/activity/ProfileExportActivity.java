@@ -147,7 +147,9 @@ public class ProfileExportActivity extends AppCompatActivity {
         findViewById(R.id.export_parentlayout).setVisibility(View.GONE);
         //runOnUiThread(() -> dynamicLayoutCreation());
         //dynamicLayoutCreation();
-        ApiCallUtil.dynamicLayoutCreation(this);
+        for (Customer obj : ProfileExportActivity.temp_level2list){
+            ApiCallUtil.dynamicLayoutCreation(this,obj);
+        }
     }
 
     public void dynamicLayoutCreation() {

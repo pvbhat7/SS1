@@ -63,6 +63,8 @@ import java.util.List;
 
 public class ApiCallUtil {
 
+    static int counter = 0;
+
 
     // get level 1 data
     public static void getAllProfiles(String loggedInCpid, Fragment fragment, SpinKitView progressBar, Activity activity, Boolean override) {
@@ -133,8 +135,8 @@ public class ApiCallUtil {
         new AssignMembershipTask(o, activity).execute();
     }
 
-    public static void dynamicLayoutCreation(Activity activity) {
-        new DynamicLayoutCreationTask(activity).execute();
+    public static void dynamicLayoutCreation(Activity activity, Customer obj) {
+        new DynamicLayoutCreationTask(activity,obj).execute();
     }
 
 
@@ -1420,8 +1422,10 @@ public class ApiCallUtil {
 
         Activity activity;
 
-        public DynamicLayoutCreationTask(Activity activity) {
+        Customer obj;
+        public DynamicLayoutCreationTask(Activity activity, Customer obj) {
             this.activity = activity;
+            this.obj = obj;
         }
 
         @Override
@@ -1431,7 +1435,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                activity.runOnUiThread(() -> dynamicLayout(activity));
+                activity.runOnUiThread(() -> dynamicLayout(activity,obj));
 
             } catch (Exception e) {
                 Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
@@ -1446,43 +1450,30 @@ public class ApiCallUtil {
         }
     }
 
-    public static void dynamicLayout(Activity activity) {
+    public static void dynamicLayout(Activity activity, Customer obj1) {
 
         try {
             List<Customer> list = ProfileExportActivity.temp_level2list;
             LinearLayout parentLayout = activity.findViewById(R.id.exportview_view);
             LayoutInflater inflater = LayoutInflater.from(activity);
 
+            View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
+            parentLayout.addView(v);
             for (Customer obj : list) {
-                View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+
+                /*LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
-                v.setLayoutParams(layoutParams);
+                v.setLayoutParams(layoutParams);*/
 
-                parentLayout.addView(v);
 
-                ((TextView) v.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
-                ((TextView) v.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
-                /*((TextView) v.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
-                ((TextView) v.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
-                ((TextView) v.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
-                ((TextView) v.findViewById(R.id.height)).setText(obj.getHeight());
-                ((TextView) v.findViewById(R.id.bloodgroup)).setText(obj.getBloodgroup());
-                ((TextView) v.findViewById(R.id.zodiac)).setText(obj.getZodiac());
-                ((TextView) v.findViewById(R.id.education)).setText(obj.getEducation());
-                ((TextView) v.findViewById(R.id.occupation)).setText(obj.getOccupation());
-                ((TextView) v.findViewById(R.id.religion)).setText(obj.getReligion());
-                ((TextView) v.findViewById(R.id.caste)).setText(obj.getCaste());
-                ((TextView) v.findViewById(R.id.marriagestatus)).setText(obj.getMarriagestatus());
-                ((TextView) v.findViewById(R.id.fathername)).setText(obj.getFathername());
-                ((TextView) v.findViewById(R.id.mothername)).setText(obj.getMothername());
-                ((TextView) v.findViewById(R.id.relatives)).setText(obj.getRelatives());
-                ((TextView) v.findViewById(R.id.family)).setText(obj.getFamily());
-                ((TextView) v.findViewById(R.id.expectations)).setText(obj.getExpectations());*/
+
+
+
 
                 createBitmapForViewAsync(v, activity, obj.getProfileId());
+
             }
         } catch (Exception e) {
             Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
@@ -1498,9 +1489,28 @@ public class ApiCallUtil {
             public void onGlobalLayout() {
                 try {
                     view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
                     // Check if the view's dimensions are valid
                     if (view.getWidth() > 0 && view.getHeight() > 0) {
+                        Customer obj = ProfileExportActivity.temp_level2list.get(counter);
+                        ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
+                        ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
+                        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
+                        ((TextView) view.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
+                        ((TextView) view.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
+                        ((TextView) view.findViewById(R.id.height)).setText(obj.getHeight());
+                        ((TextView) view.findViewById(R.id.bloodgroup)).setText(obj.getBloodgroup());
+                        ((TextView) view.findViewById(R.id.zodiac)).setText(obj.getZodiac());
+                        ((TextView) view.findViewById(R.id.education)).setText(obj.getEducation());
+                        ((TextView) view.findViewById(R.id.occupation)).setText(obj.getOccupation());
+                        ((TextView) view.findViewById(R.id.religion)).setText(obj.getReligion());
+                        ((TextView) view.findViewById(R.id.caste)).setText(obj.getCaste());
+                        ((TextView) view.findViewById(R.id.marriagestatus)).setText(obj.getMarriagestatus());
+                        ((TextView) view.findViewById(R.id.fathername)).setText(obj.getFathername());
+                        ((TextView) view.findViewById(R.id.mothername)).setText(obj.getMothername());
+                        ((TextView) view.findViewById(R.id.relatives)).setText(obj.getRelatives());
+                        ((TextView) view.findViewById(R.id.family)).setText(obj.getFamily());
+                        ((TextView) view.findViewById(R.id.expectations)).setText(obj.getExpectations());
+
                         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
                         view.draw(canvas);
@@ -1579,6 +1589,8 @@ public class ApiCallUtil {
                     outputStream.close();
                 }
             }
+
+            counter++;
         } catch (Exception e) {
             Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
         }
