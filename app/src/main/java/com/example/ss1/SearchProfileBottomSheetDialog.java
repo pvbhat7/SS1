@@ -82,7 +82,7 @@ public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
                 }
             }
             FilterModal modal = new FilterModal(c.getProfileId(),minAge_,maxAge_,minHeight_,maxHeight_);
-            ApiCallUtil.filterProfiles(this.getActivity(),fragment,modal);
+            ApiCallUtil.getFilteredLevel1Profiles(this.getActivity(),fragment,modal);
         });
     }
 

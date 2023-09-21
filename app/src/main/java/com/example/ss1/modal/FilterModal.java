@@ -8,6 +8,8 @@ public class FilterModal {
     public String minHeight;
     public String maxHeight;
 
+    public String gender;
+
 
     public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight) {
         this.cpid = cpid;
@@ -15,6 +17,15 @@ public class FilterModal {
         this.maxAge = maxAge;
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
+    }
+
+    public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight,String gender) {
+        this.cpid = cpid;
+        this.minAge = minAge;
+        this.maxAge = maxAge;
+        this.minHeight = minHeight;
+        this.maxHeight = maxHeight;
+        this.gender = gender;
     }
 
     public String getCpid() {
@@ -55,5 +66,16 @@ public class FilterModal {
 
     public void setMaxHeight(String maxHeight) {
         this.maxHeight = maxHeight;
+    }
+
+    @Override
+    public String toString() {
+        return "FilterModal{" +
+                "cpid='" + cpid + '\'' +
+                ", minAge='" + minAge + '\'' +
+                ", maxAge='" + maxAge + '\'' +
+                ", minHeight='" + minHeight + '\'' +
+                ", maxHeight='" + maxHeight + '\'' +
+                '}';
     }
 }

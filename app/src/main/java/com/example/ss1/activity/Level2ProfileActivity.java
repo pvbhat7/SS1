@@ -1,13 +1,23 @@
 package com.example.ss1.activity;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +33,7 @@ import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.HelperUtils;
 import com.example.ss1.api.DateApi;
 import com.example.ss1.modal.Customer;
+import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
@@ -39,9 +50,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class Level2ProfileActivity extends AppCompatActivity {
 
@@ -52,12 +67,12 @@ public class Level2ProfileActivity extends AppCompatActivity {
     Boolean enableDisableContactViewButton = false;
     Customer customer;
 
-    TextView profileid,name,birthdate,birthtime,height,education,occupation,religion,caste,income,bloodgroup,marriagestatus,birthname,birthplace,fathername,mothername,relatives,family,city,address,expectations,kuldaivat,zodiac,varn,nakshatra,nadi ,gan ,yoni ,charan ,gotra ,mangal,email,mobile1,mobile2,mobile3 ;
+    TextView profileid, name, birthdate, birthtime, height, education, occupation, religion, caste, income, bloodgroup, marriagestatus, birthname, birthplace, fathername, mothername, relatives, family, city, address, expectations, kuldaivat, zodiac, varn, nakshatra, nadi, gan, yoni, charan, gotra, mangal, email, mobile1, mobile2, mobile3;
 
-    Button viewContactDetailsBtn;
+    Button viewContactDetailsBtn, editprofile_link;
     ImageView profilephotoaddresss;
 
-    CardView editprofile_link,contact_card;
+    CardView contact_card;
 
 
     @Override
@@ -77,18 +92,17 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            profile = new Gson().fromJson(extras.getString("level2data"), new TypeToken<Level_2_Modal>() {}.getType());
+            profile = new Gson().fromJson(extras.getString("level2data"), new TypeToken<Level_2_Modal>() {
+            }.getType());
             enableDisableContactViewButton = extras.getBoolean("enableDisableContactViewButton");
         }
 
 
-
         if (profile != null) {
-            if(profile.getContactViewed()){
+            if (profile.getContactViewed()) {
                 viewContactDetailsBtn.setVisibility(View.GONE);
                 contact_card.setVisibility(View.VISIBLE);
-            }
-            else{
+            } else {
                 viewContactDetailsBtn.setVisibility(View.VISIBLE);
                 contact_card.setVisibility(View.GONE);
             }
@@ -100,7 +114,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
             name.setText(profile.getFirstname() + " " + profile.getLastname());
             String age = getAgeByDOB(profile.getBirthdate());
             profileid.setText("Profile id : A" + profile.getProfileId());
-            birthdate.setText(profile.getBirthdate()+getAgeByDOB(profile.getBirthdate()));
+            birthdate.setText(profile.getBirthdate() + getAgeByDOB(profile.getBirthdate()));
             birthtime.setText(profile.getBirthtime());
             height.setText(profile.getHeight());
             education.setText(profile.getEducation());
@@ -108,7 +122,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
             religion.setText(profile.getReligion());
             caste.setText(profile.getCaste());
             income.setText(profile.getIncome());
-
+            expectations.setText(profile.getExpectations());
             bloodgroup.setText(profile.getBloodgroup());
             marriagestatus.setText(profile.getMarriagestatus());
             birthname.setText(profile.getBirthname());
@@ -138,12 +152,15 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         }
 
+        //ApiCallUtil.dynamicLayoutCreation(this);
+        //runinthread();
+
     }
 
     private String getAgeByDOB(String birthdate) {
         String age = "";
         try {
-            age = "    ( "+Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(birthdate))) / 365 + " yrs )";
+            age = "    ( " + Math.abs(DateApi.daysDiff(new Date(), new SimpleDateFormat("dd/MM/yyyy").parse(birthdate))) / 365 + " yrs )";
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -168,7 +185,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         });
 
-        profilephotoaddresss.setOnClickListener(view -> HelperUtils.showImageDialog(Level2ProfileActivity.this,profile.getProfilephotoaddress()));
+        profilephotoaddresss.setOnClickListener(view -> HelperUtils.showImageDialog(Level2ProfileActivity.this, profile.getProfilephotoaddress()));
 
         /*whatsapp.setOnClickListener(view -> {
             String uri = "https://wa.me/+91" + profile.getMobile1().toString().trim();
@@ -210,8 +227,8 @@ public class Level2ProfileActivity extends AppCompatActivity {
         editprofile_link.setOnClickListener(view -> {
             HelperUtils.vibrateFunction(Level2ProfileActivity.this);
             Intent intent = new Intent(Level2ProfileActivity.this, RegistrationActivity.class);
-            intent.putExtra("editprofile",true);
-            intent.putExtra("profile",new Gson().toJson(profile));
+            intent.putExtra("editprofile", true);
+            intent.putExtra("profile", new Gson().toJson(profile));
 
             startActivity(intent);
         });
@@ -222,8 +239,8 @@ public class Level2ProfileActivity extends AppCompatActivity {
         contact_card = findViewById(R.id.contact_card);
         editprofile_link = findViewById(R.id.editprofile_link);
         profilephotoaddresss = findViewById(R.id.profilephotoaddresss);
-        profileid= findViewById(R.id.profileid);
-        name= findViewById(R.id.name);
+        profileid = findViewById(R.id.profileid);
+        name = findViewById(R.id.name);
         coordinatorLayout = findViewById(R.id.level2CoordinatorLayout);
         //sliderView = findViewById(R.id.image_slider);
         viewContactDetailsBtn = findViewById(R.id.viewContactDetailsBtn);
@@ -264,17 +281,14 @@ public class Level2ProfileActivity extends AppCompatActivity {
         mobile3 = findViewById(R.id.mobile3);
 
 
-
-
-
     }
 
     public static Context getContextObject() {
         return ctx;
     }
 
-    private void handleCarosol(String img1 , String img2) {
-        try{
+    private void handleCarosol(String img1, String img2) {
+        try {
             String[] arr = new String[2];
             arr[0] = img1;
             arr[1] = img2;
@@ -285,8 +299,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
             sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
             sliderView.setSliderTransformAnimation(SliderAnimations.DEPTHTRANSFORMATION);
             sliderView.startAutoCycle();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

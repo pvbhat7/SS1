@@ -38,9 +38,10 @@ import java.util.Locale;
 
 public class AdminZoneActivity extends AppCompatActivity {
 
-    LinearLayout link1, link2;
+    LinearLayout link1, link2, link3;
 
     CardView card1, card2;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,16 +59,22 @@ public class AdminZoneActivity extends AppCompatActivity {
             Intent intent = new Intent(AdminZoneActivity.this, RegistrationActivity.class);
             startActivity(intent);
         });
+
         link2.setOnClickListener(view -> {
             Dialog d = new Dialog(this);
             Activity activity = this;
             d.setContentView(R.layout.assign_membership_dialog);
-
-
             handleAssignMembership(d, activity);
             d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             d.show();
         });
+
+        link3.setOnClickListener(view -> {
+
+            Intent intent = new Intent(AdminZoneActivity.this, ProfileExportActivity.class);
+            startActivity(intent);
+        });
+
         card1.setOnClickListener(view -> {
             HelperUtils.vibrateFunction(AdminZoneActivity.this);
             Intent intent = new Intent(AdminZoneActivity.this, AllMemberActivity.class);
@@ -87,6 +94,7 @@ public class AdminZoneActivity extends AppCompatActivity {
     private void initUIElements() {
         link1 = findViewById(R.id.link1);
         link2 = findViewById(R.id.link2);
+        link3 = findViewById(R.id.link3);
         card1 = findViewById(R.id.card1);
         card2 = findViewById(R.id.card2);
     }
@@ -189,28 +197,30 @@ public class AdminZoneActivity extends AppCompatActivity {
             // create order object
             String cpid = ((TextView) d.findViewById(R.id.selectedProfileId)).getText().toString().trim();
             String membershipId = ((TextView) d.findViewById(R.id.membershipId)).getText().toString().trim();
-            String paymentmode = ((AutoCompleteTextView)d.findViewById(R.id.paymentmode)).getText().toString().trim();
-            String txnDate = ((TextInputEditText)d.findViewById(R.id.txnDate)).getText().toString().trim();
-            String startDate = ((TextInputEditText)d.findViewById(R.id.txnDate)).getText().toString().trim();
-            String endDate = HelperUtils.addDaysToDate(startDate,days.replace("Days ",""));
+            String paymentmode = ((AutoCompleteTextView) d.findViewById(R.id.paymentmode)).getText().toString().trim();
+            String txnDate = ((TextInputEditText) d.findViewById(R.id.txnDate)).getText().toString().trim();
+            String startDate = ((TextInputEditText) d.findViewById(R.id.txnDate)).getText().toString().trim();
+            String endDate = HelperUtils.addDaysToDate(startDate, days.replace("Days ", ""));
 
-            OrderModal o = new OrderModal(cpid,membershipId,paymentmode,txnDate,startDate,endDate);
+            OrderModal o = new OrderModal(cpid, membershipId, paymentmode, txnDate, startDate, endDate);
             d.dismiss();
-            ApiCallUtil.assignMembership(o,activity);
+            ApiCallUtil.assignMembership(o, activity);
         });
 
     }
 
-    private void validateAssignMembershipForm(Dialog d){
+    private void validateAssignMembershipForm(Dialog d) {
 
-        if( !((AutoCompleteTextView)d.findViewById(R.id.selectplan)).getText().toString().trim().isEmpty()
-            && !((AutoCompleteTextView)d.findViewById(R.id.paymentmode)).getText().toString().trim().isEmpty()
-                && !((TextInputEditText)d.findViewById(R.id.txnDate)).getText().toString().trim().isEmpty()
-                && !((TextView)d.findViewById(R.id.selectedProfileName)).getText().toString().trim().isEmpty()
-                && !((TextView)d.findViewById(R.id.selectedProfileId)).getText().toString().trim().isEmpty())
+        if (!((AutoCompleteTextView) d.findViewById(R.id.selectplan)).getText().toString().trim().isEmpty()
+                && !((AutoCompleteTextView) d.findViewById(R.id.paymentmode)).getText().toString().trim().isEmpty()
+                && !((TextInputEditText) d.findViewById(R.id.txnDate)).getText().toString().trim().isEmpty()
+                && !((TextView) d.findViewById(R.id.selectedProfileName)).getText().toString().trim().isEmpty()
+                && !((TextView) d.findViewById(R.id.selectedProfileId)).getText().toString().trim().isEmpty())
             d.findViewById(R.id.submitBtn).setEnabled(true);
         else
             d.findViewById(R.id.submitBtn).setEnabled(false);
 
     }
+
+
 }

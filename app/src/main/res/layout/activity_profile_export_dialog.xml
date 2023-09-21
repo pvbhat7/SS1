@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/exportview_view"
+    android:background="@drawable/i1"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    app:cardCornerRadius="10dp"
+    card_view:cardElevation="0dp">
+
+    <LinearLayout
+        android:id="@+id/export_parentlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/filter_card"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:foregroundGravity="center_vertical"
+            app:cardBackgroundColor="@color/gray"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:focusable="true"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.mikhaellopez.circularimageview.CircularImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/notilist_photo"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_below="@+id/header_cover_image"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="30dp"
+                        android:clickable="false"
+                        android:elevation="5dp"
+                        android:padding="10dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/oops"
+                        app:civ_border_color="#FFFFFFFF"
+                        app:civ_border_width="3dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/notilist_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Filter panel"
+                            android:textAlignment="center"
+                            android:textColor="@color/black" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/tickimg"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="30dp"
+                        android:src="@drawable/down_icon" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <!--filter layout-->
+        <LinearLayout
+            android:id="@+id/filterlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:hint="Gender">
+
+                    <!-- Inside text input layout add
+                          an auto complete text view
+                            and make its input type to none-->
+                    <AutoCompleteTextView
+                        android:id="@+id/gender"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:inputType="none"
+                        android:text=""
+                        android:textSize="10dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:text="Height" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:hint="Min height"
+                    android:textSize="10dp">
+
+                    <!-- Inside text input layout add
+                          an auto complete text view
+                            and make its input type to none-->
+                    <AutoCompleteTextView
+                        android:id="@+id/minHeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:inputType="none"
+                        android:text=""
+                        android:textSize="10dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:hint="Max Height"
+                    android:textSize="10dp">
+
+                    <!-- Inside text input layout add
+                          an auto complete text view
+                            and make its input type to none-->
+                    <AutoCompleteTextView
+                        android:id="@+id/maxHeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:inputType="none"
+                        android:text=""
+                        android:textSize="10dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:text="Age" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:hint="Min Age">
+
+                    <!-- Inside text input layout add
+                          an auto complete text view
+                            and make its input type to none-->
+                    <AutoCompleteTextView
+                        android:id="@+id/minAge"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:inputType="none"
+                        android:text=""
+                        android:textSize="10dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:hint="Max Age">
+
+                    <!-- Inside text input layout add
+                          an auto complete text view
+                            and make its input type to none-->
+                    <AutoCompleteTextView
+                        android:id="@+id/maxAge"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:inputType="none"
+                        android:text=""
+                        android:textSize="10dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/searchBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
+                android:text="search" />
+
+        </LinearLayout>
+
+        <!--result layout-->
+        <LinearLayout
+            android:id="@+id/resultlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/profilefoundtext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/purple_700"
+                android:textSize="30dp" />
+
+            <Button
+                android:id="@+id/exportBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
+                android:text="export profiles" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
+
+

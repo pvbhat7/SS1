@@ -31,8 +31,11 @@ public interface Api {
     @GET("level1_view/all.php")
     Call<List<Level_1_cardModal>> getAllCustomerProfiles(@Query("cpid") String cpid);
 
-    @POST("level1_view/allFiltered.php")
+    @POST("level1_view/allFilteredLevel1.php")
     Call<List<Level_1_cardModal>> getFilteredLevel1Profiles(@Body FilterModal modal);
+
+    @POST("level2_view/allFilteredLevel2.php")
+    Call<List<Customer>> getFilteredLevel2Profiles(@Body FilterModal modal);
 
     // GET LEVEL 2 DATA
     @GET("level2_view/byCustomerProfileId.php")

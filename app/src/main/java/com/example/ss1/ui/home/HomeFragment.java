@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -95,6 +96,7 @@ public class HomeFragment extends Fragment {
 
         if (customer.getProfileId() != null)
             ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), false);
+
 
         return view;
     }
@@ -390,6 +392,8 @@ public class HomeFragment extends Fragment {
             d.findViewById(R.id.create_profile_btn).setEnabled(false);
 
     }
+
+
 
 
 }

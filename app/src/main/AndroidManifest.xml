@@ -48,6 +48,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
         <activity
+            android:name=".activity.ProfileExportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+        <activity
             android:name=".activity.SendOtpActivity"
             android:exported="false"
             android:screenOrientation="portrait"

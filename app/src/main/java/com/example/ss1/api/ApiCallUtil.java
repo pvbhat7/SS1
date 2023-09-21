@@ -2,11 +2,21 @@ package com.example.ss1.api;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +31,7 @@ import com.example.ss1.MainActivity;
 import com.example.ss1.R;
 import com.example.ss1.activity.AdminZoneActivity;
 import com.example.ss1.activity.Level2ProfileActivity;
+import com.example.ss1.activity.ProfileExportActivity;
 import com.example.ss1.adapters.BuyMembershipAdapter;
 import com.example.ss1.adapters.ContactViewedAdapter;
 import com.example.ss1.adapters.MyMembershipAdapter;
@@ -45,6 +56,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,24 +93,28 @@ public class ApiCallUtil {
         new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment).execute();
     }
 
-    public static void updateProfile(Customer customer, Activity activity,Boolean updateCache) {
-        new UpdateProfileTask(customer, activity , updateCache).execute();
+    public static void updateProfile(Customer customer, Activity activity, Boolean updateCache) {
+        new UpdateProfileTask(customer, activity, updateCache).execute();
     }
 
     public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, Button savebtn) {
         new ValidateLoginMobileTask(activity, mobile, formLayout, cmLayout, mobile1, savebtn).execute();
     }
 
-    public static void validateAdminCode(Dialog d , String inputCode,Activity activity) {
-        new ValidateAdminCodeTask(d,inputCode,activity).execute();
+    public static void validateAdminCode(Dialog d, String inputCode, Activity activity) {
+        new ValidateAdminCodeTask(d, inputCode, activity).execute();
     }
 
     public static void syncStats(Activity activity) {
         new SyncStatsTask(activity).execute();
     }
 
-    public static void filterProfiles(Activity activity,Fragment fragment , FilterModal modal) {
-        new GetFilteredLevel1DataTask(activity,fragment,modal).execute();
+    public static void getFilteredLevel1Profiles(Activity activity, Fragment fragment, FilterModal modal) {
+        new GetFilteredLevel1DataTask(activity, fragment, modal).execute();
+    }
+
+    public static void getFilteredLevel2Profiles(Activity activity, FilterModal modal) {
+        new GetFilteredLevel2DataTask(activity, modal).execute();
     }
 
     public static void getMyMemberships(String cpid, RecyclerView recyclerView, Activity activity) {
@@ -109,12 +125,16 @@ public class ApiCallUtil {
         new GetMembershipPlansTask(activity, recyclerView).execute();
     }
 
-    public static void searchProfilesBy(Dialog d, Activity activity, String searchBy, String value, RecyclerView recyclerView,LinearLayout downLayout) {
-        new SearchProfileTask(d,activity, searchBy, value , recyclerView,downLayout).execute();
+    public static void searchProfilesBy(Dialog d, Activity activity, String searchBy, String value, RecyclerView recyclerView, LinearLayout downLayout) {
+        new SearchProfileTask(d, activity, searchBy, value, recyclerView, downLayout).execute();
     }
 
     public static void assignMembership(OrderModal o, Activity activity) {
-        new AssignMembershipTask(o,activity).execute();
+        new AssignMembershipTask(o, activity).execute();
+    }
+
+    public static void dynamicLayoutCreation(Activity activity) {
+        new DynamicLayoutCreationTask(activity).execute();
     }
 
 
@@ -296,9 +316,9 @@ public class ApiCallUtil {
                 // set iscontactViewed
                 list.get(0).setContactViewed(false);
                 contactviewedlist = LocalCache.getContactViewedList(activity);
-                if(contactviewedlist != null && contactviewedlist.size() > 0){
-                    for(ContactViewedModal modal : contactviewedlist){
-                        if(modal.getVcpid().equalsIgnoreCase(cpid))
+                if (contactviewedlist != null && contactviewedlist.size() > 0) {
+                    for (ContactViewedModal modal : contactviewedlist) {
+                        if (modal.getVcpid().equalsIgnoreCase(cpid))
                             list.get(0).setContactViewed(true);
                     }
                 }
@@ -387,7 +407,7 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "GetCountLeftTask doInBackground calling...");
             try {
                 response_list = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
-                LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body() , activity);
+                LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body(), activity);
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetCountLeftTask doInBackground error" + e.toString());
             }
@@ -651,11 +671,11 @@ public class ApiCallUtil {
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());
                     LocalCache.setLoggedInCustomer(customer.get(0), activity);
 
-                    if(LocalCache.getContactViewedList(activity).isEmpty()) {
+                    if (LocalCache.getContactViewedList(activity).isEmpty()) {
                         List<ContactViewedModal> contactViewedModals = RetrofitClient.getInstance().getApi().getContactViewedProfiles(customer.get(0).getProfileId()).execute().body();
                         LocalCache.setContactViewedList(contactViewedModals, activity);
                     }
-                    if(LocalCache.getMembershipList(activity).isEmpty()) {
+                    if (LocalCache.getMembershipList(activity).isEmpty()) {
                         List<MembershipModal> membershipModals = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
                         LocalCache.setMembershipList(membershipModals, activity);
                     }
@@ -1097,7 +1117,7 @@ public class ApiCallUtil {
             try {
                 list = LocalCache.getMembershipList(activity);
                 if (list == null && list.isEmpty())
-                list = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
+                    list = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1120,13 +1140,13 @@ public class ApiCallUtil {
 
     static class ValidateAdminCodeTask extends AsyncTask<Void, Void, Void> {
 
-        String inputCode ;
+        String inputCode;
         SingleResponse obj;
         Dialog d;
 
         Activity activity;
 
-        public ValidateAdminCodeTask(Dialog d , String inputCode, Activity activity) {
+        public ValidateAdminCodeTask(Dialog d, String inputCode, Activity activity) {
             this.inputCode = inputCode;
             this.d = d;
             this.activity = activity;
@@ -1150,18 +1170,16 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(obj != null){
-                if(inputCode.equalsIgnoreCase(obj.getResult())){
+            if (obj != null) {
+                if (inputCode.equalsIgnoreCase(obj.getResult())) {
                     d.dismiss();
-                   activity.startActivity(new Intent(activity, AdminZoneActivity.class));
-                }
-                else{
+                    activity.startActivity(new Intent(activity, AdminZoneActivity.class));
+                } else {
                     d.findViewById(R.id.errorcode).setVisibility(View.VISIBLE);
-                    ((TextView)d.findViewById(R.id.errorcode)).setText("wrong pin entered , try again");
+                    ((TextView) d.findViewById(R.id.errorcode)).setText("wrong pin entered , try again");
                 }
-            }
-            else{
-                ((TextView)d.findViewById(R.id.errorcode)).setText("wrong pin entered , try again");
+            } else {
+                ((TextView) d.findViewById(R.id.errorcode)).setText("wrong pin entered , try again");
             }
         }
     }
@@ -1194,17 +1212,17 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(list != null){
-               LocalCache.setGenderStat(list,activity);
-               String malecount  = "0", femalecount = "0";
-               for(Stat g : list){
-                   if(g.getGender().equalsIgnoreCase("male"))
-                       malecount = g.getCount();
-                   else if(g.getGender().equalsIgnoreCase("female"))
-                       femalecount = g.getCount();
-               }
-                ((TextView)activity.findViewById(R.id.totalmalecount)).setText(malecount);
-                ((TextView)activity.findViewById(R.id.totalfemalecount)).setText(femalecount);
+            if (list != null) {
+                LocalCache.setGenderStat(list, activity);
+                String malecount = "0", femalecount = "0";
+                for (Stat g : list) {
+                    if (g.getGender().equalsIgnoreCase("male"))
+                        malecount = g.getCount();
+                    else if (g.getGender().equalsIgnoreCase("female"))
+                        femalecount = g.getCount();
+                }
+                ((TextView) activity.findViewById(R.id.totalmalecount)).setText(malecount);
+                ((TextView) activity.findViewById(R.id.totalfemalecount)).setText(femalecount);
             }
         }
     }
@@ -1219,7 +1237,7 @@ public class ApiCallUtil {
         Fragment fragment;
 
 
-        public GetFilteredLevel1DataTask(Activity activity , Fragment fragment , FilterModal filter) {
+        public GetFilteredLevel1DataTask(Activity activity, Fragment fragment, FilterModal filter) {
             this.filter = filter;
             this.activity = activity;
             this.fragment = fragment;
@@ -1245,8 +1263,53 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             HelperUtils.searchProfileBottomSheetDialog.dismiss();
             ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
-            if(list != null && !list.isEmpty())
-            LocalCache.setLevel1List(list, activity);
+            if (list != null && !list.isEmpty())
+                LocalCache.setLevel1List(list, activity);
+
+        }
+    }
+
+    static class GetFilteredLevel2DataTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        List<Customer> list;
+
+        FilterModal filter;
+
+
+        public GetFilteredLevel2DataTask(Activity activity, FilterModal filter) {
+            this.filter = filter;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                ProfileExportActivity.temp_level2list = new ArrayList<>();
+                Log.i("local_logs", filter.toString());
+                list = RetrofitClient.getInstance().getApi().getFilteredLevel2Profiles(filter).execute().body();
+
+            } catch (Exception e) {
+                Log.i("local_logs", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Log.i("local_logs", "GetFilteredLevel2DataTask postexecute");
+            if (list != null && list.size() > 0) {
+                Log.i("local_logs", list.size() + "");
+                ProfileExportActivity.temp_level2list = list;
+                activity.findViewById(R.id.filterlayout).setVisibility(View.GONE);
+                activity.findViewById(R.id.resultlayout).setVisibility(View.VISIBLE);
+                ((TextView) activity.findViewById(R.id.profilefoundtext)).setText(list.size() + " profiles found");
+            }
 
         }
     }
@@ -1266,7 +1329,7 @@ public class ApiCallUtil {
             this.d = d;
             this.activity = activity;
             this.searchBy = searchBy;
-            this.value = value ;
+            this.value = value;
             this.recyclerView = recyclerView;
             this.downLayout = downLayout;
         }
@@ -1295,15 +1358,14 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             d.findViewById(R.id.searchBtn).setEnabled(true);
-            if(list != null && !list.isEmpty()){
+            if (list != null && !list.isEmpty()) {
                 downLayout.setVisibility(View.VISIBLE);
                 d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
-                SearchedMembersAdapter adapter = new SearchedMembersAdapter(d,list,activity);
+                SearchedMembersAdapter adapter = new SearchedMembersAdapter(d, list, activity);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(activity));
                 recyclerView.setAdapter(adapter);
-            }
-            else{
+            } else {
                 downLayout.setVisibility(View.GONE);
                 d.findViewById(R.id.errorTxt).setVisibility(View.VISIBLE);
             }
@@ -1317,7 +1379,7 @@ public class ApiCallUtil {
         Activity activity;
         OrderModal orderModal;
 
-        SingleResponse response ;
+        SingleResponse response;
 
 
         public AssignMembershipTask(OrderModal orderModal, Activity activity) {
@@ -1343,15 +1405,182 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(response != null && !response.getResult().equalsIgnoreCase("0")){
+            if (response != null && !response.getResult().equalsIgnoreCase("0")) {
                 MediaPlayer.create(activity, R.raw.done_sound).start();
                 HelperUtils.showDialog(activity, R.drawable.success_icon, "Membership assigned !!!", "id : " + response.getResult());
-            }
-            else{
+            } else {
                 HelperUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", "id : " + response.getResult());
             }
             //{"cpid":"26","endDate":"09/10/2024","membershipId":"","paymentmode":"Phone Pe","startDate":"21/09/2023","txnDate":"21/09/2023"}
 
+        }
+    }
+
+    static class DynamicLayoutCreationTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+
+        public DynamicLayoutCreationTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                activity.runOnUiThread(() -> dynamicLayout(activity));
+
+            } catch (Exception e) {
+                Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+        }
+    }
+
+    public static void dynamicLayout(Activity activity) {
+
+        try {
+            List<Customer> list = ProfileExportActivity.temp_level2list;
+            LinearLayout parentLayout = activity.findViewById(R.id.exportview_view);
+            LayoutInflater inflater = LayoutInflater.from(activity);
+
+            for (Customer obj : list) {
+                View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                v.setLayoutParams(layoutParams);
+
+                parentLayout.addView(v);
+
+                ((TextView) v.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
+                ((TextView) v.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
+                /*((TextView) v.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
+                ((TextView) v.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
+                ((TextView) v.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
+                ((TextView) v.findViewById(R.id.height)).setText(obj.getHeight());
+                ((TextView) v.findViewById(R.id.bloodgroup)).setText(obj.getBloodgroup());
+                ((TextView) v.findViewById(R.id.zodiac)).setText(obj.getZodiac());
+                ((TextView) v.findViewById(R.id.education)).setText(obj.getEducation());
+                ((TextView) v.findViewById(R.id.occupation)).setText(obj.getOccupation());
+                ((TextView) v.findViewById(R.id.religion)).setText(obj.getReligion());
+                ((TextView) v.findViewById(R.id.caste)).setText(obj.getCaste());
+                ((TextView) v.findViewById(R.id.marriagestatus)).setText(obj.getMarriagestatus());
+                ((TextView) v.findViewById(R.id.fathername)).setText(obj.getFathername());
+                ((TextView) v.findViewById(R.id.mothername)).setText(obj.getMothername());
+                ((TextView) v.findViewById(R.id.relatives)).setText(obj.getRelatives());
+                ((TextView) v.findViewById(R.id.family)).setText(obj.getFamily());
+                ((TextView) v.findViewById(R.id.expectations)).setText(obj.getExpectations());*/
+
+                createBitmapForViewAsync(v, activity, obj.getProfileId());
+            }
+        } catch (Exception e) {
+            Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+        }
+
+
+    }
+
+    // Function to create the bitmap asynchronously for each view
+    private static void createBitmapForViewAsync(View view, Activity activity, String profileId) {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                try {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                    // Check if the view's dimensions are valid
+                    if (view.getWidth() > 0 && view.getHeight() > 0) {
+                        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        view.draw(canvas);
+                        persistBitmap(bitmap, activity, profileId);
+                    }
+                } catch (Exception e) {
+                    Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+                }
+            }
+        });
+    }
+
+    private static void persistBitmap(Bitmap bitmap, Activity activity, String profileId) {
+        try {
+            // Assuming you have a Bitmap object named 'bitmap' containing the generated image
+// and 'obj' is your profile object
+
+// Define the filename
+            String filename = "profile_" + profileId + ".png";
+
+// Get the content resolver
+            ContentResolver resolver = activity.getContentResolver();
+
+// Define the image details
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+
+// Define the selection criteria to find an existing image with the same filename
+            String selection = MediaStore.Images.Media.DISPLAY_NAME + "=?";
+            String[] selectionArgs = new String[]{filename};
+
+// Check if an image with the same filename already exists
+            Cursor cursor = resolver.query(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    selection,
+                    selectionArgs,
+                    null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                // An image with the same filename exists, so update it
+
+                // Get the index of the _ID column
+                int idColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+
+                if (idColumnIndex >= 0) {
+                    // Get the ID of the existing image
+                    long existingImageId = cursor.getLong(idColumnIndex);
+                    Uri existingImageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, existingImageId);
+
+                    // Update the image in the MediaStore
+                    resolver.update(existingImageUri, values, null, null);
+                } else {
+                    // Handle the case where the _ID column index is invalid or not found
+                    // You can choose to log an error or handle this situation as needed
+                }
+
+                // Close the cursor
+                cursor.close();
+            } else {
+                // No image with the same filename found, so insert the new image
+
+                // Insert the image into the MediaStore
+                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                if (imageUri != null) {
+                    // Open an output stream to write the Bitmap to the MediaStore
+                    OutputStream outputStream = resolver.openOutputStream(imageUri);
+
+                    // Compress the Bitmap as a PNG image and write it to the output stream
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+                    // Close the output stream
+                    outputStream.close();
+                }
+            }
+        } catch (Exception e) {
+            Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
         }
     }
 
