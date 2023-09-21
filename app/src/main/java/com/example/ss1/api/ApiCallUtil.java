@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
@@ -63,7 +65,8 @@ import java.util.List;
 
 public class ApiCallUtil {
 
-    static int counter = 0;
+    public static int counter = 0;
+    public static List<Bitmap> blist = new ArrayList<>();
 
 
     // get level 1 data
@@ -135,8 +138,8 @@ public class ApiCallUtil {
         new AssignMembershipTask(o, activity).execute();
     }
 
-    public static void dynamicLayoutCreation(Activity activity, Customer obj) {
-        new DynamicLayoutCreationTask(activity,obj).execute();
+    public static void dynamicLayoutCreation(Activity activity) {
+        new DynamicLayoutCreationTask(activity).execute();
     }
 
 
@@ -1422,10 +1425,8 @@ public class ApiCallUtil {
 
         Activity activity;
 
-        Customer obj;
-        public DynamicLayoutCreationTask(Activity activity, Customer obj) {
+        public DynamicLayoutCreationTask(Activity activity) {
             this.activity = activity;
-            this.obj = obj;
         }
 
         @Override
@@ -1435,7 +1436,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                activity.runOnUiThread(() -> dynamicLayout(activity,obj));
+                activity.runOnUiThread(() -> dynamicLayout(activity));
 
             } catch (Exception e) {
                 Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
@@ -1450,7 +1451,7 @@ public class ApiCallUtil {
         }
     }
 
-    public static void dynamicLayout(Activity activity, Customer obj1) {
+    public static void dynamicLayout(Activity activity) {
 
         try {
             List<Customer> list = ProfileExportActivity.temp_level2list;
@@ -1460,18 +1461,6 @@ public class ApiCallUtil {
             View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
             parentLayout.addView(v);
             for (Customer obj : list) {
-
-                /*LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                v.setLayoutParams(layoutParams);*/
-
-
-
-
-
-
                 createBitmapForViewAsync(v, activity, obj.getProfileId());
 
             }
@@ -1492,6 +1481,10 @@ public class ApiCallUtil {
                     // Check if the view's dimensions are valid
                     if (view.getWidth() > 0 && view.getHeight() > 0) {
                         Customer obj = ProfileExportActivity.temp_level2list.get(counter);
+                       /* Glide.with(activity)
+                                .load(obj.getProfilephotoaddress())
+                                .placeholder(R.drawable.oops)
+                                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
                         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
                         ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
                         ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
@@ -1514,7 +1507,8 @@ public class ApiCallUtil {
                         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
                         view.draw(canvas);
-                        persistBitmap(bitmap, activity, profileId);
+                        persistBitmap(bitmap, activity,profileId);
+
                     }
                 } catch (Exception e) {
                     Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
