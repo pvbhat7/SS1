@@ -153,7 +153,13 @@ public class ProfileExportActivity extends AppCompatActivity {
         //runOnUiThread(() -> dynamicLayoutCreation());
         //dynamicLayoutCreation();
 
-        ApiCallUtil.dynamicLayoutCreation(this);
+        List<Customer> list = ProfileExportActivity.temp_level2list;
+        LinearLayout parentLayout = findViewById(R.id.exportview_view);
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+        View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
+        parentLayout.addView(v);
+        ApiCallUtil.dynamicLayoutCreation(this,list,v);
     }
 
     public void dynamicLayoutCreation() {

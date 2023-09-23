@@ -14,11 +14,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
@@ -43,7 +40,6 @@ import com.example.ss1.modal.BitmapDataModal;
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.FilterModal;
-import com.example.ss1.modal.Stat;
 import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
 import com.example.ss1.modal.MembershipModal;
@@ -51,6 +47,7 @@ import com.example.ss1.modal.MyMembershipModal;
 import com.example.ss1.modal.NotificationModal;
 import com.example.ss1.modal.OrderModal;
 import com.example.ss1.modal.SingleResponse;
+import com.example.ss1.modal.Stat;
 import com.example.ss1.ui.dashboard.MatchesFragment;
 import com.example.ss1.ui.home.HomeFragment;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -139,10 +136,10 @@ public class ApiCallUtil {
         new AssignMembershipTask(o, activity).execute();
     }
 
-    public static void dynamicLayoutCreation(Activity activity) {
+    public static void dynamicLayoutCreation(Activity activity, List<Customer> list, View v) {
         ApiCallUtil.counter = 0;
         ApiCallUtil.blist = new ArrayList<>();
-        new DynamicLayoutCreationTask(activity).execute();
+        new DynamicLayoutCreationTask(activity, list, v).execute();
     }
 
     public static void persistBitmap(Activity activity) {
@@ -1436,9 +1433,13 @@ public class ApiCallUtil {
     static class DynamicLayoutCreationTask extends AsyncTask<Void, Void, Void> {
 
         Activity activity;
+        List<Customer> list;
+        View v;
 
-        public DynamicLayoutCreationTask(Activity activity) {
+        public DynamicLayoutCreationTask(Activity activity, List<Customer> list, View v) {
             this.activity = activity;
+            this.list = list;
+            this.v = v;
         }
 
         @Override
@@ -1448,7 +1449,8 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                activity.runOnUiThread(() -> dynamicLayout(activity));
+                //activity.runOnUiThread(() -> dynamicLayout(activity));
+                dynamicLayout(activity, list, v);
 
             } catch (Exception e) {
                 Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
@@ -1490,22 +1492,16 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            ((TextView)activity.findViewById(R.id.bitmapCount)).setText("Done");
+            ((TextView) activity.findViewById(R.id.bitmapCount)).setText("Done");
 
         }
     }
 
-    public static void dynamicLayout(Activity activity) {
+    public static void dynamicLayout(Activity activity, List<Customer> list, View v) {
 
         try {
-            List<Customer> list = ProfileExportActivity.temp_level2list;
-            LinearLayout parentLayout = activity.findViewById(R.id.exportview_view);
-            LayoutInflater inflater = LayoutInflater.from(activity);
-
-            View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
-            parentLayout.addView(v);
             for (Customer obj : list) {
-                createBitmapForViewAsync(v, activity, obj.getProfileId());
+                createBitmapForViewAsync(v, activity,obj);
 
             }
         } catch (Exception e) {
@@ -1516,7 +1512,7 @@ public class ApiCallUtil {
     }
 
     // Function to create the bitmap asynchronously for each view
-    private static void createBitmapForViewAsync(View view, Activity activity, String profileId) {
+    private static void createBitmapForViewAsync(View view, Activity activity,Customer obj) {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -1524,48 +1520,16 @@ public class ApiCallUtil {
                     view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     // Check if the view's dimensions are valid
                     if (view.getWidth() > 0 && view.getHeight() > 0) {
-                        Customer obj = ProfileExportActivity.temp_level2list.get(counter);
-                        //Uri uri = Uri.parse("content://media/external/images/media/1000222233");
-                       /* Glide.with(activity)
-                                .load(R.drawable.failed_icon)
-                                .placeholder(R.drawable.oops)
-                                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
-                        ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
-                        ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
-                        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
-                        ((TextView) view.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
-                        ((TextView) view.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
-                        ((TextView) view.findViewById(R.id.height)).setText(obj.getHeight());
-                        ((TextView) view.findViewById(R.id.bloodgroup)).setText(obj.getBloodgroup());
-                        ((TextView) view.findViewById(R.id.zodiac)).setText(obj.getZodiac());
-                        ((TextView) view.findViewById(R.id.education)).setText(obj.getEducation());
-                        ((TextView) view.findViewById(R.id.occupation)).setText(obj.getOccupation());
-                        ((TextView) view.findViewById(R.id.religion)).setText(obj.getReligion());
-                        ((TextView) view.findViewById(R.id.caste)).setText(obj.getCaste());
-                        ((TextView) view.findViewById(R.id.marriagestatus)).setText(obj.getMarriagestatus());
-                        ((TextView) view.findViewById(R.id.fathername)).setText(obj.getFathername());
-                        ((TextView) view.findViewById(R.id.mothername)).setText(obj.getMothername());
-                        ((TextView) view.findViewById(R.id.relatives)).setText(obj.getRelatives());
-                        ((TextView) view.findViewById(R.id.family)).setText(obj.getFamily());
-                        ((TextView) view.findViewById(R.id.expectations)).setText(obj.getExpectations());
-
+                        //Customer obj = ProfileExportActivity.temp_level2list.get(counter);
                         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
-                        view.draw(canvas);
-                        blist.add(new BitmapDataModal(bitmap,obj.getProfileId()));
-                        if(blist.size() == ProfileExportActivity.temp_level2list.size()){
-                            LinearLayout parentLayout = activity.findViewById(R.id.exportview_view);
-                            parentLayout.removeView(view);
-                            activity.findViewById(R.id.export_parentlayout).setVisibility(View.VISIBLE);
-                            activity.findViewById(R.id.profilefoundtext).setVisibility(View.GONE);
-                            activity.findViewById(R.id.exportBtn).setVisibility(View.GONE);
-                            activity.findViewById(R.id.savetophoneBtn).setVisibility(View.VISIBLE);
-                            activity.findViewById(R.id.exportToPhoneLayout).setVisibility(View.VISIBLE);
-                            ((TextView)activity.findViewById(R.id.bitmapCount)).setText(blist.size()+ " profiles scanned");
+                        updateExportViewData(view, canvas, bitmap, obj, activity);
 
-                        }
-                        counter++;
-                        //persistBitmap(bitmap, activity,profileId);
+                        /* Glide.with(activity)
+                                .load(obj.getProfilephotoaddress())
+                                .placeholder(R.drawable.oops)
+                                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
+
 
                     }
                 } catch (Exception e) {
@@ -1575,12 +1539,47 @@ public class ApiCallUtil {
         });
     }
 
+    private static void updateExportViewData(View view, Canvas canvas, Bitmap bitmap, Customer obj, Activity activity) {
+        ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
+        ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
+        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
+        ((TextView) view.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
+        ((TextView) view.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
+        ((TextView) view.findViewById(R.id.height)).setText(obj.getHeight());
+        ((TextView) view.findViewById(R.id.bloodgroup)).setText(obj.getBloodgroup());
+        ((TextView) view.findViewById(R.id.zodiac)).setText(obj.getZodiac());
+        ((TextView) view.findViewById(R.id.education)).setText(obj.getEducation());
+        ((TextView) view.findViewById(R.id.occupation)).setText(obj.getOccupation());
+        ((TextView) view.findViewById(R.id.religion)).setText(obj.getReligion());
+        ((TextView) view.findViewById(R.id.caste)).setText(obj.getCaste());
+        ((TextView) view.findViewById(R.id.marriagestatus)).setText(obj.getMarriagestatus());
+        ((TextView) view.findViewById(R.id.fathername)).setText(obj.getFathername());
+        ((TextView) view.findViewById(R.id.mothername)).setText(obj.getMothername());
+        ((TextView) view.findViewById(R.id.relatives)).setText(obj.getRelatives());
+        ((TextView) view.findViewById(R.id.family)).setText(obj.getFamily());
+        ((TextView) view.findViewById(R.id.expectations)).setText(obj.getExpectations());
+        view.draw(canvas);
+        blist.add(new BitmapDataModal(bitmap, obj.getProfileId()));
+        if (blist.size() == ProfileExportActivity.temp_level2list.size()) {
+            LinearLayout parentLayout = activity.findViewById(R.id.exportview_view);
+            parentLayout.removeView(view);
+            activity.findViewById(R.id.export_parentlayout).setVisibility(View.VISIBLE);
+            activity.findViewById(R.id.profilefoundtext).setVisibility(View.GONE);
+            activity.findViewById(R.id.exportBtn).setVisibility(View.GONE);
+            activity.findViewById(R.id.exportToPhoneLayout).setVisibility(View.VISIBLE);
+            activity.findViewById(R.id.savetophoneBtn).setEnabled(true);
+            ((TextView) activity.findViewById(R.id.bitmapCount)).setText(blist.size() + " profiles scanned");
+
+        }
+        counter++;
+    }
+
     private static void persistBitmapProcess(Activity activity) {
         int count = 1;
-        for(BitmapDataModal obj : blist){
+        for (BitmapDataModal obj : blist) {
             Bitmap bitmap = obj.getBitmap();
             try {
-                ((TextView)activity.findViewById(R.id.bitmapCount)).setText("Processing : "+count);
+                ((TextView) activity.findViewById(R.id.bitmapCount)).setText("Processing : " + count);
                 // Assuming you have a Bitmap object named 'bitmap' containing the generated image
 // and 'obj' is your profile object
 
@@ -1649,7 +1648,7 @@ public class ApiCallUtil {
             } catch (Exception e) {
                 Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
             }
-            count ++;
+            count++;
         }
     }
 

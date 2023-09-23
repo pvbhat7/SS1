@@ -2,6 +2,7 @@ package com.example.ss1.modal;
 
 public class Customer {
     private String profileId;
+    private String name;
     private String firstname;
     private String middlename;
     private String lastname;
@@ -67,6 +68,8 @@ public class Customer {
     public Customer(){
 
     }
+
+
 
     public Customer(String firstname ,String middlename , String lastname , String mobile , String email , String gender , String birthdate,String is_verified){
         this.firstname = firstname;
