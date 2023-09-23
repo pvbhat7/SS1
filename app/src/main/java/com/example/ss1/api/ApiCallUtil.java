@@ -39,6 +39,7 @@ import com.example.ss1.adapters.ContactViewedAdapter;
 import com.example.ss1.adapters.MyMembershipAdapter;
 import com.example.ss1.adapters.NotificationAdapter;
 import com.example.ss1.adapters.SearchedMembersAdapter;
+import com.example.ss1.modal.BitmapDataModal;
 import com.example.ss1.modal.ContactViewedModal;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.FilterModal;
@@ -66,7 +67,7 @@ import java.util.List;
 public class ApiCallUtil {
 
     public static int counter = 0;
-    public static List<Bitmap> blist = new ArrayList<>();
+    public static List<BitmapDataModal> blist = new ArrayList<>();
 
 
     // get level 1 data
@@ -139,7 +140,13 @@ public class ApiCallUtil {
     }
 
     public static void dynamicLayoutCreation(Activity activity) {
+        ApiCallUtil.counter = 0;
+        ApiCallUtil.blist = new ArrayList<>();
         new DynamicLayoutCreationTask(activity).execute();
+    }
+
+    public static void persistBitmap(Activity activity) {
+        new PersistBitmapTask(activity).execute();
     }
 
 
@@ -1313,6 +1320,11 @@ public class ApiCallUtil {
                 ProfileExportActivity.temp_level2list = list;
                 activity.findViewById(R.id.filterlayout).setVisibility(View.GONE);
                 activity.findViewById(R.id.resultlayout).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.exportBtn).setEnabled(true);
+
+                activity.findViewById(R.id.profilefoundtext).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.exportBtn).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.exportToPhoneLayout).setVisibility(View.GONE);
                 ((TextView) activity.findViewById(R.id.profilefoundtext)).setText(list.size() + " profiles found");
             }
 
@@ -1451,6 +1463,38 @@ public class ApiCallUtil {
         }
     }
 
+    static class PersistBitmapTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+
+        public PersistBitmapTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+
+                persistBitmapProcess(activity);
+
+            } catch (Exception e) {
+                Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            ((TextView)activity.findViewById(R.id.bitmapCount)).setText("Done");
+
+        }
+    }
+
     public static void dynamicLayout(Activity activity) {
 
         try {
@@ -1481,8 +1525,9 @@ public class ApiCallUtil {
                     // Check if the view's dimensions are valid
                     if (view.getWidth() > 0 && view.getHeight() > 0) {
                         Customer obj = ProfileExportActivity.temp_level2list.get(counter);
+                        //Uri uri = Uri.parse("content://media/external/images/media/1000222233");
                        /* Glide.with(activity)
-                                .load(obj.getProfilephotoaddress())
+                                .load(R.drawable.failed_icon)
                                 .placeholder(R.drawable.oops)
                                 .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
                         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
@@ -1507,7 +1552,20 @@ public class ApiCallUtil {
                         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
                         view.draw(canvas);
-                        persistBitmap(bitmap, activity,profileId);
+                        blist.add(new BitmapDataModal(bitmap,obj.getProfileId()));
+                        if(blist.size() == ProfileExportActivity.temp_level2list.size()){
+                            LinearLayout parentLayout = activity.findViewById(R.id.exportview_view);
+                            parentLayout.removeView(view);
+                            activity.findViewById(R.id.export_parentlayout).setVisibility(View.VISIBLE);
+                            activity.findViewById(R.id.profilefoundtext).setVisibility(View.GONE);
+                            activity.findViewById(R.id.exportBtn).setVisibility(View.GONE);
+                            activity.findViewById(R.id.savetophoneBtn).setVisibility(View.VISIBLE);
+                            activity.findViewById(R.id.exportToPhoneLayout).setVisibility(View.VISIBLE);
+                            ((TextView)activity.findViewById(R.id.bitmapCount)).setText(blist.size()+ " profiles scanned");
+
+                        }
+                        counter++;
+                        //persistBitmap(bitmap, activity,profileId);
 
                     }
                 } catch (Exception e) {
@@ -1517,76 +1575,81 @@ public class ApiCallUtil {
         });
     }
 
-    private static void persistBitmap(Bitmap bitmap, Activity activity, String profileId) {
-        try {
-            // Assuming you have a Bitmap object named 'bitmap' containing the generated image
+    private static void persistBitmapProcess(Activity activity) {
+        int count = 1;
+        for(BitmapDataModal obj : blist){
+            Bitmap bitmap = obj.getBitmap();
+            try {
+                ((TextView)activity.findViewById(R.id.bitmapCount)).setText("Processing : "+count);
+                // Assuming you have a Bitmap object named 'bitmap' containing the generated image
 // and 'obj' is your profile object
 
 // Define the filename
-            String filename = "profile_" + profileId + ".png";
+                String filename = "profile_" + obj.getProfileId() + ".png";
 
 // Get the content resolver
-            ContentResolver resolver = activity.getContentResolver();
+                ContentResolver resolver = activity.getContentResolver();
 
 // Define the image details
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
-            values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
 
 // Define the selection criteria to find an existing image with the same filename
-            String selection = MediaStore.Images.Media.DISPLAY_NAME + "=?";
-            String[] selectionArgs = new String[]{filename};
+                String selection = MediaStore.Images.Media.DISPLAY_NAME + "=?";
+                String[] selectionArgs = new String[]{filename};
 
 // Check if an image with the same filename already exists
-            Cursor cursor = resolver.query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    selection,
-                    selectionArgs,
-                    null
-            );
+                Cursor cursor = resolver.query(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        null,
+                        selection,
+                        selectionArgs,
+                        null
+                );
 
-            if (cursor != null && cursor.moveToFirst()) {
-                // An image with the same filename exists, so update it
+                if (cursor != null && cursor.moveToFirst()) {
+                    // An image with the same filename exists, so update it
 
-                // Get the index of the _ID column
-                int idColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                    // Get the index of the _ID column
+                    int idColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
 
-                if (idColumnIndex >= 0) {
-                    // Get the ID of the existing image
-                    long existingImageId = cursor.getLong(idColumnIndex);
-                    Uri existingImageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, existingImageId);
+                    if (idColumnIndex >= 0) {
+                        // Get the ID of the existing image
+                        long existingImageId = cursor.getLong(idColumnIndex);
+                        Uri existingImageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, existingImageId);
 
-                    // Update the image in the MediaStore
-                    resolver.update(existingImageUri, values, null, null);
+                        // Update the image in the MediaStore
+                        resolver.update(existingImageUri, values, null, null);
+                    } else {
+                        // Handle the case where the _ID column index is invalid or not found
+                        // You can choose to log an error or handle this situation as needed
+                    }
+
+                    // Close the cursor
+                    cursor.close();
                 } else {
-                    // Handle the case where the _ID column index is invalid or not found
-                    // You can choose to log an error or handle this situation as needed
+                    // No image with the same filename found, so insert the new image
+
+                    // Insert the image into the MediaStore
+                    Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                    if (imageUri != null) {
+                        // Open an output stream to write the Bitmap to the MediaStore
+                        OutputStream outputStream = resolver.openOutputStream(imageUri);
+
+                        // Compress the Bitmap as a PNG image and write it to the output stream
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+                        // Close the output stream
+                        outputStream.close();
+                    }
                 }
 
-                // Close the cursor
-                cursor.close();
-            } else {
-                // No image with the same filename found, so insert the new image
-
-                // Insert the image into the MediaStore
-                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                if (imageUri != null) {
-                    // Open an output stream to write the Bitmap to the MediaStore
-                    OutputStream outputStream = resolver.openOutputStream(imageUri);
-
-                    // Compress the Bitmap as a PNG image and write it to the output stream
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-
-                    // Close the output stream
-                    outputStream.close();
-                }
+            } catch (Exception e) {
+                Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
             }
-
-            counter++;
-        } catch (Exception e) {
-            Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+            count ++;
         }
     }
 

@@ -43,7 +43,7 @@ public class ProfileExportActivity extends AppCompatActivity {
 
     TextView mode, profilefoundtext;
     AutoCompleteTextView minHeight, maxHeight, minAge, maxAge, gender;
-    Button searchBtn, exportBtn;
+    Button searchBtn, exportBtn,savetophoneBtn;
     LinearLayout filterlayout, resultlayout;
     CardView filter_card;
 
@@ -103,11 +103,16 @@ public class ProfileExportActivity extends AppCompatActivity {
 
         });
         exportBtn.setOnClickListener(view -> exportProfiles());
+        savetophoneBtn.setOnClickListener(view -> {
+            savetophoneBtn.setEnabled(false);
+            ApiCallUtil.persistBitmap(this);
+        });
     }
 
     public void init() {
         resultlayout = findViewById(R.id.resultlayout);
         exportBtn = findViewById(R.id.exportBtn);
+        savetophoneBtn = findViewById(R.id.savetophoneBtn);
         profilefoundtext = findViewById(R.id.profilefoundtext);
         filterlayout = findViewById(R.id.filterlayout);
         mode = findViewById(R.id.mode);
@@ -147,7 +152,7 @@ public class ProfileExportActivity extends AppCompatActivity {
         findViewById(R.id.export_parentlayout).setVisibility(View.GONE);
         //runOnUiThread(() -> dynamicLayoutCreation());
         //dynamicLayoutCreation();
-        ApiCallUtil.counter = 0;
+
         ApiCallUtil.dynamicLayoutCreation(this);
     }
 
