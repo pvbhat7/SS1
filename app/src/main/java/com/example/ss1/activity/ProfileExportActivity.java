@@ -22,12 +22,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
-import com.example.ss1.api.Api;
 import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.FilterModal;
@@ -50,7 +48,7 @@ public class ProfileExportActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile_export_dialog);
+        setContentView(R.layout.activity_profile_export);
         //setContentView(R.layout.export_profile_list_item);
 
         init();
