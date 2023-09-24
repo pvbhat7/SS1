@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Vibrator;
 import android.util.Base64;
-import android.view.ScaleGestureDetector;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,7 +24,6 @@ import com.example.ss1.SearchProfileBottomSheetDialog;
 import com.example.ss1.modal.Customer;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -33,10 +34,6 @@ import java.util.Locale;
 public class HelperUtils {
 
     public static SearchProfileBottomSheetDialog searchProfileBottomSheetDialog;
-    private static float mScaleFactor = 1.0f;
-    private static ScaleGestureDetector scaleGestureDetector;
-
-    private static ImageView img_pp;
 
 
     public static void vibrateFunction(Activity activity) {
@@ -142,13 +139,27 @@ public class HelperUtils {
     }
 
 
-    public static String convertBitmapToString(Bitmap bitmap , int maxSize){
+    public static String convertBitmapToBase64(Bitmap bitmap , int maxSize){
         bitmap = getResizedBitmap(bitmap , maxSize);
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bao);
         byte[] array = bao.toByteArray();
-        String imgB64 = Base64.encodeToString(array,Base64.DEFAULT);
-        return imgB64;
+        return Base64.encodeToString(array,Base64.DEFAULT);
+    }
+
+    public static Bitmap convertBase64ToBitmap(String base64) {
+        try {
+            byte[] decodedBytes = Base64.decode(base64, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Drawable convertBitmapToDrawable(Context context, Bitmap bitmap) {
+        // Create a Drawable from the Bitmap
+        return new BitmapDrawable(context.getResources(), bitmap);
     }
     public static Bitmap getResizedBitmap(Bitmap image, int maxSize) {
         int width = image.getWidth();
@@ -163,16 +174,6 @@ public class HelperUtils {
             width = (int) (height * bitmapRatio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
-    }
-
-    private static class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            mScaleFactor *= scaleGestureDetector.getScaleFactor();
-            img_pp.setScaleX(mScaleFactor);
-            img_pp.setScaleY(mScaleFactor);
-            return true;
-        }
     }
 
     public static String addDaysToDate(String inputDate,String days){

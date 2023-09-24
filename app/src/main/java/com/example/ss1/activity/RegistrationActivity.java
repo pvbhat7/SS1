@@ -3,7 +3,6 @@ package com.example.ss1.activity;
 import static android.view.View.GONE;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -498,7 +497,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 try {
                     // You can update this bitmap to your server
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                    String imgB64 = HelperUtils.convertBitmapToString(bitmap, 500);
+                    String imgB64 = HelperUtils.convertBitmapToBase64(bitmap, 500);
 
 
                     if (clickedImagename != null) {

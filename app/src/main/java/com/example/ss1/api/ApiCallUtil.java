@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
@@ -64,6 +67,9 @@ import java.util.List;
 public class ApiCallUtil {
 
     public static int counter = 0;
+    public static String b64;
+    public static Drawable drawable123;
+
     public static List<BitmapDataModal> blist = new ArrayList<>();
 
 
@@ -984,6 +990,8 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                b64 = c.getProfilephotoaddress();
+
                 loggedInCustomer = RetrofitClient.getInstance().getApi().updateProfile(c).execute().body();
                 if (updateCache && loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
                     LocalCache.setLoggedInCustomer(loggedInCustomer.get(0), activity);
@@ -1525,10 +1533,7 @@ public class ApiCallUtil {
                         Canvas canvas = new Canvas(bitmap);
                         updateExportViewData(view, canvas, bitmap, obj, activity);
 
-                        /* Glide.with(activity)
-                                .load(obj.getProfilephotoaddress())
-                                .placeholder(R.drawable.oops)
-                                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
+
 
 
                     }
@@ -1540,6 +1545,10 @@ public class ApiCallUtil {
     }
 
     private static void updateExportViewData(View view, Canvas canvas, Bitmap bitmap, Customer obj, Activity activity) {
+        /*Glide.with(activity)
+                .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(b64)))
+                .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(b64)))
+                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
         ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
         ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
