@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -27,12 +28,19 @@ import com.bumptech.glide.Glide;
 import com.example.ss1.LocalCache;
 import com.example.ss1.R;
 import com.example.ss1.api.ApiCallUtil;
+import com.example.ss1.api.HelperUtils;
 import com.example.ss1.modal.Customer;
 import com.example.ss1.modal.FilterModal;
+import com.example.ss1.modal.Level_1_cardModal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class ProfileExportActivity extends AppCompatActivity {
@@ -49,6 +57,16 @@ public class ProfileExportActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_export);
+
+        /*List<Level_1_cardModal> list = LocalCache.getLevel1List(this);
+        for(Level_1_cardModal obj : list){
+            String b64 = convertImageToBase64(obj.getProfilephotoaddress());
+            Drawable drawable = HelperUtils.convertBitmapToDrawable(this, HelperUtils.convertBase64ToBitmap(b64));
+        }*/
+        /*Glide.with(activity)
+                .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(b64)))
+                .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(b64)))
+                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
         //setContentView(R.layout.export_profile_list_item);
 
         init();
@@ -292,6 +310,45 @@ public class ProfileExportActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+        }
+    }
+
+    public static String convertImageToBase64(String imageUrl) {
+        try {
+            // Create a URL object from the image URL
+            URL url = new URL(imageUrl);
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Set up connection properties
+            connection.setDoInput(true);
+            connection.connect();
+
+            // Read the image data from the input stream
+            InputStream inputStream = connection.getInputStream();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+
+            // Convert the image data to a byte array
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
+            // Encode the byte array to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // Close streams and disconnect
+            inputStream.close();
+            byteArrayOutputStream.close();
+            connection.disconnect();
+
+            return base64Image;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

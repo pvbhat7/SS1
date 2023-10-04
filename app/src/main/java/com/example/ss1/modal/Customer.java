@@ -17,6 +17,8 @@ public class Customer {
     private String discontinue;
     private String activepackageid;
     private String profilephotoaddress;
+
+    private String b64;
     private String biodataaddress;
     private String height;
     private String birthtime;
@@ -583,5 +585,13 @@ public class Customer {
 
     public void setIs_verified(String is_verified) {
         this.is_verified = is_verified;
+    }
+
+    public String getB64() {
+        return b64;
+    }
+
+    public void setB64(String b64) {
+        this.b64 = b64;
     }
 }

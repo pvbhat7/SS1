@@ -67,7 +67,6 @@ import java.util.List;
 public class ApiCallUtil {
 
     public static int counter = 0;
-    public static String b64;
     public static Drawable drawable123;
 
     public static List<BitmapDataModal> blist = new ArrayList<>();
@@ -990,7 +989,6 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                b64 = c.getProfilephotoaddress();
 
                 loggedInCustomer = RetrofitClient.getInstance().getApi().updateProfile(c).execute().body();
                 if (updateCache && loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
@@ -1545,10 +1543,10 @@ public class ApiCallUtil {
     }
 
     private static void updateExportViewData(View view, Canvas canvas, Bitmap bitmap, Customer obj, Activity activity) {
-        /*Glide.with(activity)
-                .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(b64)))
-                .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(b64)))
-                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));*/
+        Glide.with(activity)
+                .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
+                .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
+                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));
         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
         ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
         ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
