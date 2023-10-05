@@ -270,7 +270,19 @@
                 android:layout_marginBottom="20dp"
                 android:text="search" />
 
+
+
         </LinearLayout>
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:visibility="gone"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/progressBar"
+            style="@style/SpinKitView.Large.MultiplePulse"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_gravity="center"
+            app:SpinKit_Color="@color/colorAccent" />
 
         <!--result layout-->
         <LinearLayout

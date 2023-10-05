@@ -1289,17 +1289,25 @@ public class ApiCallUtil {
         Activity activity;
         List<Customer> list;
 
+        SpinKitView progressBar;
+
+        Circle d = new Circle();
+
         FilterModal filter;
 
 
         public GetFilteredLevel2DataTask(Activity activity, FilterModal filter) {
             this.filter = filter;
             this.activity = activity;
+            progressBar = activity.findViewById(R.id.progressBar);
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+
+            progressBar.setIndeterminateDrawable(d);
         }
 
         protected Void doInBackground(Void... params) {
@@ -1317,6 +1325,7 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            progressBar.setVisibility(View.GONE);
             Log.i("local_logs", "GetFilteredLevel2DataTask postexecute");
             if (list != null && list.size() > 0) {
                 Log.i("local_logs", list.size() + "");
@@ -1455,7 +1464,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                //activity.runOnUiThread(() -> dynamicLayout(activity));
+                //activity.runOnUiThread(() -> dynamicLayout(activity,list, v));
                 dynamicLayout(activity, list, v);
 
             } catch (Exception e) {
@@ -1530,10 +1539,6 @@ public class ApiCallUtil {
                         Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
                         updateExportViewData(view, canvas, bitmap, obj, activity);
-
-
-
-
                     }
                 } catch (Exception e) {
                     Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
@@ -1543,10 +1548,14 @@ public class ApiCallUtil {
     }
 
     private static void updateExportViewData(View view, Canvas canvas, Bitmap bitmap, Customer obj, Activity activity) {
-        Glide.with(activity)
-                .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
-                .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
-                .into((ImageView) view.findViewById(R.id.profilephotoaddresss));
+        Log.i("local_logs", "processing export data for profile " + obj.getProfileId());
+        if(!obj.getB64().isEmpty()){
+            Glide.with(activity)
+                    .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
+                    .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
+                    .into((ImageView) view.findViewById(R.id.profilephotoaddresss));
+        }
+
         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
         ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
         ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
@@ -1586,7 +1595,10 @@ public class ApiCallUtil {
         for (BitmapDataModal obj : blist) {
             Bitmap bitmap = obj.getBitmap();
             try {
-                ((TextView) activity.findViewById(R.id.bitmapCount)).setText("Processing : " + count);
+                //((TextView) activity.findViewById(R.id.bitmapCount)).setText("Processing : " + count);
+
+                int percent = (count*100)/blist.size();
+                ((TextView) activity.findViewById(R.id.bitmapCount)).setText(percent+" % completed");
                 // Assuming you have a Bitmap object named 'bitmap' containing the generated image
 // and 'obj' is your profile object
 

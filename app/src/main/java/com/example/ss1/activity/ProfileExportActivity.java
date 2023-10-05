@@ -93,6 +93,7 @@ public class ProfileExportActivity extends AppCompatActivity {
 
         searchBtn.setOnClickListener(view -> {
             searchBtn.setEnabled(false);
+            ApiCallUtil.blist = new ArrayList<>();
             String maxHeight_ = "", minHeight_ = "", minAge_ = "", maxAge_ = "", gender_ = "";
             minAge_ = minAge.getText().toString().trim();
             maxAge_ = maxAge.getText().toString().trim();
@@ -175,180 +176,12 @@ public class ProfileExportActivity extends AppCompatActivity {
 
         View v = inflater.inflate(R.layout.export_profile_list_item, parentLayout, false);
         parentLayout.addView(v);
-        ApiCallUtil.dynamicLayoutCreation(this,list,v);
-    }
-
-    public void dynamicLayoutCreation() {
-        try {
-// Assuming you have a list of profile objects like this
-            List<Customer> list = temp_level2list;
-
-            // Get a reference to the parent layout where you want to add profile items
-            LinearLayout parentLayout = findViewById(R.id.exportview_view);
-
-            // Get a reference to the LayoutInflater
-            LayoutInflater inflater = LayoutInflater.from(this);
-
-            // Loop through the profiles and populate the layouts
-            for (Customer obj : list) {
-                // Inflate the profile item layout
-                View v = inflater.inflate(R.layout.export_profile_list_item, null);
-
-                // TODO: 21-Sep-23 fill data
-                Glide.with(this)
-                        .load(obj.getProfilephotoaddress())
-                        .placeholder(R.drawable.oops)
-                        .into((ImageView) v.findViewById(R.id.profilephotoaddresss));
-                ((TextView) v.findViewById(R.id.profileid)).setText("A"+obj.getProfileId());
-                ((TextView) v.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
-                ((TextView) v.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
-                ((TextView) v.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
-                ((TextView) v.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
-                ((TextView) v.findViewById(R.id.height)).setText(obj.getHeight());
-                ((TextView) v.findViewById(R.id.bloodgroup)).setText(obj.getBloodgroup());
-                ((TextView) v.findViewById(R.id.zodiac)).setText(obj.getZodiac());
-                ((TextView) v.findViewById(R.id.education)).setText(obj.getEducation());
-                ((TextView) v.findViewById(R.id.occupation)).setText(obj.getOccupation());
-                ((TextView) v.findViewById(R.id.religion)).setText(obj.getReligion());
-                ((TextView) v.findViewById(R.id.caste)).setText(obj.getCaste());
-                ((TextView) v.findViewById(R.id.marriagestatus)).setText(obj.getMarriagestatus());
-                ((TextView) v.findViewById(R.id.fathername)).setText(obj.getFathername());
-                ((TextView) v.findViewById(R.id.mothername)).setText(obj.getMothername());
-                ((TextView) v.findViewById(R.id.relatives)).setText(obj.getRelatives());
-                ((TextView) v.findViewById(R.id.family)).setText(obj.getFamily());
-                ((TextView) v.findViewById(R.id.expectations)).setText(obj.getExpectations());
-
-
-                // Add the inflated layout to the parent layout
-                parentLayout.addView(v);
-
-                // Measure and layout the view
-                v.measure(
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-                );
-                v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
-
-                // Create a Bitmap with the same dimensions as the view
-                Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
-
-                // Create a Canvas to draw the view onto the Bitmap
-                Canvas canvas = new Canvas(bitmap);
-
-                // Draw the view onto the Canvas
-                v.draw(canvas);
-
-
-                // Assuming you have a Bitmap object named 'bitmap' containing the generated image
-// and 'obj' is your profile object
-
-// Define the filename
-                String filename = "profile_" + obj.getProfileId() + ".png";
-
-// Get the content resolver
-                ContentResolver resolver = getContentResolver();
-
-// Define the image details
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-
-// Define the selection criteria to find an existing image with the same filename
-                String selection = MediaStore.Images.Media.DISPLAY_NAME + "=?";
-                String[] selectionArgs = new String[]{filename};
-
-// Check if an image with the same filename already exists
-                Cursor cursor = resolver.query(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        null,
-                        selection,
-                        selectionArgs,
-                        null
-                );
-
-                if (cursor != null && cursor.moveToFirst()) {
-                    // An image with the same filename exists, so update it
-
-                    // Get the index of the _ID column
-                    int idColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-
-                    if (idColumnIndex >= 0) {
-                        // Get the ID of the existing image
-                        long existingImageId = cursor.getLong(idColumnIndex);
-                        Uri existingImageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, existingImageId);
-
-                        // Update the image in the MediaStore
-                        resolver.update(existingImageUri, values, null, null);
-                    } else {
-                        // Handle the case where the _ID column index is invalid or not found
-                        // You can choose to log an error or handle this situation as needed
-                    }
-
-                    // Close the cursor
-                    cursor.close();
-                } else {
-                    // No image with the same filename found, so insert the new image
-
-                    // Insert the image into the MediaStore
-                    Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-                    if (imageUri != null) {
-                        // Open an output stream to write the Bitmap to the MediaStore
-                        OutputStream outputStream = resolver.openOutputStream(imageUri);
-
-                        // Compress the Bitmap as a PNG image and write it to the output stream
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-
-                        // Close the output stream
-                        outputStream.close();
-                    }
-                }
-
-// Now, the image with the specified filename has either been updated or inserted in the MediaStore
-
-
-            }
-        } catch (IOException e) {
-            Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+        for(Customer c : list){
+            List<Customer> cl = new ArrayList<>();
+            cl.add(c);
+            ApiCallUtil.dynamicLayoutCreation(this,cl,v);
         }
+
     }
 
-    public static String convertImageToBase64(String imageUrl) {
-        try {
-            // Create a URL object from the image URL
-            URL url = new URL(imageUrl);
-
-            // Open a connection to the URL
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            // Set up connection properties
-            connection.setDoInput(true);
-            connection.connect();
-
-            // Read the image data from the input stream
-            InputStream inputStream = connection.getInputStream();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
-            }
-
-            // Convert the image data to a byte array
-            byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
-            // Encode the byte array to Base64
-            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-
-            // Close streams and disconnect
-            inputStream.close();
-            byteArrayOutputStream.close();
-            connection.disconnect();
-
-            return base64Image;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }
