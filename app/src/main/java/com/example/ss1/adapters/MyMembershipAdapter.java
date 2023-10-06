@@ -58,7 +58,6 @@ public class MyMembershipAdapter extends RecyclerView.Adapter<MyMembershipAdapte
         if (obj != null) {
 
             holder.m_name.setText(obj.getName());
-            holder.m_duration.setText(obj.getDuration());
             holder.m_fees.setText(obj.getFees());
             holder.m_totalbalance.setText(obj.getTotalbalance());
             holder.m_balanceleft.setText(obj.getBalanceleft());
@@ -76,11 +75,10 @@ public class MyMembershipAdapter extends RecyclerView.Adapter<MyMembershipAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView m_name , m_duration , m_totalbalance , m_balanceleft , m_fees , m_mode , m_txn;
+        public TextView m_name  , m_totalbalance , m_balanceleft , m_fees , m_mode , m_txn;
         public ViewHolder(View itemView) {
             super(itemView);
             this.m_name = itemView.findViewById(R.id.m_name);
-            this.m_duration = itemView.findViewById(R.id.m_duration);
             this.m_totalbalance = itemView.findViewById(R.id.m_totalbalance);
             this.m_balanceleft = itemView.findViewById(R.id.m_balanceleft);
             this.m_fees = itemView.findViewById(R.id.m_fees);

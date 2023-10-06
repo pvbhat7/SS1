@@ -19,6 +19,7 @@ public class Customer {
     private String profilephotoaddress;
 
     private String b64;
+    private String age;
     private String biodataaddress;
     private String height;
     private String birthtime;
@@ -593,5 +594,21 @@ public class Customer {
 
     public void setB64(String b64) {
         this.b64 = b64;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
     }
 }

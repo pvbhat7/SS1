@@ -49,7 +49,6 @@ public class BuyMembershipAdapter extends RecyclerView.Adapter<BuyMembershipAdap
             holder.plan_description.setText(obj.getDescription());
             holder.plan_fees.setText("Rs."+obj.getFees()+"/-");
             holder.plan_count.setText(obj.getCount()+" contacts");
-            holder.plan_days.setText(obj.getDays()+" days");
             holder.plan_buybtn.setOnClickListener(view -> {
                 // TODO: 09-Sep-23
             });
@@ -63,14 +62,13 @@ public class BuyMembershipAdapter extends RecyclerView.Adapter<BuyMembershipAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView plan_description, plan_fees, plan_days, plan_count;
+        public TextView plan_description, plan_fees, plan_count;
         Button plan_buybtn;
 
         public ViewHolder(View itemView) {
             super(itemView);
             this.plan_description = itemView.findViewById(R.id.plan_description);
             this.plan_fees = itemView.findViewById(R.id.plan_fees);
-            this.plan_days = itemView.findViewById(R.id.plan_days);
             this.plan_count = itemView.findViewById(R.id.plan_count);
             this.plan_buybtn = itemView.findViewById(R.id.plan_buybtn);
         }

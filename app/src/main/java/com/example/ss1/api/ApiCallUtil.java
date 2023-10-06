@@ -1558,7 +1558,7 @@ public class ApiCallUtil {
 
         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
         ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
-        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate());
+        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate()+"  ( "+obj.getAge()+" yrs )");
         ((TextView) view.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
         ((TextView) view.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
         ((TextView) view.findViewById(R.id.height)).setText(obj.getHeight());

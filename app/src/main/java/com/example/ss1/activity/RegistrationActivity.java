@@ -411,7 +411,7 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
         ((AutoCompleteTextView) findViewById(R.id.income)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, incomeArray));
 
-        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli","solapur"};
+        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli","solapur","belgav","thane"};
         ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
         ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
 
