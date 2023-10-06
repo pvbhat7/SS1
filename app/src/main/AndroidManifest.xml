@@ -37,47 +37,57 @@
             android:name=".activity.ContactViewedActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.RegistrationActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.Level2ProfileActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.ProfileExportActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.SendOtpActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.VerifyOtpActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.MyMembershipActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.AdminZoneActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.AllMemberActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
             />
         <activity
             android:name=".activity.SplashScreenActivity"

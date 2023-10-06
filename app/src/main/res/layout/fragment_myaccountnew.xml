@@ -168,7 +168,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
                             <TextView
-                                android:textColor="@color/black"
+                                android:textColor="@color/txtcolor"
                                 android:layout_marginLeft="25dp"
                                 android:textSize="16dp"
                                 android:fontFamily="@font/comic_bold"
@@ -214,7 +214,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
                             <TextView
-                                android:textColor="@color/black"
+                                android:textColor="@color/txtcolor"
                                 android:layout_marginLeft="25dp"
                                 android:textSize="16dp"
                                 android:fontFamily="@font/comic_bold"
@@ -262,7 +262,7 @@
                                 android:layout_height="25dp"/>
                             <TextView
                                 android:id="@+id/cb_text"
-                                android:textColor="@color/black"
+                                android:textColor="@color/txtcolor"
                                 android:layout_marginLeft="25dp"
                                 android:textSize="16dp"
                                 android:fontFamily="@font/comic_bold"
@@ -307,7 +307,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
                             <TextView
-                                android:textColor="@color/black"
+                                android:textColor="@color/txtcolor"
                                 android:layout_marginLeft="25dp"
                                 android:textSize="16dp"
                                 android:fontFamily="@font/comic_bold"
@@ -356,7 +356,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
                             <TextView
-                                android:textColor="@color/black"
+                                android:textColor="@color/txtcolor"
                                 android:layout_marginLeft="25dp"
                                 android:textSize="16dp"
                                 android:fontFamily="@font/comic_bold"
