@@ -9,11 +9,8 @@ public class AppPreference {
     public static final String ACTIVE_ORDER_JSON = "ActiveOrderJson";
     public static final String LEVEL_1_LIST_JSON = "Level1ListJson";
     public static final String CONTACT_VIEWED_LIST_JSON = "ContactViewedListJson";
-
     public static final String MEMBERSHIP_LIST_JSON = "membershipListJson";
-
     public static final String GENDER_STAT_JSON = "genderStatJson";
-
     public static final String ADMINPHONE_JSON = "adminphoneJson";
 
     public static final void setStringPref(Context context, String prefKey, String key, String value) {
