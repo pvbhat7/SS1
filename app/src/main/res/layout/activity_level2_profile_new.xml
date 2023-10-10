@@ -107,7 +107,6 @@
 
                 <ImageView
                     android:id="@+id/profilephotoaddresss"
-                    android:src="@drawable/prashant"
                     android:scaleType="center"
                     android:layout_width="match_parent"
                     android:layout_height="330dp"
@@ -129,7 +128,7 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
                         android:fontFamily="@font/roboto_bold"
-                        android:text="prashant bhat"
+                        android:text=""
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="25dp" />

@@ -72,7 +72,7 @@
                         android:fontFamily="@font/comic_bold"
                         android:textColor="@color/black"
                         android:layout_gravity="center_vertical"
-                        android:text="Prashant Bhat"
+                        android:text=""
                         android:textSize="15dp"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"/>

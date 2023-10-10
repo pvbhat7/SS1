@@ -153,7 +153,7 @@
                                 android:layout_marginTop="10dp"
                                 android:fontFamily="@font/comic_bold"
                                 android:gravity="top"
-                                android:text="Prashant Bhat"
+                                android:text=""
                                 android:textAlignment="center"
                                 android:textColor="@color/black"
                                 android:textSize="25dp" />
@@ -176,7 +176,7 @@
                                 android:layout_marginTop="5dp"
                                 android:fontFamily="@font/comic_bold"
                                 android:textColor="@color/black"
-                                android:text="bhatprashant1994@gmail.com"
+                                android:text=""
                                 android:textAlignment="center"
                                 android:textSize="12dp" />
                         </LinearLayout>

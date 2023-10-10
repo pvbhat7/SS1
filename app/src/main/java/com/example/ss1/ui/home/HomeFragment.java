@@ -206,7 +206,7 @@ public class HomeFragment extends Fragment {
     private void setProfileIcon() {
         if (customer != null && customer.getProfileId() != null) {
             Glide.with(this.getActivity())
-                    .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.prashant)
+                    .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.oops)
                     .placeholder(R.drawable.oops)
                     .into(profilePhoto);
         }

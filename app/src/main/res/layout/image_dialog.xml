@@ -22,7 +22,6 @@
             android:layout_width="20dp"
             android:layout_height="20dp"/>-->
     <com.github.chrisbanes.photoview.PhotoView
-        android:src="@drawable/prashant"
         android:scaleType="centerCrop"
         android:id="@+id/imageView"
         android:layout_width="300dp"

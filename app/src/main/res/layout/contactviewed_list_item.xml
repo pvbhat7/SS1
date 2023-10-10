@@ -20,7 +20,6 @@
             android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/cv_photo"
-                android:src="@drawable/prashant"
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"/>
             <LinearLayout
@@ -33,7 +32,7 @@
                     android:layout_marginTop="9dp"
                     android:textSize="20dp"
                     android:textColor="@color/black"
-                    android:text="Prashant Bhat"
+                    android:text=""
                     android:fontFamily="@font/comic_bold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

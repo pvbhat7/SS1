@@ -54,7 +54,7 @@
                 android:layout_marginBottom="20dp"
                 android:textAlignment="center"
                 android:fontFamily="@font/comic_bold"
-                android:text="Prashant Bhat"
+                android:text=""
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/view"

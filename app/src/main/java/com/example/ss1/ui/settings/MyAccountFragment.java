@@ -78,7 +78,7 @@ public class MyAccountFragment extends Fragment {
             profileHeadingEmail.setText(customer.getEmail());
             profileCardId.setText("Profile id : A" + customer.getProfileId());
             Glide.with(this.getActivity())
-                    .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.prashant)
+                    .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.oops)
                     .placeholder(R.drawable.oops)
                     .into(sprofilephoto);
 
@@ -199,12 +199,7 @@ public class MyAccountFragment extends Fragment {
 
         logoutId = view.findViewById(R.id.logoutId);
 
-        if (sprofilephoto != null) {
-            Glide.with(this.getActivity())
-                    .load(R.drawable.prashant)
-                    .placeholder(R.drawable.oops)
-                    .into(sprofilephoto);
-        }
+
     }
 
     @Override
