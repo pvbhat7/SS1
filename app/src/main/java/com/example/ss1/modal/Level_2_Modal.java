@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Level_2_Modal {
 
+    private String b64;
     private Boolean isContactViewed;
     private String profileId;
     private String firstname;
@@ -467,5 +468,13 @@ public class Level_2_Modal {
 
     public void setContactViewed(Boolean contactViewed) {
         isContactViewed = contactViewed;
+    }
+
+    public String getB64() {
+        return b64;
+    }
+
+    public void setB64(String b64) {
+        this.b64 = b64;
     }
 }

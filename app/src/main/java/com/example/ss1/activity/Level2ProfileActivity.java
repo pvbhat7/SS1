@@ -70,7 +70,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
     TextView profileid, name, birthdate, birthtime, height, education, occupation, religion, caste, income, bloodgroup, marriagestatus, birthname, birthplace, fathername, mothername, relatives, family, city, address, expectations, kuldaivat, zodiac, varn, nakshatra, nadi, gan, yoni, charan, gotra, mangal, email, mobile1, mobile2, mobile3;
 
     Button viewContactDetailsBtn, editprofile_link;
-    ImageView profilephotoaddresss;
+    ImageView profilephotoaddresss,shareprofileicon;
 
     CardView contact_card;
 
@@ -232,10 +232,13 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+
+        shareprofileicon.setOnClickListener(view -> ApiCallUtil.shareProfile(this,profile));
     }
 
 
     private void initUiElements() {
+        shareprofileicon = findViewById(R.id.shareprofileicon);
         contact_card = findViewById(R.id.contact_card);
         editprofile_link = findViewById(R.id.editprofile_link);
         profilephotoaddresss = findViewById(R.id.profilephotoaddresss);

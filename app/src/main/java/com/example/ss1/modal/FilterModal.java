@@ -7,16 +7,21 @@ public class FilterModal {
     public String maxAge;
     public String minHeight;
     public String maxHeight;
-
     public String gender;
 
+    public String marriagestatus;
 
-    public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight) {
+    public String religion;
+
+    public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight,String marriagestatus,String religion,String gender) {
         this.cpid = cpid;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
+        this.marriagestatus = marriagestatus;
+        this.religion = religion;
+        this.gender = gender;
     }
 
     public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight,String gender) {

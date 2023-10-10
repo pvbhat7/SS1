@@ -20,7 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
 
     Activity activity;
-    AutoCompleteTextView minHeight , maxHeight , minAge , maxAge;
+    AutoCompleteTextView minHeight , maxHeight , minAge , maxAge , status , religion;
 
     Button searchBtn;
     Fragment fragment;
@@ -39,11 +39,15 @@ public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
         init(v);
         onclickListeners();
 
-        String[] heightArray = {"4 feet | 121 cm", "4 feet 1 inch | 124 cm", "4 feet 2 inches | 127 cm", "4 feet 3 inches | 130 cm", "4 feet 4 inches | 132 cm", "4 feet 5 inches | 135 cm", "4 feet 6 inches | 138 cm", "4 feet 7 inches | 140 cm", "4 feet 8 inches | 143 cm", "4 feet 9 inches | 145 cm", "4 feet 10 inches | 148 cm", "4 feet 11 inches | 151 cm", "5 feet | 152 cm", "5 feet 1 inch | 155 cm", "5 feet 2 inches | 157 cm", "5 feet 3 inches | 160 cm", "5 feet 4 inches | 163 cm", "5 feet 5 inches | 165 cm", "5 feet 6 inches | 168 cm", "5 feet 7 inches | 170 cm", "5 feet 8 inches | 173 cm", "5 feet 9 inches | 175 cm", "5 feet 10 inches | 178 cm", "5 feet 11 inches | 180 cm", "6 feet | 183 cm", "6 feet 1 inch | 185 cm", "6 feet 2 inches | 188 cm", "6 feet 3 inches | 191 cm", "6 feet 4 inches | 193 cm", "6 feet 5 inches | 196 cm", "6 feet 6 inches | 198 cm", "6 feet 7 inches | 201 cm", "6 feet 8 inches | 203 cm", "6 feet 9 inches | 206 cm", "6 feet 10 inches | 208 cm", "6 feet 11 inches | 211 cm", "7 feet | 213 cm", "7 feet 1 inch | 216 cm", "7 feet 2 inches | 218 cm", "7 feet 3 inches | 221 cm", "7 feet 4 inches | 224 cm", "7 feet 5 inches | 226 cm", "7 feet 6 inches | 229 cm", "7 feet 7 inches | 231 cm", "7 feet 8 inches | 234 cm", "7 feet 9 inches | 237 cm", "7 feet 10 inches | 239 cm", "7 feet 11 inches | 242 cm"};
-        minHeight.setText("4 feet | 121 cm");
-        maxHeight.setText("7 feet 11 inches | 242 cm");
-        minHeight.setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, heightArray));
-        maxHeight.setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, heightArray));
+        status.setText("single");
+        religion.setText("Hindu");
+        minHeight.setText("4' 1\" | 124 cm");
+        maxHeight.setText("7' 11\" | 242 cm");
+
+        status.setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, new String[]{"single", "married", "divorsed", "widowed"}));
+        religion.setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, new String[]{"Hindu", "Brahmin", "Muslim", "Cristian", "Sikh", "Jain"}));
+        minHeight.setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, new String[]{"4' 1\"  |  124 cm", "4' 2\"  |  127 cm", "4' 3\"  |  130 cm", "4' 4\"  |  132 cm", "4' 5\"  |  135 cm", "4' 6\"  |  138 cm", "4' 7\"  |  140 cm", "4' 8\"  |  143 cm", "4' 9\"  |  145 cm", "4' 10\"  |  148 cm", "4' 11\"  |  151 cm", "5'  |  152 cm", "5' 1\"  |  155 cm", "5' 2\"  |  157 cm", "5' 3\"  |  160 cm", "5' 4\"  |  163 cm", "5' 5\"  |  165 cm", "5' 6\"  |  168 cm", "5' 7\"  |  170 cm", "5' 8\"  |  173 cm", "5' 9\"  |  175 cm", "5' 10\"  |  178 cm", "5' 11\"  |  180 cm", "6'  |  183 cm", "6' 1\"  |  185 cm", "6' 2\"  |  188 cm", "6' 3\"  |  191 cm", "6' 4\"  |  193 cm", "6' 5\"  |  196 cm", "6' 6\"  |  198 cm", "6' 7\"  |  201 cm", "6' 8\"  |  203 cm", "6' 9\"  |  206 cm", "6' 10\"  |  208 cm", "6' 11\"  |  211 cm", "7'  |  213 cm", "7' 1\"  |  216 cm", "7' 2\"  |  218 cm", "7' 3\"  |  221 cm", "7' 4\"  |  224 cm", "7' 5\"  |  226 cm", "7' 6\"  |  229 cm", "7' 7\"  |  231 cm", "7' 8\"  |  234 cm", "7' 9\"  |  237 cm", "7' 10\"  |  239 cm", "7' 11\"  |  242 cm"}));
+        maxHeight.setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, new String[]{"4' 1\"  |  124 cm", "4' 2\"  |  127 cm", "4' 3\"  |  130 cm", "4' 4\"  |  132 cm", "4' 5\"  |  135 cm", "4' 6\"  |  138 cm", "4' 7\"  |  140 cm", "4' 8\"  |  143 cm", "4' 9\"  |  145 cm", "4' 10\"  |  148 cm", "4' 11\"  |  151 cm", "5'  |  152 cm", "5' 1\"  |  155 cm", "5' 2\"  |  157 cm", "5' 3\"  |  160 cm", "5' 4\"  |  163 cm", "5' 5\"  |  165 cm", "5' 6\"  |  168 cm", "5' 7\"  |  170 cm", "5' 8\"  |  173 cm", "5' 9\"  |  175 cm", "5' 10\"  |  178 cm", "5' 11\"  |  180 cm", "6'  |  183 cm", "6' 1\"  |  185 cm", "6' 2\"  |  188 cm", "6' 3\"  |  191 cm", "6' 4\"  |  193 cm", "6' 5\"  |  196 cm", "6' 6\"  |  198 cm", "6' 7\"  |  201 cm", "6' 8\"  |  203 cm", "6' 9\"  |  206 cm", "6' 10\"  |  208 cm", "6' 11\"  |  211 cm", "7'  |  213 cm", "7' 1\"  |  216 cm", "7' 2\"  |  218 cm", "7' 3\"  |  221 cm", "7' 4\"  |  224 cm", "7' 5\"  |  226 cm", "7' 6\"  |  229 cm", "7' 7\"  |  231 cm", "7' 8\"  |  234 cm", "7' 9\"  |  237 cm", "7' 10\"  |  239 cm", "7' 11\"  |  242 cm"}));
 
         String[] ageArray = new String[38]; // Since you want to fill it till 55 (55 - 18 + 1)
 
@@ -61,27 +65,34 @@ public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
 
     private void onclickListeners() {
         searchBtn.setOnClickListener(view -> {
+            Customer c = LocalCache.getLoggedInCustomer(this.getActivity());
+
+
             searchBtn.setEnabled(false);
-            String maxHeight_ = "" , minHeight_  = "" , minAge_ = "" , maxAge_ = "";
+            String maxHeight_ = "" , minHeight_  = "" , minAge_ = "" , maxAge_ = "",_status = "",_religion =  "",_gender = "";
             minAge_ = minAge.getText().toString().trim();
             maxAge_ = maxAge.getText().toString().trim();
-            Customer c = LocalCache.getLoggedInCustomer(this.getActivity());
-            String[] parts1 = minHeight.getText().toString().trim().split("\\|");
-            String[] parts2 = maxHeight.getText().toString().trim().split("\\|");
+            _status = status.getText().toString().trim();
+            _religion = religion.getText().toString().trim();
+            _gender = c.getGender().equalsIgnoreCase("male") ? "female" : "male";
 
+
+            String[] parts1 = minHeight.getText().toString().trim().split("\\|");
             for (String part : parts1) {
                 if (part.contains("cm")) {
                     String[] cmSplit = part.trim().split("\\s+");
                     minHeight_ = cmSplit[0];
                 }
             }
+
+            String[] parts2 = maxHeight.getText().toString().trim().split("\\|");
             for (String part : parts2) {
                 if (part.contains("cm")) {
                     String[] cmSplit = part.trim().split("\\s+");
                     maxHeight_ = cmSplit[0];
                 }
             }
-            FilterModal modal = new FilterModal(c.getProfileId(),minAge_,maxAge_,minHeight_,maxHeight_);
+            FilterModal modal = new FilterModal(c.getProfileId(),minAge_,maxAge_,minHeight_,maxHeight_,_status,_religion,_gender);
             ApiCallUtil.getFilteredLevel1Profiles(this.getActivity(),fragment,modal);
         });
     }
@@ -91,6 +102,8 @@ public class SearchProfileBottomSheetDialog extends BottomSheetDialogFragment {
         maxHeight = v.findViewById(R.id.maxHeight);
         minAge = v.findViewById(R.id.minAge);
         maxAge = v.findViewById(R.id.maxAge);
+        status = v.findViewById(R.id.status);
+        religion = v.findViewById(R.id.religion);
         searchBtn = v.findViewById(R.id.searchBtn);
     }
 }

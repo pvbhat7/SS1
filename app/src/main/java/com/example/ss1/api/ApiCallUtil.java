@@ -151,6 +151,10 @@ public class ApiCallUtil {
         new PersistBitmapTask(activity).execute();
     }
 
+    public static void shareProfile(Activity activity, Level_2_Modal profile) {
+        new ShareProfileTask(activity,profile).execute();
+    }
+
 
     static class GetAllCustomerProfilesTask extends AsyncTask<Void, Void, Void> {
 
@@ -1668,6 +1672,39 @@ public class ApiCallUtil {
                 Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
             }
             count++;
+        }
+    }
+
+
+    static class ShareProfileTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        Level_2_Modal profile;
+
+        public ShareProfileTask(Activity activity,Level_2_Modal profile) {
+            this.activity = activity;
+            this.profile = profile;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+
+
+            } catch (Exception e) {
+                Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
         }
     }
 
