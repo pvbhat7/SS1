@@ -145,8 +145,8 @@ public class HomeFragment extends Fragment {
             String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
             String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
 
-            Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate,"0");
-            ApiCallUtil.registerProfile(c, getFragmentActivity(),true,this);
+            Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate, "0");
+            ApiCallUtil.registerProfile(c, getFragmentActivity(), true, this);
         });
 
         ((TextInputEditText) d.findViewById(R.id.name)).addTextChangedListener(new TextWatcher() {
@@ -272,7 +272,7 @@ public class HomeFragment extends Fragment {
 
     private void searchProfiles() {
         HelperUtils.vibrateFunction(this.getActivity());
-        SearchProfileBottomSheetDialog searchProfileBottomSheetDialog = new SearchProfileBottomSheetDialog(this.getActivity(),this);
+        SearchProfileBottomSheetDialog searchProfileBottomSheetDialog = new SearchProfileBottomSheetDialog(this.getActivity(), this);
         HelperUtils.searchProfileBottomSheetDialog = searchProfileBottomSheetDialog;
         searchProfileBottomSheetDialog.show(this.getActivity().getSupportFragmentManager(), "ModalBottomSheet");
     }
@@ -325,7 +325,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
+        if (ApiCallUtil.clicked_level2activity)
+            ApiCallUtil.clicked_level2activity = false;
+        else
+            ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
     }
 
     public void initLevel_1_CardProfilesRecyclerView(List<Level_1_cardModal> list) {
@@ -381,19 +384,17 @@ public class HomeFragment extends Fragment {
         return activity;
     }
 
-    private void validateOnBoardingForm(Dialog d){
+    private void validateOnBoardingForm(Dialog d) {
 
-        if( !((TextInputEditText)d.findViewById(R.id.name)).getText().toString().trim().isEmpty()
-                && !((TextInputEditText)d.findViewById(R.id.email)).getText().toString().trim().isEmpty()
-                && !((AutoCompleteTextView)d.findViewById(R.id.gender)).getText().toString().trim().isEmpty()
-                && !((TextInputEditText)d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty())
+        if (!((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim().isEmpty()
+                && !((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim().isEmpty()
+                && !((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim().isEmpty()
+                && !((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty())
             d.findViewById(R.id.create_profile_btn).setEnabled(true);
         else
             d.findViewById(R.id.create_profile_btn).setEnabled(false);
 
     }
-
-
 
 
 }

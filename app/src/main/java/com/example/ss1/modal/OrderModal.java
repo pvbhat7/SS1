@@ -15,6 +15,8 @@ public class OrderModal {
 
     public String endDate;
 
+    public Integer countRemaining;
+
     public OrderModal() {
 
     }
@@ -97,5 +99,9 @@ public class OrderModal {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public Integer getCountRemaining() {
+        return Integer.parseInt(maxCount) - Integer.parseInt(usedCount);
     }
 }

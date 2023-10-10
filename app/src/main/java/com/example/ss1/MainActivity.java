@@ -13,7 +13,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.ss1.databinding.ActivityMainBinding;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +24,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ApiCallUtil.getAdminPhone(this);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            // checking if user is registered in firebase
+            ApiCallUtil.setLoggedInCustomer(this,user.getPhoneNumber().replace("+91",""), null);
+        }
 
         try{
             binding = ActivityMainBinding.inflate(getLayoutInflater());

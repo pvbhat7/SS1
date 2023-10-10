@@ -14,6 +14,8 @@ public class AppPreference {
 
     public static final String GENDER_STAT_JSON = "genderStatJson";
 
+    public static final String ADMINPHONE_JSON = "adminphoneJson";
+
     public static final void setStringPref(Context context, String prefKey, String key, String value) {
         SharedPreferences sp = context.getSharedPreferences(prefKey, 0);
         SharedPreferences.Editor edit = sp.edit();

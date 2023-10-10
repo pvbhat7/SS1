@@ -277,6 +277,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/mymembership_card"
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"

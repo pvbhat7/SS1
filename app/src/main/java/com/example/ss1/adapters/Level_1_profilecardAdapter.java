@@ -151,6 +151,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
 
 
                 holder.profilephoto.setOnClickListener(view -> {
+                    ApiCallUtil.clicked_level2activity = true;
                     ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
                     /*if(customer.getIs_verified() != null && customer.getIs_verified().equalsIgnoreCase("2"))
                     ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);

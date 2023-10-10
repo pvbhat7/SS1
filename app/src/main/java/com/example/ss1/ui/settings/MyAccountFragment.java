@@ -46,7 +46,7 @@ public class MyAccountFragment extends Fragment {
     OrderModal activeOrder;
 
     static CoordinatorLayout coordinatorLayout;
-    CardView cb_card, adminzone_card, myaccount_profile_card;
+    CardView cb_card,mymembership_card, adminzone_card, myaccount_profile_card;
     LinearLayout adminzone_link, logoutId, cb_link, mymembership_link, editprofile_link;
     TextView profileHeadingName, profileHeadingmobile, profileHeadingEmail, profileCardId, cb_text;
 
@@ -84,13 +84,16 @@ public class MyAccountFragment extends Fragment {
 
             // handle contact balance
             if (activeOrder != null && activeOrder.getId() != null) {
+                mymembership_card.setVisibility(View.VISIBLE);
                 int balance = Integer.parseInt(activeOrder.getMaxCount()) - Integer.parseInt(activeOrder.getUsedCount());
                 cb_card.setVisibility(View.VISIBLE);
                 cb_text.setText("Contact Balance : " + balance);
-            } else
+            } else {
                 cb_card.setVisibility(View.GONE);
+                mymembership_card.setVisibility(View.GONE);
+            }
 
-            ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity(), cb_card, cb_text, true);
+            ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity(), cb_card,mymembership_card, cb_text, true);
         } catch (Exception e) {
             Log.i("ss_nw_call", "ErrorAla : myaccountfragment" + e.getMessage());
         }
@@ -189,6 +192,8 @@ public class MyAccountFragment extends Fragment {
 
         cb_link = view.findViewById(R.id.cb_link);
         cb_card = view.findViewById(R.id.cb_card);
+        mymembership_card = view.findViewById(R.id.mymembership_card);
+
         cb_text = view.findViewById(R.id.cb_text);
 
 
@@ -241,4 +246,9 @@ public class MyAccountFragment extends Fragment {
         snackbar.show();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ApiCallUtil.syncAccountBalance(customer.getProfileId(), this.getActivity(), cb_card,mymembership_card, cb_text, true);
+    }
 }

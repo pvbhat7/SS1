@@ -123,6 +123,22 @@ public class LocalCache {
         return list;
     }
 
+    public static String setAdminPhone(String adminPhone, Activity activity){
+        String jsonString = new Gson().toJson(adminPhone);
+        AppPreference.setStringPref(activity, AppPreference.ADMINPHONE_JSON, AppPreference.ADMINPHONE_JSON,jsonString);
+        return jsonString;
+    }
+
+    public static String getAdminPhone(Activity activity) {
+        String adminPhone;
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.ADMINPHONE_JSON, AppPreference.ADMINPHONE_JSON);
+        if (!jsonString.isEmpty())
+            adminPhone = new Gson().fromJson(jsonString, String.class);
+        else
+            adminPhone = new String();
+        return adminPhone;
+    }
+
 
 
 }

@@ -1,19 +1,13 @@
 package com.example.ss1.activity;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -33,14 +27,19 @@ import com.example.ss1.api.ApiCallUtil;
 import com.example.ss1.api.HelperUtils;
 import com.example.ss1.api.DateApi;
 import com.example.ss1.modal.Customer;
-import com.example.ss1.modal.Level_1_cardModal;
 import com.example.ss1.modal.Level_2_Modal;
+import com.example.ss1.modal.OrderModal;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
@@ -50,27 +49,26 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class Level2ProfileActivity extends AppCompatActivity {
 
+    LinearLayout call1_link , call2_link , whatsapp_link , insta_link , email_link;
+
     public static CoordinatorLayout coordinatorLayout;
-    Level_2_Modal profile;
+    Level_2_Modal viewedProfile;
     SliderView sliderView;
     static Context ctx;
     Boolean enableDisableContactViewButton = false;
-    Customer customer;
+    Customer loggedinCustomer;
 
     TextView profileid, name, birthdate, birthtime, height, education, occupation, religion, caste, income, bloodgroup, marriagestatus, birthname, birthplace, fathername, mothername, relatives, family, city, address, expectations, kuldaivat, zodiac, varn, nakshatra, nadi, gan, yoni, charan, gotra, mangal, email, mobile1, mobile2, mobile3;
 
-    Button viewContactDetailsBtn, editprofile_link;
-    ImageView profilephotoaddresss,shareprofileicon;
+    Button viewContactDetailsBtn;
+    ImageView profilephotoaddresss,shareprofileicon,editprofile_link;
 
     CardView contact_card;
 
@@ -84,7 +82,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
         handleOnClickListeners();
 
         // TODO: 12-Sep-23 <a href="https://www.freepik.com/free-photo/abstract-yellow-sunshine-theme-summer-watercolor-background-illustration-high-resolution-free-photo_26887846.htm#query=texture%20background&position=32&from_view=keyword&track=ais">Image by Sketchepedia</a> on Freepik
-        customer = LocalCache.getLoggedInCustomer(this);
+        loggedinCustomer = LocalCache.getLoggedInCustomer(this);
 
         //*set context*//*
         if (ctx == null || ((Level2ProfileActivity) ctx).isDestroyed())
@@ -92,62 +90,65 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            profile = new Gson().fromJson(extras.getString("level2data"), new TypeToken<Level_2_Modal>() {
+            viewedProfile = new Gson().fromJson(extras.getString("level2data"), new TypeToken<Level_2_Modal>() {
             }.getType());
             enableDisableContactViewButton = extras.getBoolean("enableDisableContactViewButton");
         }
 
 
-        if (profile != null) {
-            if (profile.getContactViewed()) {
+        if (viewedProfile != null) {
+            if (viewedProfile.getContactViewed()) {
+                findViewById(R.id.contactDetailsLayout).setVisibility(View.GONE);
                 viewContactDetailsBtn.setVisibility(View.GONE);
                 contact_card.setVisibility(View.VISIBLE);
+
             } else {
+
                 viewContactDetailsBtn.setVisibility(View.VISIBLE);
                 contact_card.setVisibility(View.GONE);
             }
             //handleCarosol(profile.getProfilephotoaddress() , profile.getBiodataaddress());
             Glide.with(this)
-                    .load(profile.getProfilephotoaddress())
+                    .load(viewedProfile.getProfilephotoaddress())
                     .placeholder(R.drawable.oops)
                     .into((ImageView) findViewById(R.id.profilephotoaddresss));
-            name.setText(profile.getFirstname() + " " + profile.getLastname());
-            String age = getAgeByDOB(profile.getBirthdate());
-            profileid.setText("Profile id : A" + profile.getProfileId());
-            birthdate.setText(profile.getBirthdate() + getAgeByDOB(profile.getBirthdate()));
-            birthtime.setText(profile.getBirthtime());
-            height.setText(profile.getHeight());
-            education.setText(profile.getEducation());
-            occupation.setText(profile.getOccupation());
-            religion.setText(profile.getReligion());
-            caste.setText(profile.getCaste());
-            income.setText(profile.getIncome());
-            expectations.setText(profile.getExpectations());
-            bloodgroup.setText(profile.getBloodgroup());
-            marriagestatus.setText(profile.getMarriagestatus());
-            birthname.setText(profile.getBirthname());
-            birthplace.setText(profile.getBirthplace());
-            fathername.setText(profile.getFathername());
-            mothername.setText(profile.getMothername());
-            relatives.setText(profile.getRelatives());
-            family.setText(profile.getFamily());
-            city.setText(profile.getCity());
-            address.setText(profile.getAddress());
-            kuldaivat.setText(profile.getKuldaivat());
-            zodiac.setText(profile.getZodiac());
-            varn.setText(profile.getVarn());
-            nakshatra.setText(profile.getNakshatra());
-            nadi.setText(profile.getNadi());
-            gan.setText(profile.getGan());
-            yoni.setText(profile.getYoni());
-            charan.setText(profile.getCharan());
-            gotra.setText(profile.getGotra());
-            mangal.setText(profile.getMangal());
+            name.setText(viewedProfile.getFirstname() + " " + viewedProfile.getLastname());
+            String age = getAgeByDOB(viewedProfile.getBirthdate());
+            profileid.setText("Profile id : A" + viewedProfile.getProfileId());
+            birthdate.setText(viewedProfile.getBirthdate() + getAgeByDOB(viewedProfile.getBirthdate()));
+            birthtime.setText(viewedProfile.getBirthtime());
+            height.setText(viewedProfile.getHeight());
+            education.setText(viewedProfile.getEducation());
+            occupation.setText(viewedProfile.getOccupation());
+            religion.setText(viewedProfile.getReligion());
+            caste.setText(viewedProfile.getCaste());
+            income.setText(viewedProfile.getIncome());
+            expectations.setText(viewedProfile.getExpectations());
+            bloodgroup.setText(viewedProfile.getBloodgroup());
+            marriagestatus.setText(viewedProfile.getMarriagestatus());
+            birthname.setText(viewedProfile.getBirthname());
+            birthplace.setText(viewedProfile.getBirthplace());
+            fathername.setText(viewedProfile.getFathername());
+            mothername.setText(viewedProfile.getMothername());
+            relatives.setText(viewedProfile.getRelatives());
+            family.setText(viewedProfile.getFamily());
+            city.setText(viewedProfile.getCity());
+            address.setText(viewedProfile.getContactViewed() ? viewedProfile.getAddress() : "********");
+            kuldaivat.setText(viewedProfile.getKuldaivat());
+            zodiac.setText(viewedProfile.getZodiac());
+            varn.setText(viewedProfile.getVarn());
+            nakshatra.setText(viewedProfile.getNakshatra());
+            nadi.setText(viewedProfile.getNadi());
+            gan.setText(viewedProfile.getGan());
+            yoni.setText(viewedProfile.getYoni());
+            charan.setText(viewedProfile.getCharan());
+            gotra.setText(viewedProfile.getGotra());
+            mangal.setText(viewedProfile.getMangal());
 
-            email.setText(profile.getEmail());
-            mobile1.setText(profile.getMobile1());
-            mobile2.setText(profile.getMobile2());
-            mobile3.setText(profile.getMobile3());
+            email.setText(viewedProfile.getContactViewed() ? viewedProfile.getEmail() : "********");
+            mobile1.setText(viewedProfile.getContactViewed() ? viewedProfile.getMobile1() : "********");
+            mobile2.setText(viewedProfile.getContactViewed() ? viewedProfile.getMobile2() : "********");
+            mobile3.setText(viewedProfile.getContactViewed() ? viewedProfile.getMobile3() : "********");
 
 
         }
@@ -169,23 +170,27 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
     private void handleOnClickListeners() {
 
+
+
         viewContactDetailsBtn.setOnClickListener(view -> {
 
+            OrderModal order = LocalCache.getActiveOrder(this);
+
             // check if package exist or not
-            if (customer.getActivepackageid() == null) {
+            if (loggedinCustomer.getActivepackageid() == null ) {
+                Log.i("ss_nw_call", "View contact : pkg id is null");
                 new BuyMembershipBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
-                viewContactDetailsBtn.setEnabled(false);
-                viewContactDetailsBtn.setVisibility(View.GONE);
-                contact_card.setVisibility(View.VISIBLE);
-                ApiCallUtil.viewContactData(customer.getProfileId(), profile.getProfileId(), this);
+                Log.i("ss_nw_call", "View contact : pkg id is "+ loggedinCustomer.getActivepackageid()+ " and balance is "+order.getCountRemaining());
+
+                ApiCallUtil.viewContactData(loggedinCustomer.getProfileId(), viewedProfile, this);
 
                 //showSnackBar("Credit left : 25");
             }
 
         });
 
-        profilephotoaddresss.setOnClickListener(view -> HelperUtils.showImageDialog(Level2ProfileActivity.this, profile.getProfilephotoaddress()));
+        profilephotoaddresss.setOnClickListener(view -> HelperUtils.showImageDialog(Level2ProfileActivity.this, viewedProfile.getProfilephotoaddress()));
 
         /*whatsapp.setOnClickListener(view -> {
             String uri = "https://wa.me/+91" + profile.getMobile1().toString().trim();
@@ -228,12 +233,64 @@ public class Level2ProfileActivity extends AppCompatActivity {
             HelperUtils.vibrateFunction(Level2ProfileActivity.this);
             Intent intent = new Intent(Level2ProfileActivity.this, RegistrationActivity.class);
             intent.putExtra("editprofile", true);
-            intent.putExtra("profile", new Gson().toJson(profile));
+            intent.putExtra("profile", new Gson().toJson(viewedProfile));
 
             startActivity(intent);
         });
 
-        shareprofileicon.setOnClickListener(view -> ApiCallUtil.shareProfile(this,profile));
+        shareprofileicon.setOnClickListener(view -> ApiCallUtil.shareProfile(this, viewedProfile));
+
+        call1_link.setOnClickListener(view -> Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.CALL_PHONE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                            callIntent.setData(Uri.parse("tel:+91" + viewedProfile.getMobile1().toString().trim()));
+                            startActivity(callIntent);
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check());
+        call2_link.setOnClickListener(view -> Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.CALL_PHONE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                            callIntent.setData(Uri.parse("tel:+91" + viewedProfile.getMobile2().toString().trim()));
+                            startActivity(callIntent);
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check());
+        whatsapp_link.setOnClickListener(view -> {
+            String uri = "https://wa.me/+91" + viewedProfile.getMobile1().toString().trim();
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            startActivity(intent);
+        });
+        insta_link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        email_link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
 
@@ -283,6 +340,12 @@ public class Level2ProfileActivity extends AppCompatActivity {
         mobile2 = findViewById(R.id.mobile2);
         mobile3 = findViewById(R.id.mobile3);
 
+
+        call1_link  = findViewById(R.id.call1_link);
+        call2_link   = findViewById(R.id.call2_link);
+        whatsapp_link   = findViewById(R.id.whatsapp_link);
+        insta_link   = findViewById(R.id.insta_link);
+        email_link  = findViewById(R.id.email_link);
 
     }
 

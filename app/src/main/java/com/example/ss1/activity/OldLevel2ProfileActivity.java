@@ -199,7 +199,7 @@ public class OldLevel2ProfileActivity extends AppCompatActivity {
                 new BuyMembershipBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
             } else {
 
-                ApiCallUtil.viewContactData(customer.getProfileId(), profile.getProfileId(), this);
+                ApiCallUtil.viewContactData(customer.getProfileId(), profile, this);
 
                 l2_mobile.setText("+91 " + profile.getMobile1().toString().trim());
                 l2_email.setText(profile.getEmail().trim());

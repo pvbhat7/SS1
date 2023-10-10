@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.ss1.BuyMembershipBottomSheetDialog;
 import com.example.ss1.LocalCache;
 import com.example.ss1.MainActivity;
 import com.example.ss1.R;
@@ -61,13 +62,14 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class ApiCallUtil {
 
     public static int counter = 0;
-    public static Drawable drawable123;
+    public static Boolean clicked_level2activity = false;
 
     public static List<BitmapDataModal> blist = new ArrayList<>();
 
@@ -93,8 +95,8 @@ public class ApiCallUtil {
         new UpdateViewedNotificationStateTask(noti_id).execute();
     }
 
-    public static void getContactViewedProfiles(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView, Activity activity) {
-        new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView, activity).execute();
+    public static void getContactViewedProfiles(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView,TextView cv_count, Activity activity) {
+        new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView,cv_count, activity).execute();
     }
 
     public static void registerProfile(Customer customer, Activity activity, Boolean onboardNewUser, Fragment fragment) {
@@ -127,6 +129,10 @@ public class ApiCallUtil {
 
     public static void getMyMemberships(String cpid, RecyclerView recyclerView, Activity activity) {
         new GetMyMembershipsTask(cpid, activity, recyclerView).execute();
+    }
+
+    public static void getAdminPhone(Activity activity) {
+        new GetAdminPhoneTask(activity).execute();
     }
 
     public static void getMembershipPlans(RecyclerView recyclerView, Activity activity) {
@@ -348,7 +354,7 @@ public class ApiCallUtil {
         }
     }
 
-    public static void viewContactData(String cpid, String vcpid, Activity activity) {
+    public static void viewContactData(String cpid, Level_2_Modal vcpid, Activity activity) {
         new ViewContactDataTask(cpid, vcpid, activity).execute();
     }
 
@@ -356,15 +362,17 @@ public class ApiCallUtil {
 
         String cpid;
 
-        String vcpid;
+        Level_2_Modal vcpid;
 
         SingleResponse response;
         Activity activity;
+        String mobile;
 
-        public ViewContactDataTask(String cpid, String vcpid, Activity activity) {
+        public ViewContactDataTask(String cpid, Level_2_Modal vcpid, Activity activity) {
             this.cpid = cpid;
             this.vcpid = vcpid;
             this.activity = activity;
+            this.mobile = LocalCache.getLoggedInCustomer(activity).getMobile1();
         }
 
         @Override
@@ -377,8 +385,12 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "UpdateViewCountTask doInBackground calling...");
             try {
                 // check if package exists or not
-                response = RetrofitClient.getInstance().getApi().viewContactData(cpid, vcpid).execute().body();
-                syncAccountBalance(cpid, activity, null, null, false);
+                response = RetrofitClient.getInstance().getApi().viewContactData(cpid, vcpid.getProfileId()).execute().body();
+                if(response !=  null && response.getResult().equalsIgnoreCase("true")){
+                    syncAccountBalance(cpid, activity, null,null, null, false);
+                    updateLoggedInCustomerDetails(activity,mobile);
+                }
+
             } catch (Exception e) {
                 Log.i("ss_nw_call", "UpdateViewCountTask doInBackground error" + e.toString());
             }
@@ -389,12 +401,26 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "UpdateViewCountTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
+            if(response !=  null && response.getResult().equalsIgnoreCase("true")){
+                ((TextView)activity.findViewById(R.id.address)).setText(vcpid.getAddress());
+                ((TextView)activity.findViewById(R.id.mobile1)).setText(vcpid.getMobile1());
+                ((TextView)activity.findViewById(R.id.mobile2)).setText(vcpid.getMobile2());
+                ((TextView)activity.findViewById(R.id.mobile3)).setText(vcpid.getMobile3());
+                ((TextView)activity.findViewById(R.id.email)).setText(vcpid.getEmail());
+                activity.findViewById(R.id.contactDetailsLayout).setVisibility(View.GONE);
+                activity.findViewById(R.id.viewContactDetailsBtn).setEnabled(false);
+                activity.findViewById(R.id.viewContactDetailsBtn).setVisibility(View.GONE);
+                activity.findViewById(R.id.contact_card).setVisibility(View.VISIBLE);
+            }
+            else{
+                new BuyMembershipBottomSheetDialog(activity).show(((Level2ProfileActivity)activity).getSupportFragmentManager(), "ModalBottomSheet");
+            }
 
         }
     }
 
-    public static void syncAccountBalance(String cpid, Activity activity, CardView cb_card, TextView cb_text, Boolean flag) {
-        new SyncAccountBalanceTask(cpid, activity, cb_card, cb_text, flag).execute();
+    public static void syncAccountBalance(String cpid, Activity activity, CardView cb_card,CardView membership_card, TextView cb_text, Boolean flag) {
+        new SyncAccountBalanceTask(cpid, activity, cb_card, membership_card, cb_text, flag).execute();
     }
 
     static class SyncAccountBalanceTask extends AsyncTask<Void, Void, Void> {
@@ -404,13 +430,15 @@ public class ApiCallUtil {
 
         Activity activity;
         CardView cb_card;
+        CardView membership_card;
         TextView cb_text;
         Boolean flag;
 
-        public SyncAccountBalanceTask(String cpid, Activity activity, CardView cb_card, TextView cb_text, Boolean flag) {
+        public SyncAccountBalanceTask(String cpid, Activity activity, CardView cb_card, CardView membership_card,TextView cb_text, Boolean flag) {
             this.cpid = cpid;
             this.activity = activity;
             this.cb_card = cb_card;
+            this.membership_card = membership_card;
             this.cb_text = cb_text;
             this.flag = flag;
         }
@@ -436,12 +464,13 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "GetCountLeftTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
-            if (flag && response_list != null && !response_list.isEmpty()) {
+            if (response_list != null && !response_list.isEmpty()) {
                 LocalCache.setActiveOrder(response_list.get(0), activity);
                 OrderModal activeOrder = LocalCache.getActiveOrder(activity);
-                if (activeOrder != null && activeOrder.getId() != null) {
+                if (flag && activeOrder != null && activeOrder.getId() != null) {
                     int balance = Integer.parseInt(activeOrder.getMaxCount()) - Integer.parseInt(activeOrder.getUsedCount());
                     cb_card.setVisibility(View.VISIBLE);
+                    membership_card.setVisibility(View.VISIBLE);
                     cb_text.setText("Contact Balance : " + balance);
                 }
             }
@@ -689,14 +718,10 @@ public class ApiCallUtil {
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());
                     LocalCache.setLoggedInCustomer(customer.get(0), activity);
 
-                    if (LocalCache.getContactViewedList(activity).isEmpty()) {
-                        List<ContactViewedModal> contactViewedModals = RetrofitClient.getInstance().getApi().getContactViewedProfiles(customer.get(0).getProfileId()).execute().body();
-                        LocalCache.setContactViewedList(contactViewedModals, activity);
-                    }
-                    if (LocalCache.getMembershipList(activity).isEmpty()) {
-                        List<MembershipModal> membershipModals = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
-                        LocalCache.setMembershipList(membershipModals, activity);
-                    }
+
+                    LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(customer.get(0).getProfileId()).execute().body(), activity);
+
+                    LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
                 }
             } catch (Exception e) {
                 Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground error" + e);
@@ -849,12 +874,14 @@ public class ApiCallUtil {
         ContactViewedAdapter adapter;
         RecyclerView contactviewedRecyclerView;
         Activity activity;
+        TextView cv_count;
 
-        public GetContactViewedProfilesTask(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView, Activity activity) {
+        public GetContactViewedProfilesTask(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView,TextView cv_count, Activity activity) {
             this.cpid = cpid;
             this.adapter = adapter;
             this.contactviewedRecyclerView = contactviewedRecyclerView;
             this.activity = activity;
+            this.cv_count = cv_count;
         }
 
         @Override
@@ -875,6 +902,7 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
+                cv_count.setText("Total contacts viewed : "+ list.size());
                 adapter = new ContactViewedAdapter(list, activity);
                 contactviewedRecyclerView.setHasFixedSize(true);
                 contactviewedRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -947,7 +975,7 @@ public class ApiCallUtil {
 
                 if (onboardNewUser) {
                     if (list != null && !list.isEmpty()) {
-                        //Collections.shuffle(list);
+                        Collections.shuffle(list);
                         LocalCache.setLevel1List(list, activity);
                         ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
                         if (progressBar != null)
@@ -1071,6 +1099,37 @@ public class ApiCallUtil {
                 cmLayout.setVisibility(View.VISIBLE);
                 HelperUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);
             }
+        }
+    }
+
+    static class GetAdminPhoneTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        SingleResponse response;
+
+
+        public GetAdminPhoneTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                response = RetrofitClient.getInstance().getApi().getAdminPhone().execute().body();
+            } catch (Exception e) {
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (response != null && !response.getResult().equalsIgnoreCase("0"))
+                LocalCache.setAdminPhone(response.getResult(),activity);
         }
     }
 

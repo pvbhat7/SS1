@@ -34,7 +34,7 @@ public class ContactViewedActivity extends AppCompatActivity {
 
 
 
-        cv_count.setText("Total contacts viewed : "+ activeOrder.getUsedCount());
+
         if(activeOrder.getUsedCount().equalsIgnoreCase("0")) {
             contactviewedRecyclerView.setVisibility(View.GONE);
             cv_zero.setVisibility(View.VISIBLE);
@@ -42,7 +42,7 @@ public class ContactViewedActivity extends AppCompatActivity {
 
         customer = LocalCache.getLoggedInCustomer(this);
 
-        ApiCallUtil.getContactViewedProfiles(customer.getProfileId(),adapter,contactviewedRecyclerView,this);
+        ApiCallUtil.getContactViewedProfiles(customer.getProfileId(),adapter,contactviewedRecyclerView,cv_count,this);
     }
 
     private void initUiElements() {
