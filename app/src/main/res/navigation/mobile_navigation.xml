@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.ss1.ui.home.HomeFragment"
+        android:name="com.sdgvvk.v1.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_matches"
-        android:name="com.example.ss1.ui.dashboard.MatchesFragment"
+        android:name="com.sdgvvk.v1.ui.dashboard.MatchesFragment"
         android:label="@string/matches"
         tools:layout="@layout/fragment_matches" />
 
     <fragment
         android:id="@+id/navigation_myaccount"
-        android:name="com.example.ss1.ui.settings.MyAccountFragment"
+        android:name="com.sdgvvk.v1.ui.settings.MyAccountFragment"
         android:label="@string/myaccount"
         tools:layout="@layout/fragment_myaccount" />
 </navigation>
