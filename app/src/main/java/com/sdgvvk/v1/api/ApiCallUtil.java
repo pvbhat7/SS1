@@ -717,6 +717,8 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground calling...");
             try {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
+                LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
+
                 if (customer != null && !customer.isEmpty()) {
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());
                     LocalCache.setLoggedInCustomer(customer.get(0), activity);
@@ -724,7 +726,6 @@ public class ApiCallUtil {
 
                     LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(customer.get(0).getProfileId()).execute().body(), activity);
 
-                    LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
                 }
             } catch (Exception e) {
                 Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground error" + e);

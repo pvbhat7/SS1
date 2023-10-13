@@ -61,7 +61,7 @@ public class RegistrationActivity extends AppCompatActivity {
     LinearLayout formLayout, cmlayout;
     CircularImageView profilePhotoAddress, biodataAddress;
 
-    Customer customer;
+    Customer loggedincustomer,customerprofileeditcreatemode;
 
     Boolean editprofile = false;
     String profile ;
@@ -73,20 +73,26 @@ public class RegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration);
         init();
 
-        customer = LocalCache.getLoggedInCustomer(this);
+        loggedincustomer = LocalCache.getLoggedInCustomer(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             editprofile = extras.getBoolean("editprofile");
             profile = extras.getString("profile");
             if(profile != null && !profile.isEmpty()){
-                customer = LocalCache.convertJsonToObjectCustomer(profile);
+                customerprofileeditcreatemode = LocalCache.convertJsonToObjectCustomer(profile);
                 updateCache = false;
             }
         }
 
 
         if (editprofile) {
+            if(!loggedincustomer.getIsAdmin().equalsIgnoreCase("1")){
+                name.setEnabled(false);
+                gender.setEnabled(false);
+                (findViewById(R.id.gender_)).setEnabled(false);
+                mobile1.setEnabled(false);
+            }
             formLayout.setVisibility(View.VISIBLE);
             findViewById(R.id.save_btn).setEnabled(true);
             cancel_btn.setVisibility(GONE);
@@ -104,6 +110,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void preFillFormData() {
+        Customer customer = customerprofileeditcreatemode;
         Glide.with(this).load(customer.getProfilephotoaddress()).placeholder(R.drawable.oops).into(profilePhotoAddress);
         Glide.with(this).load(customer.getBiodataaddress()).placeholder(R.drawable.oops).into(biodataAddress);
         email.setText(customer.getEmail());
@@ -463,13 +470,14 @@ public class RegistrationActivity extends AppCompatActivity {
                 charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(), relation1, relation2, relationname1.getText().toString().trim(), relationname2.getText().toString().trim(), relatives.getText().toString().trim(), family.getText().toString().trim());
 
         if (editprofile) {
-            c.setProfileId(customer.getProfileId());
+            c.setProfileId(customerprofileeditcreatemode.getProfileId());
             ApiCallUtil.updateProfile(c, this, updateCache);
         } else
             ApiCallUtil.registerProfile(c, this, false, null);
         nullifyformdata();
         cmmobile.setText("");
         formLayout.setVisibility(GONE);
+        if(loggedincustomer.getIsAdmin().equalsIgnoreCase("1"))
         cmlayout.setVisibility(View.VISIBLE);
     }
 

@@ -43,7 +43,7 @@
 
             <LinearLayout
                 android:id="@+id/loginbox"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -116,7 +116,7 @@
                     android:gravity="center_vertical"
                     android:textSize="13dp"
                     android:background="@color/yellow"
-                    android:text="App not yet launched"
+                    android:text=""
                     android:textColor="@color/purple_500"
                     android:fontFamily="@font/roboto_bold"
                     android:textAlignment="center"

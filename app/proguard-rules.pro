@@ -23,3 +23,9 @@
 # Additional keep rules to suppress warnings
 -dontwarn org.conscrypt.Conscrypt
 -dontwarn org.conscrypt.OpenSSLProvider
+# Models
+-keepclassmembers class com.sdgvvk.v1.** {*;}
+
+# GSON
+-keepattributes Signature
+-keepattributes *Annotation*

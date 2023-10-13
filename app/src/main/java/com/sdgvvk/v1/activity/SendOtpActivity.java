@@ -54,15 +54,16 @@ public class SendOtpActivity extends AppCompatActivity {
 
         handleOnClickListeners();
 
-        //textingflow();
-        launchflow();
+        textingflow();
+        //launchflow();
 
 
 
     }
 
     private void textingflow() {
-        ((TextView)findViewById(R.id.inputMobile)).setText("1111111111");
+        findViewById(R.id.loginbox).setVisibility(View.VISIBLE);
+        ((TextView)findViewById(R.id.inputMobile)).setText("1111111112");
         findViewById(R.id.buttonGetOtp).setEnabled(true);
 
             Boolean isLogoutFlow = false;
@@ -98,7 +99,7 @@ public class SendOtpActivity extends AppCompatActivity {
         errorTxt = findViewById(R.id.errorTxt);
         String flag = LocalCache.getIsLive(this);
         if(flag != null && flag.equalsIgnoreCase("true")){
-
+            loginbox.setVisibility(View.VISIBLE);
             errorbox.setVisibility(View.GONE);
             Boolean isLogoutFlow = false;
 

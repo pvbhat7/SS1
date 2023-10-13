@@ -25,7 +25,7 @@
             <TextView
                 android:gravity="center_vertical"
                 android:textAlignment="center"
-                android:textColor="@color/black"
+                android:textColor="@color/txtcolor"
                 android:layout_height="match_parent"
                 android:fontFamily="@font/roboto_bold"
                 android:text="Notifications"

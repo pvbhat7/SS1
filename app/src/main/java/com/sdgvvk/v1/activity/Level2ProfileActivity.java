@@ -56,7 +56,7 @@ import java.util.List;
 
 public class Level2ProfileActivity extends AppCompatActivity {
 
-    LinearLayout call1_link , call2_link , whatsapp_link , insta_link , email_link;
+    LinearLayout call1_link , call2_link , whatsapp_link , insta_link , email_link , contactDetailsLayout;
 
     public static CoordinatorLayout coordinatorLayout;
     Level_2_Modal viewedProfile;
@@ -71,6 +71,8 @@ public class Level2ProfileActivity extends AppCompatActivity {
     ImageView profilephotoaddresss,shareprofileicon,editprofile_link;
 
     CardView contact_card;
+
+    Boolean ownAccount = false;
 
 
     @Override
@@ -95,15 +97,25 @@ public class Level2ProfileActivity extends AppCompatActivity {
             enableDisableContactViewButton = extras.getBoolean("enableDisableContactViewButton");
         }
 
-
+        if(loggedinCustomer.getIsAdmin().equalsIgnoreCase("1")){
+            editprofile_link.setVisibility(View.VISIBLE);
+        }
         if (viewedProfile != null) {
+            if(viewedProfile.getMobile1().equalsIgnoreCase(loggedinCustomer.getMobile1()))
+                ownAccount = true;
+
+            if(ownAccount){
+                editprofile_link.setVisibility(View.VISIBLE);
+                contactDetailsLayout.setVisibility(View.GONE);
+            }
+
+
             if (viewedProfile.getContactViewed()) {
                 findViewById(R.id.contactDetailsLayout).setVisibility(View.GONE);
                 viewContactDetailsBtn.setVisibility(View.GONE);
                 contact_card.setVisibility(View.VISIBLE);
 
             } else {
-
                 viewContactDetailsBtn.setVisibility(View.VISIBLE);
                 contact_card.setVisibility(View.GONE);
             }
@@ -295,6 +307,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
 
     private void initUiElements() {
+        contactDetailsLayout = findViewById(R.id.contactDetailsLayout);
         shareprofileicon = findViewById(R.id.shareprofileicon);
         contact_card = findViewById(R.id.contact_card);
         editprofile_link = findViewById(R.id.editprofile_link);

@@ -49,6 +49,7 @@
         </androidx.cardview.widget.CardView>
         <ImageView
             android:id="@+id/editprofile_link"
+            android:visibility="gone"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="right|center_vertical"
@@ -56,6 +57,7 @@
             android:src="@drawable/editprofile_icon" />
         <ImageView
             android:id="@+id/shareprofileicon"
+            android:visibility="gone"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="right|center_vertical"
