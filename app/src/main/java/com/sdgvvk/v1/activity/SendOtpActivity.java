@@ -54,14 +54,14 @@ public class SendOtpActivity extends AppCompatActivity {
 
         handleOnClickListeners();
 
-        textingflow();
-        //launchflow();
+        //test_flow();
+        launch_flow();
 
 
 
     }
 
-    private void textingflow() {
+    private void test_flow() {
         findViewById(R.id.loginbox).setVisibility(View.VISIBLE);
         ((TextView)findViewById(R.id.inputMobile)).setText("1111111112");
         findViewById(R.id.buttonGetOtp).setEnabled(true);
@@ -93,7 +93,7 @@ public class SendOtpActivity extends AppCompatActivity {
 
     }
 
-    private void launchflow() {
+    private void launch_flow() {
         loginbox = findViewById(R.id.loginbox);
         errorbox = findViewById(R.id.errorbox);
         errorTxt = findViewById(R.id.errorTxt);

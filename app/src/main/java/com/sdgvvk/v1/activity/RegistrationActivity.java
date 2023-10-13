@@ -477,8 +477,9 @@ public class RegistrationActivity extends AppCompatActivity {
         nullifyformdata();
         cmmobile.setText("");
         formLayout.setVisibility(GONE);
-        if(loggedincustomer.getIsAdmin().equalsIgnoreCase("1"))
-        cmlayout.setVisibility(View.VISIBLE);
+        if(loggedincustomer.getIsAdmin().equalsIgnoreCase("1")) {
+            cmlayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

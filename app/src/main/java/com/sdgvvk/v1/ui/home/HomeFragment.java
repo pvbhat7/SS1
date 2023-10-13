@@ -3,6 +3,7 @@ package com.sdgvvk.v1.ui.home;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -26,7 +27,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.sdgvvk.v1.LocalCache;
+import com.sdgvvk.v1.MainActivity;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.SearchProfileBottomSheetDialog;
 import com.sdgvvk.v1.api.ApiCallUtil;
@@ -51,6 +54,7 @@ public class HomeFragment extends Fragment {
 
     static Activity activity;
 
+    public static final int PICK_IMAGE_REQUEST = 1;
     public CoordinatorLayout coordinatorLayout;
 
     SpinKitView progressBar;
@@ -103,8 +107,19 @@ public class HomeFragment extends Fragment {
     private void onboardNewUser() {
         HelperUtils.vibrateFunction(this.getActivity());
         Dialog d = new Dialog(this.getActivity());
-
         d.setContentView(R.layout.onboarding_dialog);
+
+        CircularImageView profilePhotoAddress = d.findViewById(R.id.profilePhotoAddress);
+        profilePhotoAddress.setOnClickListener(view -> {
+            // TODO: 13-Oct-23
+            ApiCallUtil.onboardDialog = d;
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            ((MainActivity)MainActivity.getContextObject()).startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        });
+
+
+
 
         String[] genderArray = {"male", "female"};
         ((AutoCompleteTextView) d.findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, genderArray));
@@ -145,6 +160,11 @@ public class HomeFragment extends Fragment {
             String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
 
             Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate, "0");
+            if(ApiCallUtil.b64 != null){
+                c.setProfilephotoaddress(ApiCallUtil.b64);
+            }
+            ApiCallUtil.onboardDialog = null;
+            ApiCallUtil.b64 = null;
             ApiCallUtil.registerProfile(c, getFragmentActivity(), true, this);
         });
 
@@ -388,7 +408,8 @@ public class HomeFragment extends Fragment {
         if (!((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim().isEmpty()
                 && !((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim().isEmpty()
                 && !((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim().isEmpty()
-                && !((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty())
+                && !((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty()
+                && ApiCallUtil.b64 != null)
             d.findViewById(R.id.create_profile_btn).setEnabled(true);
         else
             d.findViewById(R.id.create_profile_btn).setEnabled(false);

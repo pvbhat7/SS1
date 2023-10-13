@@ -216,6 +216,7 @@ public class MyAccountFragment extends Fragment {
             LocalCache.setMembershipList(new ArrayList<>( ), this.getActivity());
             LocalCache.setGenderStat(new ArrayList<>( ), this.getActivity());
             LocalCache.setAdminPhone("", this.getActivity());
+            LocalCache.setIsLive("", this.getActivity());
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this.getActivity(), SendOtpActivity.class);
             intent.putExtra("logout", true);

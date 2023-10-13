@@ -71,6 +71,8 @@ public class ApiCallUtil {
     public static Boolean clicked_level2activity = false;
 
     public static List<BitmapDataModal> blist = new ArrayList<>();
+    public static Dialog onboardDialog = null;
+    public static String b64 = null;
 
 
     // get level 1 data
