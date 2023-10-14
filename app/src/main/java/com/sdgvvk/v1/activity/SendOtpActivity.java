@@ -3,6 +3,8 @@ package com.sdgvvk.v1.activity;
 import static com.google.android.material.internal.ViewUtils.hideKeyboard;
 import static com.google.android.material.internal.ViewUtils.showKeyboard;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +23,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.MainActivity;
 import com.sdgvvk.v1.R;
@@ -36,22 +43,26 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class SendOtpActivity extends AppCompatActivity {
 
+    Activity activity;
     SpinKitView progressBar,progressBarBtnView;
     CardView boxCard;
 
     LinearLayout loginbox,errorbox;
     TextView errorTxt;
 
+    Button contactsupportbtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_otp);
 
-
+        activity = this;
         handleOnClickListeners();
 
         //test_flow();
@@ -61,7 +72,7 @@ public class SendOtpActivity extends AppCompatActivity {
 
     }
 
-    private void test_flow() {
+    /*private void test_flow() {
         findViewById(R.id.loginbox).setVisibility(View.VISIBLE);
         ((TextView)findViewById(R.id.inputMobile)).setText("1111111112");
         findViewById(R.id.buttonGetOtp).setEnabled(true);
@@ -91,9 +102,10 @@ public class SendOtpActivity extends AppCompatActivity {
                 boxCard.setVisibility(View.VISIBLE);
 
 
-    }
+    }*/
 
     private void launch_flow() {
+        contactsupportbtn = findViewById(R.id.contactsupportbtn);
         loginbox = findViewById(R.id.loginbox);
         errorbox = findViewById(R.id.errorbox);
         errorTxt = findViewById(R.id.errorTxt);
@@ -128,8 +140,31 @@ public class SendOtpActivity extends AppCompatActivity {
         else{
             loginbox.setVisibility(View.GONE);
             errorbox.setVisibility(View.VISIBLE);
+            contactsupportbtn.setVisibility(View.VISIBLE);
             errorTxt.setText(flag != null ? flag : "server error");
             findViewById(R.id.inputMobile).setEnabled(false);
+
+            contactsupportbtn.setOnClickListener(view -> Dexter.withActivity(this)
+                    .withPermissions(Manifest.permission.CALL_PHONE)
+                    .withListener(new MultiplePermissionsListener() {
+                        @Override
+                        public void onPermissionsChecked(MultiplePermissionsReport report) {
+                            if (report.areAllPermissionsGranted()) {
+                                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                String adminPhone = LocalCache.getAdminPhone(SendOtpActivity.this);
+                                if(adminPhone.isEmpty() || adminPhone == "")
+                                    callIntent.setData(Uri.parse("tel:+917972864487" ));
+                                else
+                                    callIntent.setData(Uri.parse("tel:+91"+adminPhone ));
+                                startActivity(callIntent);
+                            }
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                            token.continuePermissionRequest();
+                        }
+                    }).check());
         }
     }
 
@@ -151,58 +186,11 @@ public class SendOtpActivity extends AppCompatActivity {
         });
 
         buttonGetOtp.setOnClickListener(view -> {
+            hideKeyboard(view);
             if (!HelperUtils.isConnected()) {
                 Toast.makeText(SendOtpActivity.this, "NO INTERNET", Toast.LENGTH_SHORT).show();
             } else {
-                hideKeyboard(view);
-                HelperUtils.vibrateFunction(SendOtpActivity.this);
-                if (inputMobile.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(SendOtpActivity.this, "Enter mobile", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                //progressBar.setVisibility(View.VISIBLE);
-                buttonGetOtp.setVisibility(View.GONE);
-                showProgressBar();
-
-
-                PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                        "+91" + inputMobile.getText().toString(),
-                        10,
-                        TimeUnit.SECONDS,
-                        SendOtpActivity.this,
-                        new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
-                            @Override
-                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                                //progressBar.setVisibility(View.GONE);
-                                //hideProgressBar();
-                                //buttonGetOtp.setVisibility(View.VISIBLE);
-                                signInWIthPhoneAuthCredentials(phoneAuthCredential);
-                            }
-
-                            @Override
-                            public void onVerificationFailed(@NonNull FirebaseException e) {
-                                //progressBar.setVisibility(View.GONE);
-                                //hideProgressBar();
-                                //buttonGetOtp.setVisibility(View.VISIBLE);
-                                Toast.makeText(SendOtpActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                                //progressBar.setVisibility(View.GONE);
-                                hideProgressBar();
-                                //buttonGetOtp.setVisibility(View.VISIBLE);
-                                Intent intent = new Intent(getApplicationContext(), VerifyOtpActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                intent.putExtra("mobile", inputMobile.getText().toString());
-                                intent.putExtra("verificationId", verificationId);
-                                //buttonGetOtp.setVisibility(View.VISIBLE);
-                                startActivity(intent);
-                            }
-                        }
-                );
+                ApiCallUtil.CheckAccountStatus(this,inputMobile.getText().toString());
             }
         });
 

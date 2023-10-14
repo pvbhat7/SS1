@@ -123,6 +123,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="25dp"/>
 
+                <Button
+                    android:id="@+id/contactsupportbtn"
+                    android:visibility="gone"
+                    android:text="Contact support"
+                    android:textSize="10dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"/>
+
 
             </LinearLayout>
 

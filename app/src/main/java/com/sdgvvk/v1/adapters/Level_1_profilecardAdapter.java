@@ -1,6 +1,10 @@
 package com.sdgvvk.v1.adapters;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +14,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.ProjectConstants;
 import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.DateApi;
 import com.sdgvvk.v1.api.HelperUtils;
@@ -104,6 +115,55 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
         final Level_1_cardModal obj = mItemList.get(position);
         if (obj != null) {
             try {
+
+                if(customer.getIsAdmin().equalsIgnoreCase("1")) {
+                    holder.admin_view.setVisibility(View.VISIBLE);
+                    holder.deleteprofile.setOnClickListener(view -> {
+                        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    //Yes button clicked
+                                    HelperUtils.vibrateFunction(activity);
+                                    mItemList.remove(position);
+                                    notifyDataSetChanged();
+                                    ApiCallUtil.disableProfile(activity,obj.getProfileId());
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        };
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                        builder
+                                .setMessage("Delete profile ?")
+                                .setPositiveButton("yes", dialogClickListener)
+                                .setNegativeButton("no", dialogClickListener).show();
+                    });
+                    holder.callprofile.setOnClickListener(view -> Dexter.withActivity(activity)
+                            .withPermissions(Manifest.permission.CALL_PHONE)
+                            .withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                    if (report.areAllPermissionsGranted()) {
+                                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                        callIntent.setData(Uri.parse("tel:+91" + obj.getMobile().toString().trim()));
+                                        activity.startActivity(callIntent);
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check());
+                }
+                else
+                    holder.non_admin_view.setVisibility(View.VISIBLE);
+
+
+
 
                 // profileCardId
                 holder.profileCardId.setText("Profile id : A"+obj.getProfileId());
@@ -202,7 +262,7 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
 
         public TextView name, interestSentText, age, shortlistprofiletext, likeprofiletext,profileCardId;
         public CardView level1_cardview;
-        public LinearLayout like, shortlist, sendinterest, ignore;
+        public LinearLayout like, shortlist, sendinterest, ignore , non_admin_view , admin_view ,deleteprofile,callprofile;
         public ImageView like_img, shortlist_img, sendinterest_img, ignore_img, profilephoto;
 
         public ItemViewHolder(@NonNull View itemView) {
@@ -223,6 +283,10 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             this.sendinterest_img = itemView.findViewById(R.id.sendinterest_img);
             this.ignore_img = itemView.findViewById(R.id.ignore_img);
             this.profilephoto = itemView.findViewById(R.id.profilephoto);
+            this.deleteprofile = itemView.findViewById(R.id.deleteprofile);
+            this.callprofile = itemView.findViewById(R.id.callprofile);
+            this.non_admin_view = itemView.findViewById(R.id.non_admin_view);
+            this.admin_view = itemView.findViewById(R.id.admin_view);
 
         }
     }
@@ -272,6 +336,11 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_IGNORE_PROFILE));
             ApiCallUtil.getAllProfiles(customer.getProfileId(),fragment, sprogressBar,activity,true);
         }
+    }
+
+    public void updateList(List<Level_1_cardModal> list){
+        mItemList = list;
+        notifyDataSetChanged();
     }
 
 

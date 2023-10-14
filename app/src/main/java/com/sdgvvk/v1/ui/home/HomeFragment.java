@@ -79,8 +79,10 @@ public class HomeFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
         activity = this.getActivity();
+
         initUIElements();
         initOnclickListener();
+        
         HelperUtils.checkNetworkStatus(this.getActivity());
 
         syncLoggedInCustomer();

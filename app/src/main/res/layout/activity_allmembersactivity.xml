@@ -11,13 +11,53 @@
     app:layout_anchorGravity="center_horizontal"
     tools:context=".MainActivity">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/add"
+        android:visibility="visible"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:clickable="false"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="40dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <LinearLayout
+            android:clickable="false"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:clickable="false"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/search_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <EditText
+                android:id="@+id/searchMemberEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="30dp"
+                android:hint="search profiles"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="30dp"
         android:scrollbars="vertical" />
 
 </LinearLayout>

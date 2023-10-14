@@ -1,5 +1,7 @@
 package com.sdgvvk.v1.api;
 
+import static com.google.android.material.internal.ViewUtils.hideKeyboard;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -20,13 +22,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.sdgvvk.v1.BuyMembershipBottomSheetDialog;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.MainActivity;
@@ -34,6 +42,8 @@ import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.activity.AdminZoneActivity;
 import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.activity.ProfileExportActivity;
+import com.sdgvvk.v1.activity.SendOtpActivity;
+import com.sdgvvk.v1.activity.VerifyOtpActivity;
 import com.sdgvvk.v1.adapters.BuyMembershipAdapter;
 import com.sdgvvk.v1.adapters.ContactViewedAdapter;
 import com.sdgvvk.v1.adapters.MyMembershipAdapter;
@@ -64,6 +74,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import kotlinx.coroutines.channels.Send;
 
 public class ApiCallUtil {
 
@@ -166,6 +179,185 @@ public class ApiCallUtil {
         new ShareProfileTask(activity,profile).execute();
     }
 
+    public static void disableProfile(Activity activity, String vcpid) {
+        new DisableProfileTask(activity,vcpid).execute();
+    }
+
+    public static void CheckAccountStatus(SendOtpActivity activity , String mobile) {
+        new CheckAccountStatusTask(activity , mobile).execute();
+    }
+
+    static class CheckAccountStatusTask extends AsyncTask<Void, Void, Void> {
+
+        SendOtpActivity activity;
+        SingleResponse obj;
+        Boolean account_deactivated;
+        String mobile;
+
+        public CheckAccountStatusTask(SendOtpActivity activity, String mobile) {
+            this.activity = activity;
+            this.mobile = mobile;
+            this.account_deactivated = false;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date()+" api call : CheckAccountStatusTask");
+            try {
+                obj = RetrofitClient.getInstance().getApi().checkAccountStatus(mobile).execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "nw error");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.i("ss_nw_call", "onPostExecute ");
+            super.onPostExecute(aVoid);
+            if(obj != null && obj.getResult().equalsIgnoreCase("true"))
+                account_deactivated = true;
+
+            if(!account_deactivated){
+
+                HelperUtils.vibrateFunction(activity);
+
+                activity.findViewById(R.id.buttonGetOtp).setVisibility(View.GONE);
+                activity.showProgressBar();
+
+
+                PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                        "+91" + mobile,
+                        10,
+                        TimeUnit.SECONDS,
+                        activity,
+                        new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+                            @Override
+                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                                //progressBar.setVisibility(View.GONE);
+                                //hideProgressBar();
+                                //buttonGetOtp.setVisibility(View.VISIBLE);
+                                activity.signInWIthPhoneAuthCredentials(phoneAuthCredential);
+                            }
+
+                            @Override
+                            public void onVerificationFailed(@NonNull FirebaseException e) {
+                                //progressBar.setVisibility(View.GONE);
+                                //hideProgressBar();
+                                //buttonGetOtp.setVisibility(View.VISIBLE);
+                                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                                //progressBar.setVisibility(View.GONE);
+                                activity.hideProgressBar();
+                                //buttonGetOtp.setVisibility(View.VISIBLE);
+                                Intent intent = new Intent(activity, VerifyOtpActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                intent.putExtra("mobile", mobile);
+                                intent.putExtra("verificationId", verificationId);
+                                //buttonGetOtp.setVisibility(View.VISIBLE);
+                                activity.startActivity(intent);
+                            }
+                        }
+                );
+            }
+            else{
+                activity.findViewById(R.id.loginbox).setVisibility(View.GONE);
+                activity.findViewById(R.id.errorbox).setVisibility(View.VISIBLE);
+                activity.findViewById(R.id.contactsupportbtn).setVisibility(View.VISIBLE);
+                ((TextView)activity.findViewById(R.id.errorTxt)).setText("Account deactivated");
+            }
+        }
+    }
+
+    static class DisableProfileTask extends AsyncTask<Void, Void, Void> {
+
+        String vcpid;
+        Activity activity;
+
+        public DisableProfileTask(Activity activity, String vcpid) {
+            this.vcpid = vcpid;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date()+" api call : DisableProfileTask");
+            try {
+                RetrofitClient.getInstance().getApi().disableProfile(vcpid).execute();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "nw error");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.i("ss_nw_call", "onPostExecute ");
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    public static void deleteProfile(Activity activity, String vcpid) {
+        new DeleteProfileTask(activity,vcpid).execute();
+    }
+
+    static class DeleteProfileTask extends AsyncTask<Void, Void, Void> {
+
+        String vcpid;
+        Activity activity;
+
+        public DeleteProfileTask(Activity activity, String vcpid) {
+            this.vcpid = vcpid;
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date()+" api call : DeleteProfileTask");
+            try {
+                RetrofitClient.getInstance().getApi().deleteProfile(vcpid).execute();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "nw error");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.i("ss_nw_call", "onPostExecute ");
+            super.onPostExecute(aVoid);
+            if (HelperUtils.isConnected()) {
+                LocalCache.setLoggedInCustomer(new Customer(), activity);
+                LocalCache.setActiveOrder(new OrderModal(), activity);
+                LocalCache.setLevel1List(new ArrayList<>(), activity);
+                LocalCache.setContactViewedList(new ArrayList<>(), activity);
+                LocalCache.setMembershipList(new ArrayList<>( ), activity);
+                LocalCache.setGenderStat(new ArrayList<>( ), activity);
+                LocalCache.setIsLive("Account deactivated", activity);
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(activity, SendOtpActivity.class);
+                intent.putExtra("logout", true);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                activity.startActivity(intent);
+            }
+        }
+    }
 
     static class GetAllCustomerProfilesTask extends AsyncTask<Void, Void, Void> {
 
@@ -720,22 +912,36 @@ public class ApiCallUtil {
 
                 }
             } catch (Exception e) {
-                Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground error" + e);
+                
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
-            if (progressBar != null) {
-                progressBar.setVisibility(View.GONE);
-                Intent intent = new Intent(activity, MainActivity.class);
+            if(customer.get(0).getDiscontinue().equalsIgnoreCase("false")){
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                    Intent intent = new Intent(activity, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    activity.startActivity(intent);
+                }
+            }
+            else{
+                LocalCache.setLoggedInCustomer(new Customer(), activity);
+                LocalCache.setActiveOrder(new OrderModal(), activity);
+                LocalCache.setLevel1List(new ArrayList<>(), activity);
+                LocalCache.setContactViewedList(new ArrayList<>(), activity);
+                LocalCache.setMembershipList(new ArrayList<>( ), activity);
+                LocalCache.setGenderStat(new ArrayList<>( ), activity);
+                LocalCache.setIsLive("Account deactivated", activity);
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(activity, SendOtpActivity.class);
+                intent.putExtra("logout", true);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 activity.startActivity(intent);
             }
-
         }
     }
 
@@ -766,14 +972,13 @@ public class ApiCallUtil {
                     LocalCache.setLoggedInCustomer(customer.get(0), activity);
                 }
             } catch (Exception e) {
-                Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground error" + e);
+                
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
 
         }
@@ -808,14 +1013,13 @@ public class ApiCallUtil {
                 Customer c = LocalCache.getLoggedInCustomer(activity);
                 notificationsList = RetrofitClient.getInstance().getApi().getUserNotifications(c.getProfileId()).execute().body();
             } catch (Exception e) {
-                Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground error" + e);
+                
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
             if (notificationsList != null && !notificationsList.isEmpty()) {
                 NotificationAdapter adapter = new NotificationAdapter(notificationsList, activity, dialog);

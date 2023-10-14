@@ -2,11 +2,13 @@ package com.sdgvvk.v1.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -249,6 +252,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+
 
         shareprofileicon.setOnClickListener(view -> ApiCallUtil.shareProfile(this, viewedProfile));
 

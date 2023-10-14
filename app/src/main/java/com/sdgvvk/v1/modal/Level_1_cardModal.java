@@ -6,6 +6,8 @@ public class Level_1_cardModal {
     private String firstname;
     private String lastname;
 
+    private String mobile;
+
     private String gender;
     private String dob;
     private String age;
@@ -119,5 +121,13 @@ public class Level_1_cardModal {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

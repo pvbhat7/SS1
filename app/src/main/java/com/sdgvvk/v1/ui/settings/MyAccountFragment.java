@@ -1,6 +1,8 @@
 package com.sdgvvk.v1.ui.settings;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,8 +16,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
@@ -46,17 +50,19 @@ public class MyAccountFragment extends Fragment {
     OrderModal activeOrder;
 
     static CoordinatorLayout coordinatorLayout;
-    CardView cb_card,mymembership_card, adminzone_card, myaccount_profile_card;
-    LinearLayout adminzone_link, logoutId, cb_link, mymembership_link, editprofile_link;
+    CardView cb_card,mymembership_card, adminzone_card, myaccount_profile_card , deactivate_card;
+    LinearLayout adminzone_link, logoutId, cb_link, mymembership_link, editprofile_link , deactivate_link;
     TextView profileHeadingName, profileHeadingmobile, profileHeadingEmail, profileCardId, cb_text;
 
     ImageView sprofilephoto;
+    Activity activity;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_myaccountnew, container, false);
         HelperUtils.checkNetworkStatus(this.getActivity());
         try {
+            activity = this.getActivity();
             initUIElements();
             initOnClickListeners();
             syncLoggedInCustomer();
@@ -173,6 +179,30 @@ public class MyAccountFragment extends Fragment {
         });
 
 
+
+        deactivate_link.setOnClickListener(view -> {
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Yes button clicked
+                        Toast.makeText(activity, "Account deletion in progress...", Toast.LENGTH_SHORT).show();
+                        ApiCallUtil.deleteProfile(activity,customer.getProfileId());
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder
+                    .setMessage("Are you sure want to deactivate account ?")
+                    .setPositiveButton("yes", dialogClickListener)
+                    .setNegativeButton("no", dialogClickListener).show();
+        });
+
+
     }
 
 
@@ -183,12 +213,15 @@ public class MyAccountFragment extends Fragment {
         profileHeadingEmail = view.findViewById(R.id.profileHeadingEmail);
         profileCardId = view.findViewById(R.id.profileCardId);
         adminzone_card = view.findViewById(R.id.adminzone_card);
+        deactivate_card = view.findViewById(R.id.deactivate_card);
         myaccount_profile_card = view.findViewById(R.id.myaccount_profile_card);
 
         sprofilephoto = view.findViewById(R.id.sprofilephoto);
         adminzone_link = view.findViewById(R.id.adminzone_link);
         mymembership_link = view.findViewById(R.id.mymembership_link);
         editprofile_link = view.findViewById(R.id.editprofile_link);
+        deactivate_link = view.findViewById(R.id.deactivate_link);
+
 
         cb_link = view.findViewById(R.id.cb_link);
         cb_card = view.findViewById(R.id.cb_card);

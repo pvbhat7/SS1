@@ -14,6 +14,7 @@ import com.sdgvvk.v1.modal.OrderModal;
 import com.sdgvvk.v1.modal.SingleResponse;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -149,6 +150,12 @@ public interface Api {
     Call<List<Stat>> getStats();
 
 
+    @GET("customer/disableProfile.php")
+    Call<SingleResponse> disableProfile(@Query("vcpid") String vcpid);
 
+    @GET("customer/deleteProfile.php")
+    Call<SingleResponse> deleteProfile(@Query("cpid") String cpid);
 
+    @GET("customer/checkAccountStatus.php")
+    Call<SingleResponse> checkAccountStatus(@Query("mobile") String mobile);
 }

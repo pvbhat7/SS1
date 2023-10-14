@@ -17,7 +17,7 @@
         app:cardCornerRadius="10dp">
 
         <LinearLayout
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="5dp"
             android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
@@ -35,19 +35,27 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:fontFamily="@font/comic_bold"
-                android:text=""
+                android:text="2222"
                 android:textColor="@color/black"
-                android:textSize="20dp" />
+                android:textSize="15dp" />
             <TextView
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="10dp"
                 android:id="@+id/name"
-                android:layout_width="match_parent"
+                android:textAlignment="center"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:fontFamily="@font/comic_bold"
-                android:text=""
+                android:text="sdfdsf"
                 android:textColor="@color/black"
-                android:textSize="20dp" />
+                android:textSize="18dp" />
+
+            <ImageView
+                android:id="@+id/deleteprofile"
+                android:clickable="true"
+                android:src="@drawable/discontinue"
+                android:layout_width="45dp"
+                android:layout_height="45dp"/>
 
 
         </LinearLayout>
