@@ -83,6 +83,8 @@ public class RegistrationActivity extends AppCompatActivity {
                 customerprofileeditcreatemode = LocalCache.convertJsonToObjectCustomer(profile);
                 updateCache = false;
             }
+            else
+                customerprofileeditcreatemode = loggedincustomer;
         }
 
 

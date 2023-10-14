@@ -188,14 +188,13 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "onPreExecute");
 
             progressBar.setIndeterminateDrawable(d);
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "doInBackground");
+            Log.i("ss_nw_call", new Date()+" api call : GetAllCustomerProfilesTask");
             try {
                 list = RetrofitClient.getInstance().getApi().getAllCustomerProfiles(loggedInCpid).execute().body();
 
@@ -259,7 +258,6 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "onPreExecute");
             d = new Circle();
             progressBar.setIndeterminateDrawable(d);
             progressBar.setVisibility(View.VISIBLE);
@@ -267,7 +265,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "doInBackground");
+            Log.i("ss_nw_call", new Date()+" api call : GetProfilesByTagTask");
             try {
                 list = RetrofitClient.getInstance().getApi().getProfilesByTag(cpid, tag).execute().body();
 
@@ -317,12 +315,11 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "GetLevel2DataTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "GetLevel2DataTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : GetLevel2DataTask");
             try {
                 list = RetrofitClient.getInstance().getApi().getLevel2DataByCPID(cpid).execute().body();
                 // TODO: 14-Sep-23 prepare single rest api
@@ -331,7 +328,7 @@ public class ApiCallUtil {
 
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "GetLevel2DataTask doInBackground error" + e);
+                Log.i("ss_nw_call", "GetLevel2DataTask error" + e);
             }
             return null;
         }
@@ -382,12 +379,11 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "UpdateViewCountTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "UpdateViewCountTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : ViewContactDataTask");
             try {
                 // check if package exists or not
                 response = RetrofitClient.getInstance().getApi().viewContactData(cpid, vcpid.getProfileId()).execute().body();
@@ -397,7 +393,7 @@ public class ApiCallUtil {
                 }
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "UpdateViewCountTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "UpdateViewCountTask error" + e.toString());
             }
             return null;
         }
@@ -450,17 +446,16 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "GetCountLeftTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "GetCountLeftTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : SyncAccountBalanceTask");
             try {
                 response_list = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
                 LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body(), activity);
             } catch (Exception e) {
-                Log.i("ss_nw_call", "GetCountLeftTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "GetCountLeftTask error" + e.toString());
             }
             return null;
         }
@@ -518,17 +513,16 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "AddToShortListedProfilesTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "AddToShortListedProfilesTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : AddToShortListedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToShortListedProfiles(cpid, vcpid).execute().body();
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "AddToShortListedProfilesTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "AddToShortListedProfilesTask error" + e.toString());
             }
             return null;
         }
@@ -556,17 +550,16 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "AddToNotInterestedProfilesTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "AddToNotInterestedProfilesTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : AddToNotInterestedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToNotInterestedProfiles(cpid, vcpid).execute().body();
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "GetCountLeftTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "GetCountLeftTask error" + e.toString());
             }
             return null;
         }
@@ -594,17 +587,16 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "AddToInterestedProfilesTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "AddToInterestedProfilesTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : AddToInterestedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToInterestedProfiles(cpid, vcpid).execute().body();
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "AddToInterestedProfilesTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "AddToInterestedProfilesTask error" + e.toString());
             }
             return null;
         }
@@ -632,17 +624,16 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "AddToLikedProfilesTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "AddToLikedProfilesTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : AddToLikedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToLikedProfiles(cpid, vcpid).execute().body();
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "AddToLikedProfilesTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "AddToLikedProfilesTask error" + e.toString());
             }
             return null;
         }
@@ -665,17 +656,16 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "AddNotificationTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "AddNotificationTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : AddNotificationTask");
             try {
                 RetrofitClient.getInstance().getApi().addNotification(modal).execute().body();
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "AddNotificationTask doInBackground error" + e.toString());
+                Log.i("ss_nw_call", "AddNotificationTask error" + e.toString());
             }
             return null;
         }
@@ -707,7 +697,7 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask onPreExecute");
+
             super.onPreExecute();
             if (progressBar != null) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -716,7 +706,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : SetLoggedInCustomerTask");
             try {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
                 LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
@@ -764,12 +754,11 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask onPreExecute");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : UpdateLoggedInCustomerDetailsTask");
             try {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
                 if (customer != null && !customer.isEmpty()) {
@@ -808,14 +797,13 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask onPreExecute");
             super.onPreExecute();
             no_noti_text = dialog.findViewById(R.id.no_noti_text);
             recyclerView = dialog.findViewById(R.id.notificationlistRecyclerview);
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", "SetLoggedInCustomerTask doInBackground calling...");
+            Log.i("ss_nw_call", new Date()+" api call : GetUserNotificationsListTask");
             try {
                 Customer c = LocalCache.getLoggedInCustomer(activity);
                 notificationsList = RetrofitClient.getInstance().getApi().getUserNotifications(c.getProfileId()).execute().body();
@@ -858,6 +846,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : UpdateViewedNotificationStateTask");
                 RetrofitClient.getInstance().getApi().updateViewedNotificationState(noti_id).execute().body();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -897,6 +886,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : GetContactViewedProfilesTask");
                 list = RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -952,6 +942,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : RegisterNewCustomerTask");
                 response = RetrofitClient.getInstance().getApi().registerNewCustomer(c).execute().body();
                 if (onboardNewUser) {
                     if (response != null && !response.getResult().equalsIgnoreCase("0")) {
@@ -1027,7 +1018,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-
+                Log.i("ss_nw_call", new Date()+" api call : UpdateProfileTask");
                 loggedInCustomer = RetrofitClient.getInstance().getApi().updateProfile(c).execute().body();
                 if (updateCache && loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
                     LocalCache.setLoggedInCustomer(loggedInCustomer.get(0), activity);
@@ -1078,6 +1069,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : ValidateLoginMobileTask");
                 //response = RetrofitClient.getInstance().getApi().isMobileExists(mobile).execute().body();
                 response = RetrofitClient.getInstance().getApi().isMobileExistsAll(mobile).execute().body();
             } catch (Exception e) {
@@ -1125,6 +1117,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : GetAdminPhoneTask");
                 response = RetrofitClient.getInstance().getApi().getAdminPhone().execute().body();
             } catch (Exception e) {
             }
@@ -1161,6 +1154,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : GetMyMembershipsTask");
                 list = RetrofitClient.getInstance().getApi().getMyMemberships(cpid).execute().body();
             } catch (Exception e) {
 
@@ -1199,6 +1193,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : GetMembershipPlansTask");
                 list = LocalCache.getMembershipList(activity);
                 if (list == null && list.isEmpty())
                     list = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
@@ -1243,6 +1238,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : ValidateAdminCodeTask");
                 obj = RetrofitClient.getInstance().getApi().getAdminCode().execute().body();
 
             } catch (Exception e) {
@@ -1285,6 +1281,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : CheckIsLiveTask");
                 obj = RetrofitClient.getInstance().getApi().isLive().execute().body();
             } catch (Exception e) {
                 Log.i("local_logs", e.toString());
@@ -1321,6 +1318,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : SyncStatsTask");
                 list = RetrofitClient.getInstance().getApi().getStats().execute().body();
 
             } catch (Exception e) {
@@ -1370,6 +1368,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : GetFilteredLevel1DataTask");
                 list = RetrofitClient.getInstance().getApi().getFilteredLevel1Profiles(filter).execute().body();
 
             } catch (Exception e) {
@@ -1417,6 +1416,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : GetFilteredLevel2DataTask");
                 ProfileExportActivity.temp_level2list = new ArrayList<>();
                 Log.i("local_logs", filter.toString());
                 list = RetrofitClient.getInstance().getApi().getFilteredLevel2Profiles(filter).execute().body();
@@ -1475,6 +1475,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : SearchProfileTask");
                 if (searchBy.equalsIgnoreCase("profile id"))
                     list = RetrofitClient.getInstance().getApi().getCustomerByCpid(value).execute().body();
                 else if (searchBy.equalsIgnoreCase("mobile"))
@@ -1528,6 +1529,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : AssignMembershipTask");
                 response = RetrofitClient.getInstance().getApi().assignMembership(orderModal).execute().body();
 
             } catch (Exception e) {
@@ -1569,6 +1571,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
+                Log.i("ss_nw_call", new Date()+" api call : DynamicLayoutCreationTask");
                 //activity.runOnUiThread(() -> dynamicLayout(activity,list, v));
                 dynamicLayout(activity, list, v);
 
@@ -1600,7 +1603,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-
+                Log.i("ss_nw_call", new Date()+" api call : PersistBitmapTask");
                 persistBitmapProcess(activity);
 
             } catch (Exception e) {
@@ -1794,8 +1797,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-
-
+                Log.i("ss_nw_call", new Date()+" api call : ShareProfileTask");
             } catch (Exception e) {
                 Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
             }

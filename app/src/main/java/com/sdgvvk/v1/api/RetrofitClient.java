@@ -26,7 +26,6 @@ public class RetrofitClient {
     }
 
     public static synchronized RetrofitClient getInstance(){
-        Log.i("RetrofitClient","calling api...");
         if(retrofitClient == null)
             retrofitClient = new RetrofitClient();
         return retrofitClient;
