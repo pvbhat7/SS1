@@ -69,7 +69,7 @@ public class AllMemberActivity extends AppCompatActivity {
         List<Level_1_cardModal> tempList = new ArrayList();
 
         for(Level_1_cardModal obj : filteredList){
-            if(obj.getFirstname().toLowerCase().contains(text.toLowerCase())){
+            if(obj.getFirstname().toLowerCase().contains(text.toLowerCase()) || obj.getLastname().toLowerCase().contains(text.toLowerCase()) || obj.getProfileId().toLowerCase().contains(text.toLowerCase())){
                 tempList.add(obj);
             }
         }

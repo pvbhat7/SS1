@@ -920,28 +920,13 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(customer.get(0).getDiscontinue().equalsIgnoreCase("false")){
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
-                    Intent intent = new Intent(activity, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    activity.startActivity(intent);
-                }
-            }
-            else{
-                LocalCache.setLoggedInCustomer(new Customer(), activity);
-                LocalCache.setActiveOrder(new OrderModal(), activity);
-                LocalCache.setLevel1List(new ArrayList<>(), activity);
-                LocalCache.setContactViewedList(new ArrayList<>(), activity);
-                LocalCache.setMembershipList(new ArrayList<>( ), activity);
-                LocalCache.setGenderStat(new ArrayList<>( ), activity);
-                LocalCache.setIsLive("Account deactivated", activity);
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(activity, SendOtpActivity.class);
-                intent.putExtra("logout", true);
+            if (progressBar != null) {
+                progressBar.setVisibility(View.GONE);
+                Intent intent = new Intent(activity, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 activity.startActivity(intent);
             }
+
         }
     }
 
