@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.api.ApiCallUtil;
@@ -42,7 +45,7 @@ public class AdminZoneActivity extends AppCompatActivity {
 
     CardView card1, card2;
 
-
+    static String searchBy = "";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +67,77 @@ public class AdminZoneActivity extends AppCompatActivity {
             Dialog d = new Dialog(this);
             Activity activity = this;
             d.setContentView(R.layout.assign_membership_dialog);
+            CardView byName = d.findViewById(R.id.c1);
+            CardView byMobile = d.findViewById(R.id.c2);
+            CardView byId = d.findViewById(R.id.c3);
+            EditText searchValue = d.findViewById(R.id.searchValue);
+            LinearLayout lay = d.findViewById(R.id.lay);
+            TextInputLayout val = d.findViewById(R.id.val);
+            Button searchBtn = d.findViewById(R.id.searchBtn);
+
+            byName.setOnClickListener(view1 -> {
+                lay.setVisibility(View.VISIBLE);
+                val.setVisibility(View.VISIBLE);
+                byName.setCardBackgroundColor(Color.YELLOW);
+                byMobile.setCardBackgroundColor(Color.WHITE);
+                byId.setCardBackgroundColor(Color.WHITE);
+                searchValue.setInputType(InputType.TYPE_CLASS_TEXT);
+                searchValue.setEnabled(true);
+                searchValue.setText("");
+                searchValue.setHint("Enter name");
+                searchBy = "name";
+                d.findViewById(R.id.downLayout).setVisibility(View.GONE);
+                d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
+            });
+            byMobile.setOnClickListener(view1 -> {
+                lay.setVisibility(View.VISIBLE);
+                val.setVisibility(View.VISIBLE);
+                byName.setCardBackgroundColor(Color.WHITE);
+                byMobile.setCardBackgroundColor(Color.YELLOW);
+                byId.setCardBackgroundColor(Color.WHITE);
+                searchValue.setInputType(InputType.TYPE_CLASS_NUMBER);
+                searchValue.setEnabled(true);
+                searchValue.setText("");
+                searchValue.setHint("Enter mobile");
+                searchBy = "mobile";
+                d.findViewById(R.id.downLayout).setVisibility(View.GONE);
+                d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
+            });
+            byId.setOnClickListener(view1 -> {
+                lay.setVisibility(View.VISIBLE);
+                val.setVisibility(View.VISIBLE);
+                byName.setCardBackgroundColor(Color.WHITE);
+                byMobile.setCardBackgroundColor(Color.WHITE);
+                byId.setCardBackgroundColor(Color.YELLOW);
+                searchValue.setInputType(InputType.TYPE_CLASS_NUMBER);
+                searchValue.setEnabled(true);
+                searchValue.setText("");
+                searchValue.setHint("Enter profile id");
+                searchBy = "profile id";
+                d.findViewById(R.id.downLayout).setVisibility(View.GONE);
+                d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
+            });
             handleAssignMembership(d, activity);
+            searchValue.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+
+                    if (s.length() > 0)
+                        searchBtn.setEnabled(true);
+                    else
+                        searchBtn.setEnabled(false);
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            });
             d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             d.show();
         });
@@ -107,20 +180,17 @@ public class AdminZoneActivity extends AppCompatActivity {
 
     private void handleAssignMembership(Dialog d, Activity activity) {
         d.findViewById(R.id.searchBtn).setOnClickListener(view14 -> {
+            String value = ((TextInputEditText) d.findViewById(R.id.searchValue)).getText().toString().trim();
             d.findViewById(R.id.searchBtn).setEnabled(false);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(d.getCurrentFocus().getWindowToken(), 0);
             ((TextView) d.findViewById(R.id.selectedProfileName)).setText("");
-            ((TextView) d.findViewById(R.id.selectedProfileId)).setText("");
-            String searchBy = ((AutoCompleteTextView) d.findViewById(R.id.searchFilter)).getText().toString().trim();
-            String value = ((TextInputEditText) d.findViewById(R.id.searchValue)).getText().toString().trim();
+            ((TextView) d.findViewById(R.id.selectedProfileId)).setText(";");
             RecyclerView recyclerView = d.findViewById(R.id.searchResultListRecyclerView);
             LinearLayout downLayout = d.findViewById(R.id.downLayout);
             ApiCallUtil.searchProfilesBy(d, activity, searchBy, value, recyclerView, downLayout);
         });
 
-        String[] searchByArray = {"name", "mobile", "profile id",};
-        ((AutoCompleteTextView) d.findViewById(R.id.searchFilter)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, searchByArray));
 
         String[] paymentModeArray = {"Cash", "Google Pay", "Phone Pe", "Paytm"};
         ((AutoCompleteTextView) d.findViewById(R.id.paymentmode)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, paymentModeArray));
@@ -155,24 +225,9 @@ public class AdminZoneActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
             }
         });
-        d.findViewById(R.id.searchFilter).setOnClickListener(view12 -> {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(d.getCurrentFocus().getWindowToken(), 0);
-            ((TextInputEditText) d.findViewById(R.id.searchValue)).setText("");
-            d.findViewById(R.id.downLayout).setVisibility(View.GONE);
-            d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
-        });
 
-        ((AutoCompleteTextView) d.findViewById(R.id.searchFilter)).setOnItemClickListener((parent, arg1, pos, id) -> {
-            String selection = String.valueOf(parent.getAdapter().getItem(pos));
-            if (selection.equalsIgnoreCase("name")) {
-                ((TextInputEditText) d.findViewById(R.id.searchValue)).setInputType(InputType.TYPE_CLASS_TEXT);
-            } else {
 
-                ((TextInputEditText) d.findViewById(R.id.searchValue)).setInputType(InputType.TYPE_CLASS_NUMBER);
-            }
 
-        });
         ((AutoCompleteTextView) d.findViewById(R.id.selectplan)).setOnItemClickListener((parent, arg1, pos, id) -> {
             MembershipModal obj = (MembershipModal) parent.getAdapter().getItem(pos);
             ((TextView) d.findViewById(R.id.fees)).setText("Rs. " + obj.getFees());

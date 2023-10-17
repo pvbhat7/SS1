@@ -23,33 +23,147 @@
         android:layout_marginRight="10dp"
         android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:hint="Search By">
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
 
-            <!-- Inside text input layout add
-                  an auto complete text view
-                    and make its input type to none-->
-            <AutoCompleteTextView
-                android:id="@+id/searchFilter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:enabled="true"
-                android:inputType="none"
-                android:text=""
-                android:textSize="12dp" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c1"
+                android:layout_width="150dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:outlineAmbientShadowColor="#CCCDD1"
+                android:outlineSpotShadowColor="@color/black"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="10dp"
+                app:strokeColor="#0021FF"
+                app:strokeWidth="1dp">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/comic_bold"
+                        android:text="Name"
+                        android:textColor="@color/black"
+                        android:textSize="12dp" />
+
+                    <ImageView
+                        android:src="@drawable/name_icon"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c2"
+                android:layout_width="150dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="18dp"
+                
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="10dp"
+                app:strokeColor="#0021FF"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/comic_bold"
+                        android:text="Mobile"
+                        android:textColor="@color/black"
+                        android:textSize="12dp" />
+
+                    <ImageView
+                        android:src="@drawable/mobile_icon"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c3"
+                android:layout_width="150dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="18dp"
+                
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="10dp"
+                app:strokeColor="#0021FF"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/comic_bold"
+                        android:text="Profile id"
+                        android:textColor="@color/black"
+                        android:textSize="12dp" />
+
+                    <ImageView
+                        android:src="@drawable/id_icon"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/val"
+            android:visibility="gone"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
-            android:hint="value"
             android:textAlignment="center">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -78,6 +192,8 @@
 
 
         <LinearLayout
+            android:id="@+id/lay"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -93,6 +209,7 @@
 
             <Button
                 android:id="@+id/searchBtn"
+                android:enabled="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
