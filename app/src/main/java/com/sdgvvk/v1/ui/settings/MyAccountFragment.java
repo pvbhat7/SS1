@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -62,6 +63,9 @@ public class MyAccountFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_myaccountnew, container, false);
         HelperUtils.checkNetworkStatus(this.getActivity());
         try {
+            String version = this.getActivity().getPackageManager().getPackageInfo(this.getActivity().getPackageName(), 0).versionName;
+            ((TextView)view.findViewById(R.id.version)).setText("app version : v"+version);
+
             activity = this.getActivity();
             initUIElements();
             initOnClickListeners();
@@ -249,7 +253,6 @@ public class MyAccountFragment extends Fragment {
             LocalCache.setMembershipList(new ArrayList<>( ), this.getActivity());
             LocalCache.setGenderStat(new ArrayList<>( ), this.getActivity());
             LocalCache.setAdminPhone("", this.getActivity());
-            LocalCache.setIsLive("", this.getActivity());
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this.getActivity(), SendOtpActivity.class);
             intent.putExtra("logout", true);

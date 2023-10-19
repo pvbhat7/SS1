@@ -134,8 +134,13 @@ public class SendOtpActivity extends AppCompatActivity {
                 else
                     boxCard.setVisibility(View.VISIBLE);
             }
-            else
+            else{
+                // logout flow
                 boxCard.setVisibility(View.VISIBLE);
+                errorbox.setVisibility(View.GONE);
+                loginbox.setVisibility(View.VISIBLE);
+            }
+
         }
         else{
             loginbox.setVisibility(View.GONE);

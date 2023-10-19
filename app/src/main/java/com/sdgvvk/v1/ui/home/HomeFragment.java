@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -110,6 +111,8 @@ public class HomeFragment extends Fragment {
         HelperUtils.vibrateFunction(this.getActivity());
         Dialog d = new Dialog(this.getActivity());
         d.setContentView(R.layout.onboarding_dialog);
+        LinearLayout errBox = d.findViewById(R.id.errorBox);
+        TextView errText = d.findViewById(R.id.errText);
 
         CircularImageView profilePhotoAddress = d.findViewById(R.id.profilePhotoAddress);
         profilePhotoAddress.setOnClickListener(view -> {
@@ -140,35 +143,44 @@ public class HomeFragment extends Fragment {
         });
 
         d.findViewById(R.id.create_profile_btn).setOnClickListener(view -> {
-            d.dismiss();
-            String mobile = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+91", "");
-            String name = ((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim();
-            String firstname = "", middlename = "", lastname = "";
-            String[] nameArr = name.split(" ");
-            if (nameArr.length == 1) {
-                firstname = nameArr[0];
-            } else if (nameArr.length == 2) {
-                firstname = nameArr[0];
-                lastname = nameArr[1];
-            } else if (nameArr.length == 3) {
-                firstname = nameArr[0];
-                middlename = nameArr[1];
-                lastname = nameArr[2];
-            } else
-                firstname = name;
+            String result = validateOnBoardingForm(d);
+            if(result.equalsIgnoreCase("")){
+                d.dismiss();
+                String mobile = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+91", "");
+                String name = ((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim();
+                String firstname = "", middlename = "", lastname = "";
+                String[] nameArr = name.split(" ");
+                if (nameArr.length == 1) {
+                    firstname = nameArr[0];
+                } else if (nameArr.length == 2) {
+                    firstname = nameArr[0];
+                    lastname = nameArr[1];
+                } else if (nameArr.length == 3) {
+                    firstname = nameArr[0];
+                    middlename = nameArr[1];
+                    lastname = nameArr[2];
+                } else
+                    firstname = name;
 
-            String email = ((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim();
-            String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
-            String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
+                String email = ((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim();
+                String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
+                String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
 
-            Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate, "0");
-            if(ApiCallUtil.b64 != null){
-                c.setProfilephotoaddress(ApiCallUtil.b64);
+                Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate, "0");
+                if(ApiCallUtil.b64 != null){
+                    c.setProfilephotoaddress(ApiCallUtil.b64);
+                }
+                ApiCallUtil.onboardDialog = null;
+                ApiCallUtil.b64 = null;
+                ApiCallUtil.registerProfile(c, getFragmentActivity(), true, this);
             }
-            ApiCallUtil.onboardDialog = null;
-            ApiCallUtil.b64 = null;
-            ApiCallUtil.registerProfile(c, getFragmentActivity(), true, this);
+            else{
+                errBox.setVisibility(View.VISIBLE);
+                errText.setText(result);
+            }
+
         });
+
 
         ((TextInputEditText) d.findViewById(R.id.name)).addTextChangedListener(new TextWatcher() {
             @Override
@@ -177,21 +189,10 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                validateOnBoardingForm(d);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-        ((TextInputEditText) d.findViewById(R.id.email)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                validateOnBoardingForm(d);
+                if(s.length() > 0){
+                    errText.setText("");
+                    errBox.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -205,16 +206,25 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                validateOnBoardingForm(d);
+                if(s.length() > 0){
+                    errText.setText("");
+                    errBox.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
             }
         });
+
         ((AutoCompleteTextView) d.findViewById(R.id.gender)).setOnItemClickListener((parent, arg1, pos, id) -> {
-            validateOnBoardingForm(d);
+            String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
+            if(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")){
+                errText.setText("");
+                errBox.setVisibility(View.GONE);
+            }
         });
+
 
 
         d.setCanceledOnTouchOutside(false);
@@ -405,16 +415,31 @@ public class HomeFragment extends Fragment {
         return activity;
     }
 
-    private void validateOnBoardingForm(Dialog d) {
+    private String validateOnBoardingForm(Dialog d) {
+        String errorTxt = "";
+        List<String> list = new ArrayList<>();
 
-        if (!((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim().isEmpty()
-                && !((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim().isEmpty()
-                && !((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim().isEmpty()
-                && !((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty()
-                && ApiCallUtil.b64 != null)
-            d.findViewById(R.id.create_profile_btn).setEnabled(true);
-        else
-            d.findViewById(R.id.create_profile_btn).setEnabled(false);
+        String name = ((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim();
+        String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
+        String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
+
+
+        if(name.isEmpty())
+            list.add("name");
+        if(gender.isEmpty())
+            list.add("gender");
+        if(birthdate.isEmpty())
+            list.add("birthdate");
+
+        if(!list.isEmpty()){
+            for(int i=0;i<list.size();i++){
+                errorTxt = errorTxt +" "+list.get(i);
+                if(!(i == list.size() -1))
+                    errorTxt = errorTxt+",";
+            }
+        }
+
+        return errorTxt;
 
     }
 

@@ -165,7 +165,7 @@
                                 android:layout_marginTop="5dp"
                                 android:fontFamily="@font/comic_bold"
                                 android:textColor="@color/black"
-                                android:text="+91 8796238220"
+                                android:text=""
                                 android:textAlignment="center"
                                 android:textSize="12dp" />
 
