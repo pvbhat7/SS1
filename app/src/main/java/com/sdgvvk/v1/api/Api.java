@@ -12,6 +12,7 @@ import com.sdgvvk.v1.modal.MyMembershipModal;
 import com.sdgvvk.v1.modal.NotificationModal;
 import com.sdgvvk.v1.modal.OrderModal;
 import com.sdgvvk.v1.modal.SingleResponse;
+import com.sdgvvk.v1.modal.TransactionModal;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -158,4 +159,7 @@ public interface Api {
 
     @GET("customer/checkAccountStatus.php")
     Call<SingleResponse> checkAccountStatus(@Query("mobile") String mobile);
+
+    @GET("transaction/all.php")
+    Call<List<TransactionModal>> getAllTransactions();
 }

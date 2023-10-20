@@ -49,6 +49,7 @@ import com.sdgvvk.v1.adapters.ContactViewedAdapter;
 import com.sdgvvk.v1.adapters.MyMembershipAdapter;
 import com.sdgvvk.v1.adapters.NotificationAdapter;
 import com.sdgvvk.v1.adapters.SearchedMembersAdapter;
+import com.sdgvvk.v1.adapters.TransactionAdapter;
 import com.sdgvvk.v1.modal.BitmapDataModal;
 import com.sdgvvk.v1.modal.ContactViewedModal;
 import com.sdgvvk.v1.modal.Customer;
@@ -61,6 +62,7 @@ import com.sdgvvk.v1.modal.NotificationModal;
 import com.sdgvvk.v1.modal.OrderModal;
 import com.sdgvvk.v1.modal.SingleResponse;
 import com.sdgvvk.v1.modal.Stat;
+import com.sdgvvk.v1.modal.TransactionModal;
 import com.sdgvvk.v1.ui.dashboard.MatchesFragment;
 import com.sdgvvk.v1.ui.home.HomeFragment;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -175,9 +177,7 @@ public class ApiCallUtil {
         new PersistBitmapTask(activity).execute();
     }
 
-    public static void shareProfile(Activity activity, Level_2_Modal profile) {
-        new ShareProfileTask(activity,profile).execute();
-    }
+
 
     public static void disableProfile(Activity activity, String vcpid) {
         new DisableProfileTask(activity,vcpid).execute();
@@ -185,6 +185,10 @@ public class ApiCallUtil {
 
     public static void CheckAccountStatus(SendOtpActivity activity , String mobile) {
         new CheckAccountStatusTask(activity , mobile).execute();
+    }
+
+    public static void getAllTransactions(Dialog d, Activity activity) {
+        new GetAllTransactionsTask(d,activity).execute();
     }
 
     static class CheckAccountStatusTask extends AsyncTask<Void, Void, Void> {
@@ -273,6 +277,47 @@ public class ApiCallUtil {
                 activity.findViewById(R.id.errorbox).setVisibility(View.VISIBLE);
                 activity.findViewById(R.id.contactsupportbtn).setVisibility(View.VISIBLE);
                 ((TextView)activity.findViewById(R.id.errorTxt)).setText("Account deactivated");
+            }
+        }
+    }
+
+    static class GetAllTransactionsTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        Dialog d;
+        List<TransactionModal> txnList;
+
+        public GetAllTransactionsTask(Dialog d , Activity activity) {
+            this.activity = activity;
+            this.d = d;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date()+" api call : GetAllTransactionsTask");
+            try {
+                txnList = RetrofitClient.getInstance().getApi().getAllTransactions().execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "nw error");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.i("ss_nw_call", "onPostExecute ");
+            super.onPostExecute(aVoid);
+            if(txnList != null && !txnList.isEmpty()){
+                // update in recyclerview
+                TransactionAdapter adapter = new TransactionAdapter(txnList, activity, d);
+                RecyclerView recyclerView = d.findViewById(R.id.recyclerView);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                recyclerView.setAdapter(adapter);
             }
         }
     }
@@ -604,6 +649,9 @@ public class ApiCallUtil {
                 activity.findViewById(R.id.viewContactDetailsBtn).setEnabled(false);
                 activity.findViewById(R.id.viewContactDetailsBtn).setVisibility(View.GONE);
                 activity.findViewById(R.id.contact_card).setVisibility(View.VISIBLE);
+
+                if(vcpid.getMobile2().equalsIgnoreCase(""))
+                    activity.findViewById(R.id.call2_link).setVisibility(View.GONE);
             }
             else{
                 new BuyMembershipBottomSheetDialog(activity).show(((Level2ProfileActivity)activity).getSupportFragmentManager(), "ModalBottomSheet");
@@ -1969,36 +2017,6 @@ public class ApiCallUtil {
     }
 
 
-    static class ShareProfileTask extends AsyncTask<Void, Void, Void> {
-
-        Activity activity;
-        Level_2_Modal profile;
-
-        public ShareProfileTask(Activity activity,Level_2_Modal profile) {
-            this.activity = activity;
-            this.profile = profile;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        protected Void doInBackground(Void... params) {
-            try {
-                Log.i("ss_nw_call", new Date()+" api call : ShareProfileTask");
-            } catch (Exception e) {
-                Log.i("local_logs", "DynamicLayoutCreationTask " + e.toString());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-        }
-    }
 
 
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.modal.ContactViewedModal;
@@ -22,7 +24,9 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.sdgvvk.v1.modal.Customer;
 
+import java.net.URLEncoder;
 import java.util.List;
 
 public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdapter.ViewHolder> {
@@ -65,9 +69,26 @@ public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdap
             holder.cv_card.setOnClickListener(view -> ApiCallUtil.getLevel2Data(obj.getVcpid(), activity));
 
             holder.cv_whatstappicon.setOnClickListener(view -> {
-                String uri = "https://wa.me/+91" + obj.getMobile().toString().trim();
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                activity.startActivity(intent);
+                Customer loggedinCustomer = LocalCache.getLoggedInCustomer(activity);
+                String phoneNumber = "+91" + obj.getMobile().toString().trim();
+                String message = "Hi "+obj.getName()+", "+
+                        "\n\nMy name is "+loggedinCustomer.getFirstname()+" , I viewed your profile on sri datt guru vadhu var kendra app.\n" +
+                        "\n\nI am interested in your profile, can we connect to discuss further." +
+                        "\n\nApp link: \nhttps://play.google.com/store/apps/details?id=com.sdgvvk.v1\n" +
+                        "\n "+obj.getName()+"'s profile: \nhttps://tavrostechinfo.com/profile?id="+obj.getVcpid()+"\n" +
+                        "\n "+loggedinCustomer.getFirstname()+"'s profile: \nhttps://tavrostechinfo.com/profile?id="+loggedinCustomer.getProfileId()+"\n";
+                // create an Intent to send data to the whatsapp
+                Intent intent = new Intent(Intent.ACTION_VIEW);    // setting action
+
+                // setting data url, if we not catch the exception then it shows an error
+                try {
+                    String url = "https://api.whatsapp.com/send?phone="+phoneNumber+"" + "&text=" + URLEncoder.encode(message, "UTF-8");
+                    intent.setData(Uri.parse(url));
+                    activity.startActivity(intent);
+                }
+                catch(Exception e){
+                    Log.d("notSupport", "thrown by encoder");
+                }
             });
             holder.cv_callicon.setOnClickListener(view -> Dexter.withActivity(activity)
                     .withPermissions(Manifest.permission.CALL_PHONE)

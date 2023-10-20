@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,6 +54,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -71,10 +75,11 @@ public class Level2ProfileActivity extends AppCompatActivity {
     TextView profileid, name, birthdate, birthtime, height, education, occupation, religion, caste, income, bloodgroup, marriagestatus, birthname, birthplace, fathername, mothername, relatives, family, city, address, expectations, kuldaivat, zodiac, varn, nakshatra, nadi, gan, yoni, charan, gotra, mangal, email, mobile1, mobile2, mobile3;
 
     Button viewContactDetailsBtn;
-    ImageView profilephotoaddresss,shareprofileicon,editprofile_link;
+    ImageView profilephotoaddresss,editprofile_link;
 
     CardView contact_card;
 
+    LinearLayout shareprofile;
     Boolean ownAccount = false;
 
 
@@ -117,6 +122,8 @@ public class Level2ProfileActivity extends AppCompatActivity {
                 findViewById(R.id.contactDetailsLayout).setVisibility(View.GONE);
                 viewContactDetailsBtn.setVisibility(View.GONE);
                 contact_card.setVisibility(View.VISIBLE);
+                if(viewedProfile.getMobile2().equalsIgnoreCase(""))
+                    findViewById(R.id.call2_link).setVisibility(View.GONE);
 
             } else {
                 viewContactDetailsBtn.setVisibility(View.VISIBLE);
@@ -195,7 +202,11 @@ public class Level2ProfileActivity extends AppCompatActivity {
             if (loggedinCustomer.getActivepackageid() == null ) {
                 Log.i("ss_nw_call", "View contact : pkg id is null");
                 new BuyMembershipBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
-            } else {
+            }
+            else if(LocalCache.getActiveOrder(this) != null && LocalCache.getActiveOrder(this).getCountRemaining() <= 0 ){
+                Log.i("ss_nw_call", "Balance left : "+LocalCache.getActiveOrder(this).getCountRemaining());
+                new BuyMembershipBottomSheetDialog(this).show(getSupportFragmentManager(), "ModalBottomSheet");
+            }else {
                 Log.i("ss_nw_call", "View contact : pkg id is "+ loggedinCustomer.getActivepackageid()+ " and balance is "+order.getCountRemaining());
 
                 ApiCallUtil.viewContactData(loggedinCustomer.getProfileId(), viewedProfile, this);
@@ -254,7 +265,15 @@ public class Level2ProfileActivity extends AppCompatActivity {
         });
 
 
-        shareprofileicon.setOnClickListener(view -> ApiCallUtil.shareProfile(this, viewedProfile));
+        shareprofile.setOnClickListener(view -> {
+            String profileUrl = "https://tavrostechinfo.com/profile?id="+viewedProfile.getProfileId()+"";
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, profileUrl);
+            shareIntent.setType("text/plain");
+
+            startActivity(Intent.createChooser(shareIntent, "Share URL using"));
+        });
 
         call1_link.setOnClickListener(view -> Dexter.withActivity(this)
                 .withPermissions(Manifest.permission.CALL_PHONE)
@@ -291,14 +310,58 @@ public class Level2ProfileActivity extends AppCompatActivity {
                     }
                 }).check());
         whatsapp_link.setOnClickListener(view -> {
-            String uri = "https://wa.me/+91" + viewedProfile.getMobile1().toString().trim();
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-            startActivity(intent);
+            String phoneNumber = "+91" + viewedProfile.getMobile1().toString().trim();
+            String message = "Hi "+viewedProfile.getFirstname()+", "+
+                    "\n\nMy name is "+loggedinCustomer.getFirstname()+" , I viewed your profile on sri datt guru vadhu var kendra app.\n" +
+                    "\n\nI am interested in your profile, can we connect to discuss further." +
+                    "\n\nApp link: \nhttps://play.google.com/store/apps/details?id=com.sdgvvk.v1\n" +
+                    "\n "+viewedProfile.getFirstname()+"'s profile: \nhttps://tavrostechinfo.com/profile?id="+viewedProfile.getProfileId()+"\n" +
+                    "\n "+loggedinCustomer.getFirstname()+"'s profile: \nhttps://tavrostechinfo.com/profile?id="+loggedinCustomer.getProfileId()+"\n";
+            // create an Intent to send data to the whatsapp
+            Intent intent = new Intent(Intent.ACTION_VIEW);    // setting action
+
+            // setting data url, if we not catch the exception then it shows an error
+            try {
+                String url = "https://api.whatsapp.com/send?phone="+phoneNumber+"" + "&text=" + URLEncoder.encode(message, "UTF-8");
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+            catch(Exception e){
+                Log.d("notSupport", "thrown by encoder");
+            }
         });
+        /*
+        *
+        * Hi Prashant ,
+        *
+        * My name is Pranali , I viewed your profile on sri datt guru vadhu var kendra app.
+        * I am interested in your profile , can we connect to discuss further.
+        *
+        * app link : https://play.google.com/store/apps/details?id=com.sdgvvk.v1
+        * prashant's profile
+        * https://tavrostechinfo.com/profile?id=4405
+        *
+        * pranali's profile
+        * https://tavrostechinfo.com/profile?id=4405
+        *
+        * */
         insta_link.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Uri uri = Uri.parse("http://instagram.com");
 
+
+                Intent i= new Intent(Intent.ACTION_VIEW,uri);
+
+                i.setPackage("com.instagram.android");
+
+                try {
+                    startActivity(i);
+                } catch (Exception e) {
+
+                    /*startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://instagram.com/xxx")));*/
+                }
             }
         });
         email_link.setOnClickListener(new View.OnClickListener() {
@@ -312,7 +375,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
 
     private void initUiElements() {
         contactDetailsLayout = findViewById(R.id.contactDetailsLayout);
-        shareprofileicon = findViewById(R.id.shareprofileicon);
+        shareprofile = findViewById(R.id.shareprofile);
         contact_card = findViewById(R.id.contact_card);
         editprofile_link = findViewById(R.id.editprofile_link);
         profilephotoaddresss = findViewById(R.id.profilephotoaddresss);

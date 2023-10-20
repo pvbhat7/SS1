@@ -43,7 +43,7 @@ public class AdminZoneActivity extends AppCompatActivity {
 
     LinearLayout link1, link2, link3;
 
-    CardView card1, card2;
+    CardView card1, card2 , card3 , card4;
 
     static String searchBy = "";
     @Override
@@ -67,77 +67,7 @@ public class AdminZoneActivity extends AppCompatActivity {
             Dialog d = new Dialog(this);
             Activity activity = this;
             d.setContentView(R.layout.assign_membership_dialog);
-            CardView byName = d.findViewById(R.id.c1);
-            CardView byMobile = d.findViewById(R.id.c2);
-            CardView byId = d.findViewById(R.id.c3);
-            EditText searchValue = d.findViewById(R.id.searchValue);
-            LinearLayout lay = d.findViewById(R.id.lay);
-            TextInputLayout val = d.findViewById(R.id.val);
-            Button searchBtn = d.findViewById(R.id.searchBtn);
-
-            byName.setOnClickListener(view1 -> {
-                lay.setVisibility(View.VISIBLE);
-                val.setVisibility(View.VISIBLE);
-                byName.setCardBackgroundColor(Color.YELLOW);
-                byMobile.setCardBackgroundColor(Color.WHITE);
-                byId.setCardBackgroundColor(Color.WHITE);
-                searchValue.setInputType(InputType.TYPE_CLASS_TEXT);
-                searchValue.setEnabled(true);
-                searchValue.setText("");
-                searchValue.setHint("Enter name");
-                searchBy = "name";
-                d.findViewById(R.id.downLayout).setVisibility(View.GONE);
-                d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
-            });
-            byMobile.setOnClickListener(view1 -> {
-                lay.setVisibility(View.VISIBLE);
-                val.setVisibility(View.VISIBLE);
-                byName.setCardBackgroundColor(Color.WHITE);
-                byMobile.setCardBackgroundColor(Color.YELLOW);
-                byId.setCardBackgroundColor(Color.WHITE);
-                searchValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-                searchValue.setEnabled(true);
-                searchValue.setText("");
-                searchValue.setHint("Enter mobile");
-                searchBy = "mobile";
-                d.findViewById(R.id.downLayout).setVisibility(View.GONE);
-                d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
-            });
-            byId.setOnClickListener(view1 -> {
-                lay.setVisibility(View.VISIBLE);
-                val.setVisibility(View.VISIBLE);
-                byName.setCardBackgroundColor(Color.WHITE);
-                byMobile.setCardBackgroundColor(Color.WHITE);
-                byId.setCardBackgroundColor(Color.YELLOW);
-                searchValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-                searchValue.setEnabled(true);
-                searchValue.setText("");
-                searchValue.setHint("Enter profile id");
-                searchBy = "profile id";
-                d.findViewById(R.id.downLayout).setVisibility(View.GONE);
-                d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
-            });
             handleAssignMembership(d, activity);
-            searchValue.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-
-                    if (s.length() > 0)
-                        searchBtn.setEnabled(true);
-                    else
-                        searchBtn.setEnabled(false);
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-
-                }
-            });
             d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             d.show();
         });
@@ -160,6 +90,17 @@ public class AdminZoneActivity extends AppCompatActivity {
             intent.putExtra("gender", "female");
             startActivity(intent);
         });
+        card3.setOnClickListener(view -> {
+
+        });
+        card4.setOnClickListener(view -> {
+            Dialog d = new Dialog(this);
+            Activity activity = this;
+            d.setContentView(R.layout.transactions_dialog);
+            ApiCallUtil.getAllTransactions(d,activity);
+            //d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            d.show();
+        });
 
     }
 
@@ -170,6 +111,8 @@ public class AdminZoneActivity extends AppCompatActivity {
         link3 = findViewById(R.id.link3);
         card1 = findViewById(R.id.card1);
         card2 = findViewById(R.id.card2);
+        card3 = findViewById(R.id.card3);
+        card4 = findViewById(R.id.card4);
     }
 
     @Override
@@ -179,6 +122,57 @@ public class AdminZoneActivity extends AppCompatActivity {
     }
 
     private void handleAssignMembership(Dialog d, Activity activity) {
+        CardView byName = d.findViewById(R.id.c1);
+        CardView byMobile = d.findViewById(R.id.c2);
+        CardView byId = d.findViewById(R.id.c3);
+        EditText searchValue = d.findViewById(R.id.searchValue);
+        LinearLayout lay = d.findViewById(R.id.lay);
+        TextInputLayout val = d.findViewById(R.id.val);
+        Button searchBtn = d.findViewById(R.id.searchBtn);
+
+        byName.setOnClickListener(view1 -> {
+            lay.setVisibility(View.VISIBLE);
+            val.setVisibility(View.VISIBLE);
+            byName.setCardBackgroundColor(Color.YELLOW);
+            byMobile.setCardBackgroundColor(Color.WHITE);
+            byId.setCardBackgroundColor(Color.WHITE);
+            searchValue.setInputType(InputType.TYPE_CLASS_TEXT);
+            searchValue.setEnabled(true);
+            searchValue.setText("");
+            searchValue.setHint("Enter name");
+            searchBy = "name";
+            d.findViewById(R.id.downLayout).setVisibility(View.GONE);
+            d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
+        });
+        byMobile.setOnClickListener(view1 -> {
+            lay.setVisibility(View.VISIBLE);
+            val.setVisibility(View.VISIBLE);
+            byName.setCardBackgroundColor(Color.WHITE);
+            byMobile.setCardBackgroundColor(Color.YELLOW);
+            byId.setCardBackgroundColor(Color.WHITE);
+            searchValue.setInputType(InputType.TYPE_CLASS_NUMBER);
+            searchValue.setEnabled(true);
+            searchValue.setText("");
+            searchValue.setHint("Enter mobile");
+            searchBy = "mobile";
+            d.findViewById(R.id.downLayout).setVisibility(View.GONE);
+            d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
+        });
+        byId.setOnClickListener(view1 -> {
+            lay.setVisibility(View.VISIBLE);
+            val.setVisibility(View.VISIBLE);
+            byName.setCardBackgroundColor(Color.WHITE);
+            byMobile.setCardBackgroundColor(Color.WHITE);
+            byId.setCardBackgroundColor(Color.YELLOW);
+            searchValue.setInputType(InputType.TYPE_CLASS_NUMBER);
+            searchValue.setEnabled(true);
+            searchValue.setText("");
+            searchValue.setHint("Enter profile id");
+            searchBy = "profile id";
+            d.findViewById(R.id.downLayout).setVisibility(View.GONE);
+            d.findViewById(R.id.errorTxt).setVisibility(View.GONE);
+        });
+
         d.findViewById(R.id.searchBtn).setOnClickListener(view14 -> {
             String value = ((TextInputEditText) d.findViewById(R.id.searchValue)).getText().toString().trim();
             d.findViewById(R.id.searchBtn).setEnabled(false);
@@ -260,6 +254,27 @@ public class AdminZoneActivity extends AppCompatActivity {
             OrderModal o = new OrderModal(cpid, membershipId, paymentmode, txnDate, startDate, endDate);
             d.dismiss();
             ApiCallUtil.assignMembership(o, activity);
+        });
+
+        searchValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+
+                if (s.length() > 0)
+                    searchBtn.setEnabled(true);
+                else
+                    searchBtn.setEnabled(false);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
         });
 
     }
