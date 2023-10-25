@@ -198,6 +198,7 @@
                     android:inputType="number"
                     android:maxLength="6"
                     android:text=""
+                    android:hint="enter otp"
                     android:textSize="30dp" />
 
             </LinearLayout>

@@ -6,6 +6,7 @@ import static com.google.android.material.internal.ViewUtils.showKeyboard;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,9 +21,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.appupdate.AppUpdateOptions;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -48,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SendOtpActivity extends AppCompatActivity {
 
+    private static final int REQ_CODE = 100 ;
     Activity activity;
     SpinKitView progressBar,progressBarBtnView;
     CardView boxCard;
@@ -61,15 +70,40 @@ public class SendOtpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_otp);
-
         activity = this;
+        checkforappupdates();
         handleOnClickListeners();
-
         //test_flow();
         launch_flow();
 
 
 
+    }
+
+    private void checkforappupdates() {
+        Log.e("ImageUtils", "calling checkforappupdates");
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
+
+// Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,AppUpdateType.IMMEDIATE,this,REQ_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e("ImageUtils", e.toString());
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     /*private void test_flow() {
@@ -282,5 +316,18 @@ public class SendOtpActivity extends AppCompatActivity {
     public void hideProgressBar(){
         progressBarBtnView.setVisibility(View.GONE);
         //boxCard.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("ImageUtils", "onActivityResult req_code = "+requestCode+" & res_code = "+resultCode);
+        // handle callback
+        if(requestCode == REQ_CODE){
+            if (resultCode != RESULT_OK) {
+                checkforappupdates();
+            }
+        }
+
     }
 }

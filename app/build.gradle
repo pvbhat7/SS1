@@ -20,8 +20,8 @@ android {
         applicationId "com.sdgvvk.v1"
         minSdk 26
         targetSdk 33
-        versionCode 10
-        versionName "10.0"
+        versionCode 11
+        versionName "11.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -73,6 +73,8 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.10'
     implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.0.6'
     implementation 'com.google.android.play:integrity:1.1.0'
+    implementation 'com.google.android.play:app-update:2.0.1'
+
 
 }
 
