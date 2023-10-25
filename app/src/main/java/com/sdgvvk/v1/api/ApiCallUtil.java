@@ -143,6 +143,7 @@ public class ApiCallUtil {
         new GetFilteredLevel1DataTask(activity, fragment, modal).execute();
     }
 
+
     public static void getFilteredLevel2Profiles(Activity activity, FilterModal modal) {
         new GetFilteredLevel2DataTask(activity, modal).execute();
     }
@@ -717,6 +718,76 @@ public class ApiCallUtil {
         }
     }
 
+    public static void getEducationList(Activity activity) {
+        new GetEducationListTask(activity).execute();
+    }
+    static class GetEducationListTask extends AsyncTask<Void, Void, Void> {
+
+        List<SingleResponse> response_list;
+
+        Activity activity;
+
+        public GetEducationListTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date()+" api call : GetEducationListTask");
+            try {
+                response_list = RetrofitClient.getInstance().getApi().getAllEducationList().execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "GetEducationListTask error" + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            LocalCache.setEducationList(response_list,activity);
+        }
+    }
+
+    public static void getOccupationList(Activity activity) {
+        new GetOccupationListTask(activity).execute();
+    }
+    static class GetOccupationListTask extends AsyncTask<Void, Void, Void> {
+
+        List<SingleResponse> response_list;
+
+        Activity activity;
+
+        public GetOccupationListTask(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date()+" api call : GetOccupationListTask");
+            try {
+                response_list = RetrofitClient.getInstance().getApi().getAllOccupationList().execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "GetOccupationListTask error" + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            LocalCache.setOccupationList(response_list , activity);
+        }
+    }
+
     public static void addToShortListedProfiles(String cpid, String vcpid) {
         new AddToShortListedProfilesTask(cpid, vcpid).execute();
     }
@@ -950,6 +1021,9 @@ public class ApiCallUtil {
             try {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
                 LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
+
+                getEducationList(activity);
+                getOccupationList(activity);
 
                 if (customer != null && !customer.isEmpty()) {
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());

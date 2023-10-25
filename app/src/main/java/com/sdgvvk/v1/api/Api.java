@@ -162,4 +162,10 @@ public interface Api {
 
     @GET("transaction/all.php")
     Call<List<TransactionModal>> getAllTransactions();
+
+    @GET("educationList.php")
+    Call<List<SingleResponse>> getAllEducationList();
+
+    @GET("occupationList.php")
+    Call<List<SingleResponse>> getAllOccupationList();
 }

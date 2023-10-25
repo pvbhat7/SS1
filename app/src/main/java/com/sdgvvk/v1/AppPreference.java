@@ -15,6 +15,10 @@ public class AppPreference {
 
     public static final String IS_LIVE_JSON = "isliveJson";
 
+    public static final String EDUCATION_JSON = "educationJson";
+
+    public static final String OCCUPATION_JSON = "occupationJson";
+
     public static final void setStringPref(Context context, String prefKey, String key, String value) {
         SharedPreferences sp = context.getSharedPreferences(prefKey, 0);
         SharedPreferences.Editor edit = sp.edit();

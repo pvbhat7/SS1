@@ -9,11 +9,15 @@ public class FilterModal {
     public String maxHeight;
     public String gender;
 
+    public String education;
+
+    public String occupation;
+
     public String marriagestatus;
 
     public String religion;
 
-    public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight,String marriagestatus,String religion,String gender) {
+    public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight,String marriagestatus,String religion,String gender,String education , String occupation) {
         this.cpid = cpid;
         this.minAge = minAge;
         this.maxAge = maxAge;
@@ -22,6 +26,8 @@ public class FilterModal {
         this.marriagestatus = marriagestatus;
         this.religion = religion;
         this.gender = gender;
+        this.education = education;
+        this.occupation = occupation;
     }
 
     public FilterModal(String cpid, String minAge, String maxAge, String minHeight, String maxHeight,String gender) {

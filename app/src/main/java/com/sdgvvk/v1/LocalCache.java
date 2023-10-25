@@ -1,9 +1,11 @@
 package com.sdgvvk.v1;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.sdgvvk.v1.modal.ContactViewedModal;
 import com.sdgvvk.v1.modal.Customer;
+import com.sdgvvk.v1.modal.SingleResponse;
 import com.sdgvvk.v1.modal.Stat;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
 import com.sdgvvk.v1.modal.MembershipModal;
@@ -13,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class LocalCache {
@@ -155,4 +158,53 @@ public class LocalCache {
             flag = new String();
         return flag;
     }
+
+    public static String setEducationList(List<SingleResponse> list, Activity activity){
+        List<String> list_ = new ArrayList<>();
+        if(list != null && !list.isEmpty()){
+            for(SingleResponse obj : list){
+                Log.i("ss_nw_call", "looper adding "+obj.getResult());
+                list_.add(obj.getResult());
+            }
+        }
+        String jsonString = new Gson().toJson(list_);
+        AppPreference.setStringPref(activity, AppPreference.EDUCATION_JSON, AppPreference.EDUCATION_JSON,jsonString);
+        return jsonString;
+    }
+
+    public static List<String> getEducationList(Activity activity) {
+        List<String> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.EDUCATION_JSON, AppPreference.EDUCATION_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static String setOccupationList(List<SingleResponse> list, Activity activity){
+        List<String> list_ = new ArrayList<>();
+        if(list != null && !list.isEmpty()){
+            for(SingleResponse obj : list){
+                list_.add(obj.getResult());
+            }
+        }
+        String jsonString = new Gson().toJson(list_);
+        AppPreference.setStringPref(activity, AppPreference.OCCUPATION_JSON, AppPreference.OCCUPATION_JSON,jsonString);
+        return jsonString;
+    }
+
+    public static List<String> getOccupationList(Activity activity) {
+        List<String> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.OCCUPATION_JSON, AppPreference.OCCUPATION_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+
 }
