@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -15,7 +16,13 @@ import android.util.Log;
 import android.widget.AutoCompleteTextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.api.ApiCallUtil;
@@ -41,6 +48,8 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQ_CODE = 100 ;
+
     private ActivityMainBinding binding;
     private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
     private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
@@ -57,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         if (ctx == null || ((MainActivity) ctx).isDestroyed())
             ctx = this;
 
+        checkforappupdates();
         ApiCallUtil.getAdminPhone(this);
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -139,10 +149,18 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // Handle the case where the cropped image URI is null
             }
-        } else if (resultCode == UCrop.RESULT_ERROR) {
+        }
+        else if (resultCode == UCrop.RESULT_ERROR) {
             // Handle the cropping error
             Throwable cropError = UCrop.getError(data);
         }
+
+        if(requestCode == REQ_CODE){
+            if (resultCode != RESULT_OK) {
+                checkforappupdates();
+            }
+        }
+
     }
 
     private void cropImage(Uri sourceUri) {
@@ -181,5 +199,32 @@ public class MainActivity extends AppCompatActivity {
     public static Context getContextObject() {
         return ctx;
     }
+
+    private void checkforappupdates() {
+        Log.e("ImageUtils", "calling checkforappupdates");
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
+
+// Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,AppUpdateType.IMMEDIATE,this,REQ_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e("ImageUtils", e.toString());
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
 
 }

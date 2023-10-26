@@ -71,7 +71,6 @@ public class SendOtpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_otp);
         activity = this;
-        checkforappupdates();
         handleOnClickListeners();
         //test_flow();
         launch_flow();
@@ -139,12 +138,9 @@ public class SendOtpActivity extends AppCompatActivity {
     }*/
 
     private void launch_flow() {
-        contactsupportbtn = findViewById(R.id.contactsupportbtn);
-        loginbox = findViewById(R.id.loginbox);
-        errorbox = findViewById(R.id.errorbox);
-        errorTxt = findViewById(R.id.errorTxt);
-        String flag = LocalCache.getIsLive(this);
-        if(flag != null && flag.equalsIgnoreCase("true")){
+
+        String isLive = LocalCache.getIsLive(this);
+        if(isLive != null && isLive.equalsIgnoreCase("true")){
             loginbox.setVisibility(View.VISIBLE);
             errorbox.setVisibility(View.GONE);
             Boolean isLogoutFlow = false;
@@ -170,6 +166,7 @@ public class SendOtpActivity extends AppCompatActivity {
             }
             else{
                 // logout flow
+                checkforappupdates();
                 boxCard.setVisibility(View.VISIBLE);
                 errorbox.setVisibility(View.GONE);
                 loginbox.setVisibility(View.VISIBLE);
@@ -180,7 +177,7 @@ public class SendOtpActivity extends AppCompatActivity {
             loginbox.setVisibility(View.GONE);
             errorbox.setVisibility(View.VISIBLE);
             contactsupportbtn.setVisibility(View.VISIBLE);
-            errorTxt.setText(flag != null ? flag : "server error");
+            errorTxt.setText(isLive != null ? isLive : "server error");
             findViewById(R.id.inputMobile).setEnabled(false);
 
             contactsupportbtn.setOnClickListener(view -> Dexter.withActivity(this)
@@ -208,6 +205,10 @@ public class SendOtpActivity extends AppCompatActivity {
     }
 
     private void handleOnClickListeners() {
+        contactsupportbtn = findViewById(R.id.contactsupportbtn);
+        loginbox = findViewById(R.id.loginbox);
+        errorbox = findViewById(R.id.errorbox);
+        errorTxt = findViewById(R.id.errorTxt);
         progressBar = findViewById(R.id.progressBar);
         progressBarBtnView = findViewById(R.id.progressBarBtnView);
         boxCard = findViewById(R.id.boxCard);
