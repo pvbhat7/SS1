@@ -80,7 +80,7 @@ public class SendOtpActivity extends AppCompatActivity {
     }
 
     private void checkforappupdates() {
-        Log.e("ImageUtils", "calling checkforappupdates");
+        Log.e("sendotpactivity", "mainactivity calling checkforappupdates");
         AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
 
 // Returns an intent object that you use to check for an update.
@@ -322,7 +322,7 @@ public class SendOtpActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e("ImageUtils", "onActivityResult req_code = "+requestCode+" & res_code = "+resultCode);
+        Log.e("sendotpactivity", "sendotpactivity onActivityResult req_code = "+requestCode+" & res_code = "+resultCode);
         // handle callback
         if(requestCode == REQ_CODE){
             if (resultCode != RESULT_OK) {

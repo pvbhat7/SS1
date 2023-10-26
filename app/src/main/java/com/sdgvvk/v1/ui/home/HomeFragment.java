@@ -4,12 +4,14 @@ package com.sdgvvk.v1.ui.home;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Task;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.MainActivity;
@@ -52,6 +60,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
+
+    private static final int REQ_CODE = 100 ;
 
     static Activity activity;
 
@@ -80,7 +90,7 @@ public class HomeFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
         activity = this.getActivity();
-
+        checkforappupdates();
         initUIElements();
         initOnclickListener();
         
@@ -441,6 +451,32 @@ public class HomeFragment extends Fragment {
 
         return errorTxt;
 
+    }
+
+    private void checkforappupdates() {
+        Log.e("homefragment", "mainactivity calling checkforappupdates");
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this.getActivity());
+
+// Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,AppUpdateType.IMMEDIATE,this.getActivity(),REQ_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e("ImageUtils", e.toString());
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
 

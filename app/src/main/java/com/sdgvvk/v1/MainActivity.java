@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQ_CODE = 100 ;
 
+
     private ActivityMainBinding binding;
     private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
     private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         if (ctx == null || ((MainActivity) ctx).isDestroyed())
             ctx = this;
 
-        checkforappupdates();
         ApiCallUtil.getAdminPhone(this);
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.e("mainactivity", "sendotpactivity onActivityResult req_code = "+requestCode+" & res_code = "+resultCode);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             if (data != null) {
 
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkforappupdates() {
-        Log.e("ImageUtils", "calling checkforappupdates");
+        Log.e("mainactivity", "mainactivity calling checkforappupdates");
         AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
 
 // Returns an intent object that you use to check for an update.
@@ -225,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
 }
