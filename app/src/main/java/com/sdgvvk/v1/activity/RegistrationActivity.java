@@ -3,17 +3,22 @@ package com.sdgvvk.v1.activity;
 import static android.view.View.GONE;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -21,12 +26,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
+import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.api.ApiCallUtil;
@@ -41,18 +50,22 @@ import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class RegistrationActivity extends AppCompatActivity {
 
-    private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
-    private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
+    private boolean lockAspectRatio = true, setBitmapMaxWidthHeight = false;
+    private int ASPECT_RATIO_X = 3, ASPECT_RATIO_Y = 4, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
     private int IMAGE_COMPRESSION = 80;
+
+    public SpinKitView progressBar ;
     public static String fileName;
 
-    public TextInputEditText cmmobile, email, name, birthname, fathername, birthdate,occupation, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2, relatives, family;
-    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, zodiac, city, birthplace, income, hour, minute, ampm;
+    public TextInputEditText income,cmmobile, email, name, birthname, fathername, birthdate,occupation, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2, relatives, family;
+    public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, zodiac, city, birthplace, hour, minute, ampm;
 
     static String clickedImagename, profilePhotoAddressBase64, biodataAddressBase64;
 
@@ -64,11 +77,14 @@ public class RegistrationActivity extends AppCompatActivity {
     Customer loggedincustomer,customerprofileeditcreatemode;
 
     Boolean editprofile = false;
+    Boolean forceupdate = false;
+    Boolean onboarding = false;
     String profile ;
     Boolean updateCache = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity oncreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
         init();
@@ -78,17 +94,23 @@ public class RegistrationActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             editprofile = extras.getBoolean("editprofile");
+            forceupdate = extras.getBoolean("forceupdate");
+            onboarding = extras.getBoolean("onboarding");
             profile = extras.getString("profile");
-            if(profile != null && !profile.isEmpty()){
-                customerprofileeditcreatemode = LocalCache.convertJsonToObjectCustomer(profile);
-                updateCache = false;
-            }
-            else
-                customerprofileeditcreatemode = loggedincustomer;
+
         }
 
+        if(profile != null && !profile.isEmpty()){
+            customerprofileeditcreatemode = LocalCache.convertJsonToObjectCustomer(profile);
+            updateCache = false;
+        }
+        else
+            customerprofileeditcreatemode = loggedincustomer;
 
-        if (editprofile) {
+        profilePhotoAddressBase64 = "";
+        biodataAddressBase64 = "";
+
+        if (editprofile || forceupdate) {
             if(!loggedincustomer.getIsAdmin().equalsIgnoreCase("1")){
                 name.setEnabled(false);
                 gender.setEnabled(false);
@@ -96,12 +118,18 @@ public class RegistrationActivity extends AppCompatActivity {
                 mobile1.setEnabled(false);
             }
             formLayout.setVisibility(View.VISIBLE);
-            findViewById(R.id.save_btn).setEnabled(true);
             cancel_btn.setVisibility(GONE);
             preFillFormData();
-        } else {
-            profilePhotoAddressBase64 = "";
-            biodataAddressBase64 = "";
+
+            if(forceupdate)
+                showNotiDialog();
+        } else if(onboarding){
+            cancel_btn.setVisibility(GONE);
+            formLayout.setVisibility(View.VISIBLE);
+            mobile1.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+91",""));
+            mobile1.setEnabled(false);
+        }else{
+
             cmlayout.setVisibility(View.VISIBLE);
             formLayout.setVisibility(GONE);
         }
@@ -109,6 +137,22 @@ public class RegistrationActivity extends AppCompatActivity {
         initFormData();
         handleOnclickListeners();
         handleFormOnClickListeners();
+    }
+
+    private void showNotiDialog() {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+        builder
+                .setMessage("App चा वापर सुरु ठेवण्यासाठी कृपया आपली संपूर्ण प्रोफाइल त्वरित भरा ")
+                .setNegativeButton("ok", dialogClickListener).show();
     }
 
     private void preFillFormData() {
@@ -233,8 +277,19 @@ public class RegistrationActivity extends AppCompatActivity {
         });
 
         save_btn.setOnClickListener(view -> {
-            save_btn.setEnabled(false);
-            createProfile();
+            String result = validateOnBoardingForm();
+            if(result.equalsIgnoreCase("")){
+                createProfile();
+            }
+            else{
+                Dialog d = new Dialog(this);
+                d.setContentView(R.layout.registration_error_dialog);
+                ((TextView)d.findViewById(R.id.errText)).setText(result);
+                d.setCanceledOnTouchOutside(true);
+                d.setCancelable(true);
+                d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                d.show();
+            }
         });
         cancel_btn.setOnClickListener(view -> {
             nullifyformdata();
@@ -272,43 +327,12 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
 
-        ((AutoCompleteTextView) findViewById(R.id.height)).setOnItemClickListener((parent, arg1, pos, id) -> {
-            validateForm();
-        });
-        ((AutoCompleteTextView) findViewById(R.id.gender)).setOnItemClickListener((parent, arg1, pos, id) -> {
-            validateForm();
-        });
-        ((TextInputEditText) findViewById(R.id.name)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                validateForm();
-            }
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-        ((TextInputEditText) findViewById(R.id.birthdate)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                validateForm();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
     }
 
     private void init() {
+        progressBar = findViewById(R.id.progressBar1);
         save_btn = findViewById(R.id.save_btn);
         cancel_btn = findViewById(R.id.cancel_btn);
         formLayout = findViewById(R.id.formLayout);
@@ -417,9 +441,6 @@ public class RegistrationActivity extends AppCompatActivity {
         String[] marriagestatusArray = {"single", "married", "divorsed", "widowed"};
         ((AutoCompleteTextView) findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, marriagestatusArray));
 
-        String[] incomeArray = {"1-3 lakh", "3-5 lakh", "5-8 lakh", "8-12 lakh", "12+ lakh"};
-        ((AutoCompleteTextView) findViewById(R.id.income)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, incomeArray));
-
         String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli","solapur","belgav","thane"};
         ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
         ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
@@ -437,6 +458,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void createProfile() {
+        save_btn.setEnabled(false);
         String creationsource = "mobile app";
         String profilephotoaddress = "";
         String biodataaddress = "";
@@ -471,15 +493,22 @@ public class RegistrationActivity extends AppCompatActivity {
                 birthplace.getText().toString().trim(), income.getText().toString().trim(), kuldaivat.getText().toString().trim(), devak.getText().toString().trim(), nakshatra.getText().toString().trim(), nadi.getText().toString().trim(), gan.getText().toString().trim(), yoni.getText().toString().trim(),
                 charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(), relation1, relation2, relationname1.getText().toString().trim(), relationname2.getText().toString().trim(), relatives.getText().toString().trim(), family.getText().toString().trim());
 
-        if (editprofile) {
+        if (editprofile || forceupdate) {
             c.setProfileId(customerprofileeditcreatemode.getProfileId());
             ApiCallUtil.updateProfile(c, this, updateCache);
-        } else
+        } else if (onboarding){
+            ApiCallUtil.registerProfile(c, this, true, null);
+        }else{
+            // register new profile
             ApiCallUtil.registerProfile(c, this, false, null);
+        }
+
+
         nullifyformdata();
         cmmobile.setText("");
+
         formLayout.setVisibility(GONE);
-        if(loggedincustomer.getIsAdmin().equalsIgnoreCase("1")) {
+        if((!editprofile) && (loggedincustomer.getIsAdmin() != null && loggedincustomer.getIsAdmin().equalsIgnoreCase("1"))) {
             cmlayout.setVisibility(View.VISIBLE);
         }
     }
@@ -616,21 +645,115 @@ public class RegistrationActivity extends AppCompatActivity {
         return name;
     }
 
-    private void validateForm(){
 
-        if(!editprofile){
-            if( !((TextInputEditText)findViewById(R.id.name)).getText().toString().trim().isEmpty()
-                    && !((AutoCompleteTextView)findViewById(R.id.height)).getText().toString().trim().isEmpty()
-                    && !((AutoCompleteTextView)findViewById(R.id.gender)).getText().toString().trim().isEmpty()
-                    && !((TextInputEditText)findViewById(R.id.birthdate)).getText().toString().trim().isEmpty())
-                findViewById(R.id.save_btn).setEnabled(true);
-            else
-                findViewById(R.id.save_btn).setEnabled(false);
+    private String validateOnBoardingForm() {
+        String errorTxt = "";
+        List<String> list = new ArrayList<>();
+
+        if(name.getText().toString().isEmpty())
+            list.add("संपूर्ण नाव");
+        if(marriagestatus.getText().toString().isEmpty())
+            list.add("status");
+        if(height.getText().toString().isEmpty())
+            list.add("उंची");
+        if(gender.getText().toString().isEmpty())
+            list.add("gender");
+        if(bloodgroup.getText().toString().isEmpty())
+            list.add("रक्तगट");
+
+
+        if(birthdate.getText().toString().isEmpty())
+            list.add("जन्म तारीख");
+        //birth time
+        if(hour.getText().toString().isEmpty() || minute.getText().toString().isEmpty() || ampm.getText().toString().isEmpty())
+            list.add("जन्म वेळ");
+
+        if(education.getText().toString().isEmpty())
+            list.add("शिक्षण");
+        if(occupation.getText().toString().isEmpty())
+            list.add("नोकरी / व्यवसाय");
+        if(income.getText().toString().isEmpty())
+            list.add("महिना उत्पन्न");
+
+
+
+        if(religion.getText().toString().isEmpty())
+            list.add("धर्म");
+        if(caste.getText().toString().isEmpty())
+            list.add("जात");
+        if(zodiac.getText().toString().isEmpty())
+            list.add("रास");
+
+
+        if(city.getText().toString().isEmpty())
+            list.add("city");
+        if(address.getText().toString().isEmpty())
+            list.add("address");
+        if(relatives.getText().toString().isEmpty())
+            list.add("नातेसंबंध");
+
+        if(editprofile || forceupdate){
+            if(customerprofileeditcreatemode.getProfilephotoaddress() == null || customerprofileeditcreatemode.getProfilephotoaddress().isEmpty())
+                list.add("profile photo");
         }
-        else
-            findViewById(R.id.save_btn).setEnabled(true);
+        else{
+            if(profilePhotoAddressBase64.isEmpty())
+                list.add("profile photo");
+        }
 
+
+
+        if(!list.isEmpty()){
+            for(int i=0;i<list.size();i++){
+                errorTxt = errorTxt +" "+list.get(i);
+                if(!(i == list.size() -1))
+                    errorTxt = errorTxt+",";
+            }
+        }
+
+        return errorTxt;
 
     }
 
+    @Override
+    protected void onStart() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity onStart");
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity onRestart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity onStop");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!forceupdate)
+        super.onBackPressed();
+    }
 }

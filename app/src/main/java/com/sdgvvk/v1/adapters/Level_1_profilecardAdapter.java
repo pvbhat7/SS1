@@ -116,129 +116,144 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
         if (obj != null) {
             try {
 
-                if(customer.getIsAdmin().equalsIgnoreCase("1")) {
-                    holder.admin_view.setVisibility(View.VISIBLE);
-                    holder.deleteprofile.setOnClickListener(view -> {
-                        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                            switch (which){
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
-                                    HelperUtils.vibrateFunction(activity);
-                                    mItemList.remove(position);
-                                    notifyDataSetChanged();
-                                    ApiCallUtil.disableProfile(activity,obj.getProfileId());
-                                    break;
+                if(obj.getIsAdmin().equalsIgnoreCase("999")){
+                    holder.level1_cardview.setVisibility(View.GONE);
+                    holder.notification_cardview.setVisibility(View.VISIBLE);
 
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    //No button clicked
-                                    break;
-                            }
-                        };
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                        builder
-                                .setMessage("Delete profile ?")
-                                .setPositiveButton("yes", dialogClickListener)
-                                .setNegativeButton("no", dialogClickListener).show();
-                    });
-                    holder.callprofile.setOnClickListener(view -> Dexter.withActivity(activity)
-                            .withPermissions(Manifest.permission.CALL_PHONE)
-                            .withListener(new MultiplePermissionsListener() {
-                                @Override
-                                public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                    if (report.areAllPermissionsGranted()) {
-                                        Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                        callIntent.setData(Uri.parse("tel:+91" + obj.getMobile().toString().trim()));
-                                        activity.startActivity(callIntent);
-                                    }
-                                }
-
-                                @Override
-                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                                    token.continuePermissionRequest();
-                                }
-                            }).check());
+                    // photo
+                    Glide.with(activity)
+                            .load(obj.getProfilephotoaddress())
+                            .placeholder(R.drawable.oops)
+                            .into(holder.notiphoto);
                 }
-                else
-                    holder.non_admin_view.setVisibility(View.VISIBLE);
+                else{
+                    holder.level1_cardview.setVisibility(View.VISIBLE);
+                    holder.notification_cardview.setVisibility(View.GONE);
+
+                    if(customer.getIsAdmin() != null && customer.getIsAdmin().equalsIgnoreCase("1")) {
+                        holder.admin_view.setVisibility(View.VISIBLE);
+                        holder.deleteprofile.setOnClickListener(view -> {
+                            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        //Yes button clicked
+                                        HelperUtils.vibrateFunction(activity);
+                                        mItemList.remove(position);
+                                        notifyDataSetChanged();
+                                        ApiCallUtil.disableProfile(activity,obj.getProfileId());
+                                        break;
+
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        //No button clicked
+                                        break;
+                                }
+                            };
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder
+                                    .setMessage("Delete profile ?")
+                                    .setPositiveButton("yes", dialogClickListener)
+                                    .setNegativeButton("no", dialogClickListener).show();
+                        });
+                        holder.callprofile.setOnClickListener(view -> Dexter.withActivity(activity)
+                                .withPermissions(Manifest.permission.CALL_PHONE)
+                                .withListener(new MultiplePermissionsListener() {
+                                    @Override
+                                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                        if (report.areAllPermissionsGranted()) {
+                                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                            callIntent.setData(Uri.parse("tel:+91" + obj.getMobile().toString().trim()));
+                                            activity.startActivity(callIntent);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                        token.continuePermissionRequest();
+                                    }
+                                }).check());
+                    }
+                    else
+                        holder.non_admin_view.setVisibility(View.VISIBLE);
+
+                    // profileCardId
+                    holder.profileCardId.setText("Profile id : A"+obj.getProfileId());
+
+                    // name
+                    holder.name.setText(obj.getFirstname().trim() + " " + obj.getLastname().trim());
+
+                    // dob
+                    Date dob ;
+                    dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());
+                    int daysleft = DateApi.daysDiff(new Date(), dob);
+                    holder.age.setText(Math.abs(daysleft) / 365 + " yrs");
 
 
+                    // photo
+                    Glide.with(activity)
+                            .load(obj.getProfilephotoaddress())
+                            .placeholder(R.drawable.oops)
+                            .into(holder.profilephoto);
+
+                    // like
+                    Glide.with(activity)
+                            .load(obj.getIsLiked().equalsIgnoreCase("1") ? R.drawable.redheart : R.drawable.whiteheart)
+                            .placeholder(R.drawable.oops)
+                            .into(holder.like_img);
+                    holder.likeprofiletext.setText(obj.getIsLiked().equalsIgnoreCase("1") ? "Liked" : "Like");
+                    holder.like.setEnabled(obj.getIsLiked().equalsIgnoreCase("1") ? false : true);
 
 
-                // profileCardId
-                holder.profileCardId.setText("Profile id : A"+obj.getProfileId());
+                    // shortlist
+                    Glide.with(activity)
+                            .load(obj.getIsShortlisted().equalsIgnoreCase("1") ? R.drawable.star_golden : R.drawable.star_white)
+                            .placeholder(R.drawable.oops)
+                            .into(holder.shortlist_img);
+                    holder.shortlistprofiletext.setText(obj.getIsShortlisted().equalsIgnoreCase("1") ? "Shortlisted" : "Shortlist");
+                    holder.shortlist.setEnabled(obj.getIsShortlisted().equalsIgnoreCase("1") ? false : true);
 
-                // name
-                holder.name.setText(obj.getFirstname().trim() + " " + obj.getLastname().trim());
-
-                // dob
-                Date dob ;
-                dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());
-                int daysleft = DateApi.daysDiff(new Date(), dob);
-                holder.age.setText(Math.abs(daysleft) / 365 + " yrs");
-
-
-                // photo
-                Glide.with(activity)
-                        .load(obj.getProfilephotoaddress())
-                        .placeholder(R.drawable.oops)
-                        .into(holder.profilephoto);
-
-                // like
-                Glide.with(activity)
-                        .load(obj.getIsLiked().equalsIgnoreCase("1") ? R.drawable.redheart : R.drawable.whiteheart)
-                        .placeholder(R.drawable.oops)
-                        .into(holder.like_img);
-                holder.likeprofiletext.setText(obj.getIsLiked().equalsIgnoreCase("1") ? "Liked" : "Like");
-                holder.like.setEnabled(obj.getIsLiked().equalsIgnoreCase("1") ? false : true);
+                    // interested profiles
+                    Glide.with(activity)
+                            .load(obj.getIsInterestsent().equalsIgnoreCase("1") ? R.drawable.interestsent : R.drawable.sendinterest)
+                            .placeholder(R.drawable.oops)
+                            .into(holder.sendinterest_img);
+                    holder.interestSentText.setText(obj.getIsInterestsent().equalsIgnoreCase("1") ? "Interest Sent" : "Send Interest");
+                    holder.sendinterest.setEnabled(obj.getIsInterestsent().equalsIgnoreCase("1") ? false : true);
 
 
-                // shortlist
-                Glide.with(activity)
-                        .load(obj.getIsShortlisted().equalsIgnoreCase("1") ? R.drawable.star_golden : R.drawable.star_white)
-                        .placeholder(R.drawable.oops)
-                        .into(holder.shortlist_img);
-                holder.shortlistprofiletext.setText(obj.getIsShortlisted().equalsIgnoreCase("1") ? "Shortlisted" : "Shortlist");
-                holder.shortlist.setEnabled(obj.getIsShortlisted().equalsIgnoreCase("1") ? false : true);
-
-                // interested profiles
-                Glide.with(activity)
-                        .load(obj.getIsInterestsent().equalsIgnoreCase("1") ? R.drawable.interestsent : R.drawable.sendinterest)
-                        .placeholder(R.drawable.oops)
-                        .into(holder.sendinterest_img);
-                holder.interestSentText.setText(obj.getIsInterestsent().equalsIgnoreCase("1") ? "Interest Sent" : "Send Interest");
-                holder.sendinterest.setEnabled(obj.getIsInterestsent().equalsIgnoreCase("1") ? false : true);
-
-
-                holder.profilephoto.setOnClickListener(view -> {
-                    ApiCallUtil.clicked_level2activity = true;
-                    ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
+                    holder.profilephoto.setOnClickListener(view -> {
+                        ApiCallUtil.clicked_level2activity = true;
+                        ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
                     /*if(customer.getIs_verified() != null && customer.getIs_verified().equalsIgnoreCase("2"))
                     ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
                     else
                         ((HomeFragment)fragment).showSnackBar("Complete your profile to view "+obj.getFirstname()+"'s profile");*/
 
-                });
+                    });
 
-                holder.like.setOnClickListener(view -> {
-                    holder.like.setEnabled(false);
-                    handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.LIKE);
-                });
+                    holder.like.setOnClickListener(view -> {
+                        holder.like.setEnabled(false);
+                        handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.LIKE);
+                    });
 
-                holder.shortlist.setOnClickListener(view -> {
-                    holder.shortlist.setEnabled(false);
-                    handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.SHORTLIST);
-                });
+                    holder.shortlist.setOnClickListener(view -> {
+                        holder.shortlist.setEnabled(false);
+                        handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.SHORTLIST);
+                    });
 
-                holder.sendinterest.setOnClickListener(view -> {
-                    holder.sendinterest.setEnabled(false);
-                    handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.SEND_INTEREST);
-                });
+                    holder.sendinterest.setOnClickListener(view -> {
+                        holder.sendinterest.setEnabled(false);
+                        handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.SEND_INTEREST);
+                    });
 
-                holder.ignore.setOnClickListener(view -> {
-                    holder.ignore.setEnabled(false);
-                    handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.IGNORE);
-                });
+                    holder.ignore.setOnClickListener(view -> {
+                        holder.ignore.setEnabled(false);
+                        handleActionClick(activity, holder, fragment, obj, position, ProjectConstants.IGNORE);
+                    });
+                }
+
+
+
 
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -261,19 +276,22 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
     public class ItemViewHolder extends RecyclerView.ViewHolder {
 
         public TextView name, interestSentText, age, shortlistprofiletext, likeprofiletext,profileCardId;
-        public CardView level1_cardview;
+        public CardView level1_cardview,notification_cardview;
         public LinearLayout like, shortlist, sendinterest, ignore , non_admin_view , admin_view ,deleteprofile,callprofile;
-        public ImageView like_img, shortlist_img, sendinterest_img, ignore_img, profilephoto;
+        public ImageView like_img, shortlist_img, sendinterest_img, ignore_img, profilephoto,notiphoto;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
             this.name = itemView.findViewById(R.id.name);
+            this.notiphoto = itemView.findViewById(R.id.notiphoto);
+
             this.profileCardId = itemView.findViewById(R.id.profileCardId);
             this.age = itemView.findViewById(R.id.age);
             this.interestSentText = itemView.findViewById(R.id.interestSentText);
             this.shortlistprofiletext = itemView.findViewById(R.id.shortlistprofiletext);
             this.likeprofiletext = itemView.findViewById(R.id.likeprofiletext);
             this.level1_cardview = itemView.findViewById(R.id.level1_cardview);
+            this.notification_cardview = itemView.findViewById(R.id.notification_cardview);
             this.like = itemView.findViewById(R.id.like);
             this.shortlist = itemView.findViewById(R.id.shortlist);
             this.sendinterest = itemView.findViewById(R.id.sendinterest);

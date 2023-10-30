@@ -227,7 +227,7 @@ public class SendOtpActivity extends AppCompatActivity {
 
         buttonGetOtp.setOnClickListener(view -> {
             hideKeyboard(view);
-            if (!HelperUtils.isConnected()) {
+            if (!HelperUtils.isConnected(this)) {
                 Toast.makeText(SendOtpActivity.this, "NO INTERNET", Toast.LENGTH_SHORT).show();
             } else {
                 ApiCallUtil.CheckAccountStatus(this,inputMobile.getText().toString());

@@ -31,6 +31,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 public class HelperUtils {
 
     public static SearchProfileBottomSheetDialog searchProfileBottomSheetDialog;
@@ -40,6 +44,20 @@ public class HelperUtils {
         Vibrator vibe = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
         vibe.vibrate(50);
     }
+
+
+    public static boolean isConnected(Activity activity) {
+        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            return true;
+        }
+
+        return false;
+    }
+
+
 
 
 
@@ -56,7 +74,7 @@ public class HelperUtils {
     }
 
     public static void checkNetworkStatus(Activity activity) {
-        if(!HelperUtils.isConnected())
+        if(!HelperUtils.isConnected(activity))
             showNoInternetDialog(activity);
     }
 

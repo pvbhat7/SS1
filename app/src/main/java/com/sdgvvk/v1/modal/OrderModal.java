@@ -102,6 +102,20 @@ public class OrderModal {
     }
 
     public Integer getCountRemaining() {
-        return Integer.parseInt(maxCount) - Integer.parseInt(usedCount);
+        int max = 0;
+        int used = 0;
+        int result = 0;
+        try {
+            max = Integer.parseInt(maxCount);
+            used = Integer.parseInt(usedCount);
+
+        } catch (NumberFormatException e) {
+            // Handle the exception - Log an error or return an error value
+            //return null; // Or throw an exception, depending on your application's needs
+        }
+        finally {
+            result  = max - used;
+        }
+        return result;
     }
 }

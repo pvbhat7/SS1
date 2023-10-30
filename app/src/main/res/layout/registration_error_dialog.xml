@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="350dp"
+    android:layout_height="100dp"
+    android:layout_gravity="center_horizontal"
+    android:layout_margin="20dp"
+    android:clickable="true"
+    android:gravity="center"
+    android:visibility="visible"
+    app:cardBackgroundColor="@color/yellow"
+    app:cardCornerRadius="40dp">
+
+    <LinearLayout
+        android:id="@+id/errorBox"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|start"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:textSize="11dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Please fill this details : "
+                android:textAlignment="center"
+                android:textColor="@color/black" />
+            <TextView
+                android:textSize="11dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="कृपया ही माहिती भरा : "
+                android:textAlignment="center"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/errText"
+            android:textSize="13dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_bold"
+            android:text="sdfdsfsdf"
+            android:textAlignment="center"
+            android:textColor="@color/red" />
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

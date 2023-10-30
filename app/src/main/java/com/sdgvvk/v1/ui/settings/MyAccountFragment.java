@@ -245,7 +245,7 @@ public class MyAccountFragment extends Fragment {
     }
 
     public void handleLogout() {
-        if (HelperUtils.isConnected()) {
+        if (HelperUtils.isConnected(this.getActivity())) {
             LocalCache.setLoggedInCustomer(new Customer(), this.getActivity());
             LocalCache.setActiveOrder(new OrderModal(), this.getActivity());
             LocalCache.setLevel1List(new ArrayList<>(), this.getActivity());

@@ -78,9 +78,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import kotlinx.coroutines.channels.Send;
-
 public class ApiCallUtil {
+
+    static Boolean educationApiCalled = false , occupationApiCalled = false;
 
     public static int counter = 0;
     public static Boolean clicked_level2activity = false;
@@ -88,6 +88,7 @@ public class ApiCallUtil {
     public static List<BitmapDataModal> blist = new ArrayList<>();
     public static Dialog onboardDialog = null;
     public static String b64 = null;
+    public static String cpid = null;
 
 
     // get level 1 data
@@ -388,7 +389,7 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
-            if (HelperUtils.isConnected()) {
+            if (HelperUtils.isConnected(activity)) {
                 LocalCache.setLoggedInCustomer(new Customer(), activity);
                 LocalCache.setActiveOrder(new OrderModal(), activity);
                 LocalCache.setLevel1List(new ArrayList<>(), activity);
@@ -739,6 +740,7 @@ public class ApiCallUtil {
         protected Void doInBackground(Void... params) {
             Log.i("ss_nw_call", new Date()+" api call : GetEducationListTask");
             try {
+                educationApiCalled = true;
                 response_list = RetrofitClient.getInstance().getApi().getAllEducationList().execute().body();
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetEducationListTask error" + e.toString());
@@ -774,6 +776,7 @@ public class ApiCallUtil {
         protected Void doInBackground(Void... params) {
             Log.i("ss_nw_call", new Date()+" api call : GetOccupationListTask");
             try {
+                occupationApiCalled = true;
                 response_list = RetrofitClient.getInstance().getApi().getAllOccupationList().execute().body();
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetOccupationListTask error" + e.toString());
@@ -1022,7 +1025,9 @@ public class ApiCallUtil {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
                 LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
 
+                if(!educationApiCalled)
                 getEducationList(activity);
+                if(!occupationApiCalled)
                 getOccupationList(activity);
 
                 if (customer != null && !customer.isEmpty()) {
@@ -1222,9 +1227,8 @@ public class ApiCallUtil {
 
         Activity activity;
         Customer c;
-        List<Customer> loggedInCustomer;
+        List<Customer> persistedCustomerObj = null;
 
-        SingleResponse response;
         String error;
         SpinKitView progressBar;
         Circle d = new Circle();
@@ -1237,7 +1241,7 @@ public class ApiCallUtil {
         public RegisterNewCustomerTask(Customer c, Activity activity, Boolean onboardNewUser, Fragment fragment) {
             this.c = c;
             this.activity = activity;
-            progressBar = activity.findViewById(R.id.progressBar);
+            progressBar = activity.findViewById(R.id.progressBar1);
             this.onboardNewUser = onboardNewUser;
             this.fragment = fragment;
         }
@@ -1254,15 +1258,11 @@ public class ApiCallUtil {
         protected Void doInBackground(Void... params) {
             try {
                 Log.i("ss_nw_call", new Date()+" api call : RegisterNewCustomerTask");
-                response = RetrofitClient.getInstance().getApi().registerNewCustomer(c).execute().body();
-                if (onboardNewUser) {
-                    if (response != null && !response.getResult().equalsIgnoreCase("0")) {
-                        loggedInCustomer = RetrofitClient.getInstance().getApi().getCustomerByMobile(c.getMobile1()).execute().body();
-                        if (loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
-                            LocalCache.setLoggedInCustomer(loggedInCustomer.get(0), activity);
-                            list = RetrofitClient.getInstance().getApi().getAllCustomerProfiles(loggedInCustomer.get(0).getProfileId()).execute().body();
-                        }
-                    }
+                persistedCustomerObj = RetrofitClient.getInstance().getApi().registerNewCustomernew(c).execute().body();
+                if(persistedCustomerObj != null){
+                    LocalCache.setLoggedInCustomer(persistedCustomerObj.get(0),activity);
+                    if(onboardNewUser)
+                    ApiCallUtil.cpid = persistedCustomerObj.get(0).getProfileId();
                 }
 
             } catch (Exception e) {
@@ -1274,21 +1274,19 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (progressBar != null && !onboardNewUser)
+            if (progressBar != null)
                 progressBar.setVisibility(View.GONE);
 
-            if (response != null && !response.getResult().equalsIgnoreCase("0")) {
-                MediaPlayer.create(activity, R.raw.done_sound).start();
-                HelperUtils.showDialog(activity, R.drawable.success_icon, "Profile created !!!", "id : " + response.getResult());
+            if (persistedCustomerObj != null) {
 
                 if (onboardNewUser) {
-                    if (list != null && !list.isEmpty()) {
-                        Collections.shuffle(list);
-                        LocalCache.setLevel1List(list, activity);
-                        ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
-                        if (progressBar != null)
-                            progressBar.setVisibility(View.GONE);
-                    }
+                    Intent intent = new Intent(activity, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    activity.startActivity(intent);
+                }
+                else{
+                    MediaPlayer.create(activity, R.raw.done_sound).start();
+                    HelperUtils.showDialog(activity, R.drawable.success_icon, "Profile created !!!", "id : " + persistedCustomerObj.get(0).getProfileId());
                 }
             } else
                 HelperUtils.showDialog(activity, R.drawable.failed_icon, "Error occured !!!", error);

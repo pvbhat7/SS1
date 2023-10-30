@@ -3,25 +3,23 @@ package com.sdgvvk.v1.ui.home;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
@@ -30,38 +28,36 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
-import com.mikhaellopez.circularimageview.CircularImageView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.sdgvvk.v1.LocalCache;
-import com.sdgvvk.v1.MainActivity;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.SearchProfileBottomSheetDialog;
-import com.sdgvvk.v1.api.ApiCallUtil;
+import com.sdgvvk.v1.activity.RegistrationActivity;
 import com.sdgvvk.v1.adapters.Level_1_profilecardAdapter;
+import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.HelperUtils;
 import com.sdgvvk.v1.modal.Customer;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
-import com.github.ybq.android.spinkit.SpinKitView;
-import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.ListIterator;
 
 public class HomeFragment extends Fragment {
 
-    private static final int REQ_CODE = 100 ;
+    Boolean forceupdate = false;
+    private static final int REQ_CODE = 100;
 
     static Activity activity;
 
@@ -87,160 +83,68 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onCreateView");
         view = inflater.inflate(R.layout.fragment_home, container, false);
         activity = this.getActivity();
         checkforappupdates();
         initUIElements();
         initOnclickListener();
-        
         HelperUtils.checkNetworkStatus(this.getActivity());
 
-        syncLoggedInCustomer();
-        customer = LocalCache.getLoggedInCustomer(this.getActivity());
-        level1list = LocalCache.getLevel1List(this.getActivity());
 
+        customer = LocalCache.getLoggedInCustomer(this.getActivity());
+
+        // NON-REGISTERED USER FLOW
         if (customer.getProfileId() == null)
             onboardNewUser();
+        else {
 
+            Boolean isAdmin = customer.getIsAdmin() != null && customer.getIsAdmin().equalsIgnoreCase("1") ? true : false;
 
-        setProfileIcon();
+            // add blocker for existing user for filling complete profile
+            if (!isAdmin && ( customer.getHeight().isEmpty() || customer.getProfilephotoaddress() == null ) ) {
+                forceupdate = true;
+                Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("forceupdate", true);
+                startActivity(intent);
+            } else {
+                // REGISTERED USER FLOW
+                if (ApiCallUtil.cpid != null) {
+                    // onboarding complete : show successful registration msg
+                    MediaPlayer.create(activity, R.raw.done_sound).start();
+                    HelperUtils.showDialog(activity, R.drawable.success_icon, "Profile created !!!", "profild id : " + ApiCallUtil.cpid);
+                    ApiCallUtil.cpid = null;
+                }
 
-        if (!level1list.isEmpty()) {
-            initLevel_1_CardProfilesRecyclerView(level1list);
+                syncLoggedInCustomer();
+
+                level1list = LocalCache.getLevel1List(this.getActivity());
+
+                setProfileIcon();
+
+                if (!level1list.isEmpty()) {
+                    initLevel_1_CardProfilesRecyclerView(level1list);
+                }
+
+                if (customer.getProfileId() != null)
+                    ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), false);
+
+            }
+
         }
-
-        if (customer.getProfileId() != null)
-            ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), false);
 
 
         return view;
     }
 
+
     private void onboardNewUser() {
-        HelperUtils.vibrateFunction(this.getActivity());
-        Dialog d = new Dialog(this.getActivity());
-        d.setContentView(R.layout.onboarding_dialog);
-        LinearLayout errBox = d.findViewById(R.id.errorBox);
-        TextView errText = d.findViewById(R.id.errText);
-
-        CircularImageView profilePhotoAddress = d.findViewById(R.id.profilePhotoAddress);
-        profilePhotoAddress.setOnClickListener(view -> {
-            // TODO: 13-Oct-23
-            ApiCallUtil.onboardDialog = d;
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            ((MainActivity)MainActivity.getContextObject()).startActivityForResult(intent, PICK_IMAGE_REQUEST);
-        });
-
-
-
-
-        String[] genderArray = {"male", "female"};
-        ((AutoCompleteTextView) d.findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this.getActivity(), R.layout.package_list_item, genderArray));
-
-        d.findViewById(R.id.birthdate).setOnClickListener(view1 -> {
-            //Date Picker
-            MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-            MaterialDatePicker<Long> picker = builder.build();
-            picker.show(this.getActivity().getSupportFragmentManager(), picker.toString());
-            picker.addOnPositiveButtonClickListener(selectedDate -> {
-
-                Date date = new Date(selectedDate);
-                SimpleDateFormat simpleFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-                ((TextView) d.findViewById(R.id.birthdate)).setText(simpleFormat.format(date));
-            });
-        });
-
-        d.findViewById(R.id.create_profile_btn).setOnClickListener(view -> {
-            String result = validateOnBoardingForm(d);
-            if(result.equalsIgnoreCase("")){
-                d.dismiss();
-                String mobile = FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+91", "");
-                String name = ((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim();
-                String firstname = "", middlename = "", lastname = "";
-                String[] nameArr = name.split(" ");
-                if (nameArr.length == 1) {
-                    firstname = nameArr[0];
-                } else if (nameArr.length == 2) {
-                    firstname = nameArr[0];
-                    lastname = nameArr[1];
-                } else if (nameArr.length == 3) {
-                    firstname = nameArr[0];
-                    middlename = nameArr[1];
-                    lastname = nameArr[2];
-                } else
-                    firstname = name;
-
-                String email = ((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim();
-                String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
-                String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
-
-                Customer c = new Customer(firstname, middlename, lastname, mobile, email, gender, birthdate, "0");
-                if(ApiCallUtil.b64 != null){
-                    c.setProfilephotoaddress(ApiCallUtil.b64);
-                }
-                ApiCallUtil.onboardDialog = null;
-                ApiCallUtil.b64 = null;
-                ApiCallUtil.registerProfile(c, getFragmentActivity(), true, this);
-            }
-            else{
-                errBox.setVisibility(View.VISIBLE);
-                errText.setText(result);
-            }
-
-        });
-
-
-        ((TextInputEditText) d.findViewById(R.id.name)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                if(s.length() > 0){
-                    errText.setText("");
-                    errBox.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-        ((TextInputEditText) d.findViewById(R.id.birthdate)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                if(s.length() > 0){
-                    errText.setText("");
-                    errBox.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        ((AutoCompleteTextView) d.findViewById(R.id.gender)).setOnItemClickListener((parent, arg1, pos, id) -> {
-            String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
-            if(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")){
-                errText.setText("");
-                errBox.setVisibility(View.GONE);
-            }
-        });
-
-
-
-        d.setCanceledOnTouchOutside(false);
-        d.setCancelable(false);
-        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        d.show();
+        Log.i("ss_nw_call", new Date() + "lifecycle : cpid " + ApiCallUtil.cpid);
+        Log.i("ss_nw_call", new Date() + "lifecycle : onboarding new user");
+        Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
+        intent.putExtra("onboarding", true);
+        startActivity(intent);
     }
 
 
@@ -338,7 +242,7 @@ public class HomeFragment extends Fragment {
             int nextLimit = currentSize + 20;
 
             while (currentSize - 1 < nextLimit) {
-                rowsArrayList.add(new Level_1_cardModal(String.valueOf(currentSize), "fname", "lname", "06/09/1994", "age", "address", "0", "0", "0"));
+                //rowsArrayList.add(new Level_1_cardModal(String.valueOf(currentSize), "fname", "lname", "06/09/1994", "age", "address", "0", "0", "0"));
 
                 currentSize++;
             }
@@ -348,35 +252,29 @@ public class HomeFragment extends Fragment {
         }, 100);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (ApiCallUtil.clicked_level2activity)
-            ApiCallUtil.clicked_level2activity = false;
-        else
-            ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
-    }
 
     public void initLevel_1_CardProfilesRecyclerView(List<Level_1_cardModal> list) {
         if (view != null) {
             recyclerView = view.findViewById(R.id.level1cardsRecyclerView);
             if (recyclerView != null) {
                 if (list != null) {
+                    Level_1_cardModal tempObj = null;
+                    ListIterator<Level_1_cardModal> iterator = list.listIterator();
+
+                    while (iterator.hasNext()) {
+                        Level_1_cardModal obj = iterator.next();
+
+                        if (obj.getIsAdmin().equalsIgnoreCase("999")) {
+                            tempObj = obj;
+                            iterator.remove();
+                        }
+                    }
+
+                    if (tempObj != null) {
+                        list.add(0, tempObj);
+                    }
+
+
                     rowsArrayList = list;
                     level1CardAdapter = new Level_1_profilecardAdapter(progressBar, view, list, this, this.getActivity());
                     recyclerView.setHasFixedSize(true);
@@ -399,10 +297,7 @@ public class HomeFragment extends Fragment {
     public void showSnackBar(String content) {
         Snackbar snackbar = Snackbar
                 .make(view.findViewById(R.id.level1CoordinatorLayout), content, Snackbar.LENGTH_LONG)
-                .setAction("OK", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                    }
+                .setAction("OK", view -> {
                 });
         snackbar.show();
     }
@@ -430,22 +325,59 @@ public class HomeFragment extends Fragment {
         List<String> list = new ArrayList<>();
 
         String name = ((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim();
-        String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
         String birthdate = ((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim();
+        String education = ((TextInputEditText) d.findViewById(R.id.education)).getText().toString().trim();
+        String occupation = ((TextInputEditText) d.findViewById(R.id.occupation)).getText().toString().trim();
+        String income = ((TextInputEditText) d.findViewById(R.id.income)).getText().toString().trim();
+        String caste = ((TextInputEditText) d.findViewById(R.id.caste)).getText().toString().trim();
+        String address = ((TextInputEditText) d.findViewById(R.id.address)).getText().toString().trim();
 
+        String gender = ((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim();
+        String status = ((AutoCompleteTextView) d.findViewById(R.id.marriagestatus)).getText().toString().trim();
+        String height = ((AutoCompleteTextView) d.findViewById(R.id.height)).getText().toString().trim();
+        String zodiac = ((AutoCompleteTextView) d.findViewById(R.id.zodiac)).getText().toString().trim();
+        String religion = ((AutoCompleteTextView) d.findViewById(R.id.religion)).getText().toString().trim();
+        String bloodgroup = ((AutoCompleteTextView) d.findViewById(R.id.bloodgroup)).getText().toString().trim();
+        String city = ((AutoCompleteTextView) d.findViewById(R.id.city)).getText().toString().trim();
 
-        if(name.isEmpty())
-            list.add("name");
-        if(gender.isEmpty())
+        if (name.isEmpty())
+            list.add("संपूर्ण नाव");
+        if (gender.isEmpty())
             list.add("gender");
-        if(birthdate.isEmpty())
-            list.add("birthdate");
+        if (birthdate.isEmpty())
+            list.add("जन्म तारीख");
+        if (education.isEmpty())
+            list.add("शिक्षण");
+        if (occupation.isEmpty())
+            list.add("नोकरी / व्यवसाय");
+        if (income.isEmpty())
+            list.add("महिना उत्पन्न");
+        if (status.isEmpty())
+            list.add("status");
+        if (height.isEmpty())
+            list.add("उंची");
+        if (zodiac.isEmpty())
+            list.add("रास");
+        if (religion.isEmpty())
+            list.add("धर्म");
+        if (caste.isEmpty())
+            list.add("जात");
+        if (bloodgroup.isEmpty())
+            list.add("bloodgroup");
+        if (city.isEmpty())
+            list.add("city");
+        if (address.isEmpty())
+            list.add("address");
 
-        if(!list.isEmpty()){
-            for(int i=0;i<list.size();i++){
-                errorTxt = errorTxt +" "+list.get(i);
-                if(!(i == list.size() -1))
-                    errorTxt = errorTxt+",";
+        if (ApiCallUtil.b64 == null)
+            list.add("photo");
+
+
+        if (!list.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                errorTxt = errorTxt + " " + list.get(i);
+                if (!(i == list.size() - 1))
+                    errorTxt = errorTxt + ",";
             }
         }
 
@@ -470,7 +402,7 @@ public class HomeFragment extends Fragment {
                 // Request the update.
                 try {
                     appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,AppUpdateType.IMMEDIATE,this.getActivity(),REQ_CODE);
+                            appUpdateInfo, AppUpdateType.IMMEDIATE, this.getActivity(), REQ_CODE);
                 } catch (IntentSender.SendIntentException e) {
                     Log.e("ImageUtils", e.toString());
                     throw new RuntimeException(e);
@@ -479,5 +411,71 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onAttach");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onViewCreated");
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onStart() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onStart");
+        super.onStart();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onDetach");
+        super.onDetach();
+    }
+
+    @Override
+    public void onPause() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        Log.i("ss_nw_call", new Date() + "lifecycle : HomeFragment onResume");
+        super.onResume();
+        if (ApiCallUtil.clicked_level2activity)
+            ApiCallUtil.clicked_level2activity = false;
+        else{
+            if(!forceupdate)
+                ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
+        }
+
+    }
 
 }

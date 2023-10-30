@@ -23,8 +23,7 @@
     <string name="go_to_settings">GOTO SETTINGS</string>
     <string name="buynow">Buy now</string>
 
-
-    <string name="name">नाव</string>
+    <string name="name">संपूर्ण नाव</string>
     <string name="bloodgroup">रक्तगट </string>
     <string name="height">उंची </string>
     <string name="weight">वजन </string>
@@ -38,10 +37,10 @@
 
 
     <string name="education">शिक्षण </string>
-    <string name="occupation">नोकरी / व्यवसाय </string>
+    <string name="occupation">नोकरी / व्यवसाय</string>
     <string name="business">व्यवसाय </string>
     <string name="job">नोकरी </string>
-    <string name="income">उत्पन्न </string>
+    <string name="income">महिना उत्पन्न</string>
 
     <string name="kuldaivat">कुलदैवत </string>
     <string name="devak">देवक</string>

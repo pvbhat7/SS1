@@ -74,7 +74,9 @@ public class Customer {
 
 
 
-    public Customer(String firstname ,String middlename , String lastname , String mobile , String email , String gender , String birthdate,String is_verified){
+    public Customer(String firstname ,String middlename , String lastname , String mobile , String email, String gender , String birthdate,String is_verified,
+                    String status , String height , String education , String occupation , String income , String zodiac , String religion ,
+                    String caste,String bloodgroup , String address , String city){
         this.firstname = firstname;
         this.middlename = middlename;
         this.lastname = lastname;
@@ -83,6 +85,18 @@ public class Customer {
         this.gender = gender;
         this.birthdate = birthdate;
         this.is_verified = is_verified;
+        this.marriagestatus = status;
+        this.height = height;
+        this.education = education;
+        this.occupation = occupation;
+        this.income = income;
+        this.zodiac = zodiac;
+        this.religion = religion;
+        this.caste = caste;
+        this.address = address;
+        this.bloodgroup = bloodgroup;
+        this.city = city;
+
     }
 
 

@@ -22,8 +22,10 @@ public class Level_1_cardModal {
 
     private String profilephotoaddress;
 
+    private String isAdmin;
 
-    public Level_1_cardModal(String profileId, String firstname, String lastname, String dob, String age, String profilephotoaddress, String isShortlisted, String isInterestsent, String isLiked) {
+
+    public Level_1_cardModal(String profileId, String firstname, String lastname, String dob, String age, String profilephotoaddress, String isShortlisted, String isInterestsent, String isLiked,String isAdmin) {
         this.profileId = profileId;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -33,6 +35,7 @@ public class Level_1_cardModal {
         this.isShortlisted = isShortlisted;
         this.isInterestsent = isInterestsent;
         this.isLiked = isLiked;
+        this.isAdmin = isAdmin;
     }
 
     public String getProfileId() {
@@ -129,5 +132,13 @@ public class Level_1_cardModal {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getIsAdmin() {
+        return isAdmin ;
+    }
+
+    public void setIsAdmin(String isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

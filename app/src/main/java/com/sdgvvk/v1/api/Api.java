@@ -119,6 +119,9 @@ public interface Api {
     @POST("customer/app_submit_register.php")
     Call<SingleResponse> registerNewCustomer(@Body Customer customer);
 
+    @POST("customer/app_submit_register_new.php")
+    Call<List<Customer>> registerNewCustomernew(@Body Customer customer);
+
     @POST("customer/updateProfile.php")
     Call<List<Customer>> updateProfile(@Body Customer customer);
 

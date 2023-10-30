@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Task;
@@ -44,6 +46,7 @@ import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private ActivityMainBinding binding;
-    private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
-    private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
+    private boolean lockAspectRatio = true, setBitmapMaxWidthHeight = false;
+    private int ASPECT_RATIO_X = 3, ASPECT_RATIO_Y = 4, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
     private int IMAGE_COMPRESSION = 80;
     public static final int PICK_IMAGE_REQUEST = 1;
 
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onCreate");
         super.onCreate(savedInstanceState);
 
         if (ctx == null || ((MainActivity) ctx).isDestroyed())
@@ -127,20 +131,10 @@ public class MainActivity extends AppCompatActivity {
 
                     if (ApiCallUtil.onboardDialog != null) {
                         Dialog d = ApiCallUtil.onboardDialog;
-                        CircularImageView profilePhotoAddress = ApiCallUtil.onboardDialog.findViewById(R.id.profilePhotoAddress);
+                        ImageView profilePhotoAddress = d.findViewById(R.id.profilePhotoAddress);
+                        profilePhotoAddress.setVisibility(View.VISIBLE);
                         ApiCallUtil.b64 = imgB64;
                         Glide.with(this).load(uri.toString()).placeholder(R.drawable.oops).into(profilePhotoAddress);
-
-
-                        if (!((TextInputEditText) d.findViewById(R.id.name)).getText().toString().trim().isEmpty()
-                                && !((TextInputEditText) d.findViewById(R.id.email)).getText().toString().trim().isEmpty()
-                                && !((AutoCompleteTextView) d.findViewById(R.id.gender)).getText().toString().trim().isEmpty()
-                                && !((TextInputEditText) d.findViewById(R.id.birthdate)).getText().toString().trim().isEmpty()
-                                && ApiCallUtil.b64 != null)
-                            d.findViewById(R.id.create_profile_btn).setEnabled(true);
-                        else
-                            d.findViewById(R.id.create_profile_btn).setEnabled(false);
-
 
                     }
 
@@ -225,6 +219,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onStart");
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onRestart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onStop");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onDestroy");
+        super.onDestroy();
     }
 
 
