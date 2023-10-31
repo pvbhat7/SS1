@@ -57,6 +57,7 @@ import java.util.Locale;
 
 public class RegistrationActivity extends AppCompatActivity {
 
+    public Boolean isAdmin = false;
     private boolean lockAspectRatio = true, setBitmapMaxWidthHeight = false;
     private int ASPECT_RATIO_X = 3, ASPECT_RATIO_Y = 4, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
     private int IMAGE_COMPRESSION = 80;
@@ -106,6 +107,9 @@ public class RegistrationActivity extends AppCompatActivity {
         }
         else
             customerprofileeditcreatemode = loggedincustomer;
+
+        if(customerprofileeditcreatemode.getIsAdmin() != null && customerprofileeditcreatemode.getIsAdmin().equalsIgnoreCase("1"))
+            isAdmin = true;
 
         profilePhotoAddressBase64 = "";
         biodataAddressBase64 = "";
@@ -495,7 +499,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         if (editprofile || forceupdate) {
             c.setProfileId(customerprofileeditcreatemode.getProfileId());
-            ApiCallUtil.updateProfile(c, this, updateCache);
+            ApiCallUtil.updateProfile(c, this, updateCache,forceupdate);
         } else if (onboarding){
             ApiCallUtil.registerProfile(c, this, true, null);
         }else{
@@ -692,16 +696,11 @@ public class RegistrationActivity extends AppCompatActivity {
         if(relatives.getText().toString().isEmpty())
             list.add("नातेसंबंध");
 
-        if(editprofile || forceupdate){
-            if(customerprofileeditcreatemode.getProfilephotoaddress() == null || customerprofileeditcreatemode.getProfilephotoaddress().isEmpty())
-                list.add("profile photo");
-        }
-        else{
+        Boolean isDPAlreadyAdded = customerprofileeditcreatemode.getProfilephotoaddress() != null && !customerprofileeditcreatemode.getProfilephotoaddress().isEmpty();
+        if(!isDPAlreadyAdded){
             if(profilePhotoAddressBase64.isEmpty())
                 list.add("profile photo");
         }
-
-
 
         if(!list.isEmpty()){
             for(int i=0;i<list.size();i++){
@@ -711,7 +710,7 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         }
 
-        return errorTxt;
+        return isAdmin ? "" : errorTxt;
 
     }
 

@@ -73,7 +73,6 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -120,8 +119,8 @@ public class ApiCallUtil {
         new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment).execute();
     }
 
-    public static void updateProfile(Customer customer, Activity activity, Boolean updateCache) {
-        new UpdateProfileTask(customer, activity, updateCache).execute();
+    public static void updateProfile(Customer customer, Activity activity, Boolean updateCache, Boolean forceupdate) {
+        new UpdateProfileTask(customer, activity, updateCache,forceupdate).execute();
     }
 
     public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, Button savebtn) {
@@ -1308,12 +1307,14 @@ public class ApiCallUtil {
         List<Level_1_cardModal> list = new ArrayList<>();
 
         Boolean updateCache;
+        Boolean forceupdate;
 
-        public UpdateProfileTask(Customer c, Activity activity, Boolean updateCache) {
+        public UpdateProfileTask(Customer c, Activity activity, Boolean updateCache, Boolean forceupdate) {
             this.c = c;
             this.activity = activity;
             progressBar = activity.findViewById(R.id.progressBar);
             this.updateCache = updateCache;
+            this.forceupdate = forceupdate;
         }
 
         @Override
@@ -1344,9 +1345,15 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             if (progressBar != null)
                 progressBar.setVisibility(View.GONE);
-
             MediaPlayer.create(activity, R.raw.done_sound).start();
             activity.onBackPressed();
+            if (forceupdate) {
+                Intent intent = new Intent(activity, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                activity.startActivity(intent);
+            }
+
+
         }
     }
 

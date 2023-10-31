@@ -76,9 +76,14 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView, level1cardsRecyclerView;
     private View view;
     boolean isLoading = false;
-    Customer customer;
+    Customer loggedinCustomer;
     List<Level_1_cardModal> level1list;
     SwipeRefreshLayout swipeRefreshLayout;
+
+    public void init(){
+        initUIElements();
+        initOnclickListener();
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -87,22 +92,21 @@ public class HomeFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         activity = this.getActivity();
         checkforappupdates();
-        initUIElements();
-        initOnclickListener();
+        init();
         HelperUtils.checkNetworkStatus(this.getActivity());
 
 
-        customer = LocalCache.getLoggedInCustomer(this.getActivity());
+        loggedinCustomer = LocalCache.getLoggedInCustomer(this.getActivity());
 
         // NON-REGISTERED USER FLOW
-        if (customer.getProfileId() == null)
+        if (loggedinCustomer.getProfileId() == null)
             onboardNewUser();
         else {
 
-            Boolean isAdmin = customer.getIsAdmin() != null && customer.getIsAdmin().equalsIgnoreCase("1") ? true : false;
+            Boolean isAdmin = loggedinCustomer.getIsAdmin() != null && loggedinCustomer.getIsAdmin().equalsIgnoreCase("1") ? true : false;
 
             // add blocker for existing user for filling complete profile
-            if (!isAdmin && ( customer.getHeight().isEmpty() || customer.getProfilephotoaddress() == null ) ) {
+            if (!isAdmin && ( loggedinCustomer.getHeight().isEmpty() || loggedinCustomer.getProfilephotoaddress() == null ) ) {
                 forceupdate = true;
                 Intent intent = new Intent(this.getActivity(), RegistrationActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -127,8 +131,8 @@ public class HomeFragment extends Fragment {
                     initLevel_1_CardProfilesRecyclerView(level1list);
                 }
 
-                if (customer.getProfileId() != null)
-                    ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), false);
+                if (loggedinCustomer.getProfileId() != null)
+                    ApiCallUtil.getAllProfiles(loggedinCustomer.getProfileId(), this, progressBar, this.getActivity(), false);
 
             }
 
@@ -149,9 +153,9 @@ public class HomeFragment extends Fragment {
 
 
     private void setProfileIcon() {
-        if (customer != null && customer.getProfileId() != null) {
+        if (loggedinCustomer != null && loggedinCustomer.getProfileId() != null) {
             Glide.with(this.getActivity())
-                    .load(customer.getProfilephotoaddress() != null ? customer.getProfilephotoaddress() : R.drawable.oops)
+                    .load(loggedinCustomer.getProfilephotoaddress() != null ? loggedinCustomer.getProfilephotoaddress() : R.drawable.oops)
                     .placeholder(R.drawable.oops)
                     .into(profilePhoto);
         }
@@ -207,7 +211,7 @@ public class HomeFragment extends Fragment {
         // Refresh  the layout
         swipeRefreshLayout.setOnRefreshListener(
                 () -> {
-                    ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
+                    ApiCallUtil.getAllProfiles(loggedinCustomer.getProfileId(), this, progressBar, this.getActivity(), true);
                     swipeRefreshLayout.setRefreshing(false);
                 }
         );
@@ -224,7 +228,7 @@ public class HomeFragment extends Fragment {
 
     private void showUserProfile() {
         HelperUtils.vibrateFunction(this.getActivity());
-        ApiCallUtil.getLevel2Data(customer.getProfileId(), activity);
+        ApiCallUtil.getLevel2Data(loggedinCustomer.getProfileId(), activity);
     }
 
     private void loadMore() {
@@ -473,7 +477,7 @@ public class HomeFragment extends Fragment {
             ApiCallUtil.clicked_level2activity = false;
         else{
             if(!forceupdate)
-                ApiCallUtil.getAllProfiles(customer.getProfileId(), this, progressBar, this.getActivity(), true);
+                ApiCallUtil.getAllProfiles(loggedinCustomer.getProfileId(), this, progressBar, this.getActivity(), true);
         }
 
     }

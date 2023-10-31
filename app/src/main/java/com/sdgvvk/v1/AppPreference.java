@@ -30,7 +30,7 @@ public class AppPreference {
         SharedPreferences sp = null;
         if(context != null)
         sp = context.getSharedPreferences(prefName, 0);
-        return sp.getString(key, "");
+        return sp == null ? "" : sp.getString(key, "");
     }
 
 

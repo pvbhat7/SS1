@@ -20,8 +20,8 @@ android {
         applicationId "com.sdgvvk.v1"
         minSdk 26
         targetSdk 33
-        versionCode 15
-        versionName "15"
+        versionCode 18
+        versionName "18"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
