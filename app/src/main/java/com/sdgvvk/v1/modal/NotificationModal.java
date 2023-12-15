@@ -12,6 +12,13 @@ public class NotificationModal {
     private String photo;
     private String title;
     private String time;
+    private String name;
+    private String count;
+    private String city;
+    private String age;
+
+    private String clientname;
+
     public NotificationModal(String cpid , String vcpid , String action_id) {
         this.cpid = cpid;
         this.vcpid = vcpid;
@@ -88,5 +95,45 @@ public class NotificationModal {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getClientname() {
+        return clientname;
+    }
+
+    public void setClientname(String clientname) {
+        this.clientname = clientname;
     }
 }

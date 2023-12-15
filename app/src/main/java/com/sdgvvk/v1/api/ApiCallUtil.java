@@ -1,23 +1,31 @@
 package com.sdgvvk.v1.api;
 
-import static com.google.android.material.internal.ViewUtils.hideKeyboard;
-
+import android.Manifest;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,26 +34,33 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.github.ybq.android.spinkit.SpinKitView;
+import com.github.ybq.android.spinkit.style.Circle;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.sdgvvk.v1.BuyMembershipBottomSheetDialog;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.MainActivity;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.activity.AdminZoneActivity;
+import com.sdgvvk.v1.activity.AllMemberActivity;
 import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.activity.ProfileExportActivity;
 import com.sdgvvk.v1.activity.SendOtpActivity;
 import com.sdgvvk.v1.activity.VerifyOtpActivity;
+import com.sdgvvk.v1.adapters.AllMembersAdapter;
 import com.sdgvvk.v1.adapters.BuyMembershipAdapter;
 import com.sdgvvk.v1.adapters.ContactViewedAdapter;
+import com.sdgvvk.v1.adapters.FollowUpAdapter;
 import com.sdgvvk.v1.adapters.MyMembershipAdapter;
 import com.sdgvvk.v1.adapters.NotificationAdapter;
 import com.sdgvvk.v1.adapters.SearchedMembersAdapter;
@@ -53,7 +68,11 @@ import com.sdgvvk.v1.adapters.TransactionAdapter;
 import com.sdgvvk.v1.modal.BitmapDataModal;
 import com.sdgvvk.v1.modal.ContactViewedModal;
 import com.sdgvvk.v1.modal.Customer;
+import com.sdgvvk.v1.modal.CustomerActivityModal;
+import com.sdgvvk.v1.modal.FcmNotificationModal;
+import com.sdgvvk.v1.modal.FcmTokenModal;
 import com.sdgvvk.v1.modal.FilterModal;
+import com.sdgvvk.v1.modal.FollowUpModal;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
 import com.sdgvvk.v1.modal.Level_2_Modal;
 import com.sdgvvk.v1.modal.MembershipModal;
@@ -61,25 +80,39 @@ import com.sdgvvk.v1.modal.MyMembershipModal;
 import com.sdgvvk.v1.modal.NotificationModal;
 import com.sdgvvk.v1.modal.OrderModal;
 import com.sdgvvk.v1.modal.SingleResponse;
+import com.sdgvvk.v1.modal.SmsModal;
 import com.sdgvvk.v1.modal.Stat;
 import com.sdgvvk.v1.modal.TransactionModal;
-import com.sdgvvk.v1.ui.dashboard.MatchesFragment;
+import com.sdgvvk.v1.ui.ViewedContactBottomSheetDialog;
 import com.sdgvvk.v1.ui.home.HomeFragment;
-import com.github.ybq.android.spinkit.SpinKitView;
-import com.github.ybq.android.spinkit.style.Circle;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ApiCallUtil {
 
-    static Boolean educationApiCalled = false , occupationApiCalled = false;
+    public static Boolean redirected_via_home_screen_noti = false;
+    public static Boolean redirected_via_deep_link = false;
+    public static Boolean redirected_via_notification = false;
+    public static String noti_target_class = null;
+    public static String noti_target_cpid = null;
+
+    public static String noti_category= null;
+    public static String noti_longtext= null;
+
+    public static String noti_title = null;
+    public static String noti_message = null;
+    public static String noti_image = null;
+    public static boolean logout_initiated = false;
+
+
+    static Boolean educationApiCalled = false, occupationApiCalled = false , lastnamesApiCalled = false , cityApiCalled = false , casteApiCalled = false;
 
     public static int counter = 0;
     public static Boolean clicked_level2activity = false;
@@ -88,6 +121,7 @@ public class ApiCallUtil {
     public static Dialog onboardDialog = null;
     public static String b64 = null;
     public static String cpid = null;
+    public static Customer editedCustomerProfile = null;
 
 
     // get level 1 data
@@ -103,27 +137,39 @@ public class ApiCallUtil {
         new UpdateLoggedInCustomerDetailsTask(activity, mobile).execute();
     }
 
-    public static void getUserNotifications(Activity activity, Dialog dialog) {
-        new GetUserNotificationsListTask(activity, dialog).execute();
+    public static void getUserNotifications(Activity activity, Dialog dialog, String cpid, Boolean showSingleNotification) {
+        new GetUserNotificationsListTask(activity, dialog, cpid , showSingleNotification).execute();
+    }
+
+    public static void getDistinctUsers(Activity activity, RecyclerView recyclerView, AllMembersAdapter adapter) {
+        new GetDistinctUserNotificationsTask(activity, recyclerView, adapter).execute();
     }
 
     public static void updateViewedNotificationState(String noti_id) {
         new UpdateViewedNotificationStateTask(noti_id).execute();
     }
 
-    public static void getContactViewedProfiles(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView,TextView cv_count, Activity activity) {
-        new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView,cv_count, activity).execute();
+    public static void addLeads(String cpid , String vcpid , String type) {
+        new AddLeadsTask(cpid , vcpid , type).execute();
     }
 
-    public static void registerProfile(Customer customer, Activity activity, Boolean onboardNewUser, Fragment fragment) {
-        new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment).execute();
+    public static void getContactViewedProfiles(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView, TextView cv_count,TextView cv_zero, Activity activity) {
+        new GetContactViewedProfilesTask(cpid, adapter, contactviewedRecyclerView, cv_count,cv_zero, activity).execute();
+    }
+
+    public static void getFollowupByCpid(String cpid, RecyclerView recyclerView, Activity activity) {
+        new GetFollowupsTask(cpid, recyclerView, activity).execute();
+    }
+
+    public static void registerProfile(Customer customer, Activity activity, Boolean onboardNewUser, Fragment fragment, Boolean isAdmin) {
+        new RegisterNewCustomerTask(customer, activity, onboardNewUser, fragment , isAdmin).execute();
     }
 
     public static void updateProfile(Customer customer, Activity activity, Boolean updateCache, Boolean forceupdate) {
-        new UpdateProfileTask(customer, activity, updateCache,forceupdate).execute();
+        new UpdateProfileTask(customer, activity, updateCache, forceupdate).execute();
     }
 
-    public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, Button savebtn) {
+    public static void validateLoginMobile(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, ExtendedFloatingActionButton savebtn) {
         new ValidateLoginMobileTask(activity, mobile, formLayout, cmLayout, mobile1, savebtn).execute();
     }
 
@@ -139,10 +185,15 @@ public class ApiCallUtil {
         new SyncStatsTask(activity).execute();
     }
 
-    public static void getFilteredLevel1Profiles(Activity activity, Fragment fragment, FilterModal modal) {
-        new GetFilteredLevel1DataTask(activity, fragment, modal).execute();
+
+
+    public static void searchLevel1Profiles(Activity activity, Fragment fragment, FilterModal modal , Dialog d) {
+        new SearchLevel1DataTask(activity, fragment, modal, d ).execute();
     }
 
+    public static void searchSingleProfile(Activity activity, Fragment fragment,FilterModal modal , Dialog d) {
+        new SearchSingleProfileTask(activity, fragment, modal, d ).execute();
+    }
 
     public static void getFilteredLevel2Profiles(Activity activity, FilterModal modal) {
         new GetFilteredLevel2DataTask(activity, modal).execute();
@@ -157,7 +208,7 @@ public class ApiCallUtil {
     }
 
     public static void getMembershipPlans(RecyclerView recyclerView, Activity activity) {
-        new GetMembershipPlansTask(activity, recyclerView).execute();
+        new GetMembershipPlansTask(activity, recyclerView ).execute();
     }
 
     public static void searchProfilesBy(Dialog d, Activity activity, String searchBy, String value, RecyclerView recyclerView, LinearLayout downLayout) {
@@ -179,17 +230,258 @@ public class ApiCallUtil {
     }
 
 
-
     public static void disableProfile(Activity activity, String vcpid) {
-        new DisableProfileTask(activity,vcpid).execute();
+        new DisableProfileTask(activity, vcpid).execute();
     }
 
-    public static void CheckAccountStatus(SendOtpActivity activity , String mobile) {
-        new CheckAccountStatusTask(activity , mobile).execute();
+    public static void CheckAccountStatus(SendOtpActivity activity, String mobile) {
+        new CheckAccountStatusTask(activity, mobile).execute();
     }
 
     public static void getAllTransactions(Dialog d, Activity activity) {
-        new GetAllTransactionsTask(d,activity).execute();
+        new GetAllTransactionsTask(d, activity).execute();
+    }
+
+    public static void SaveFollowUp(String profileId, String followupdate, String comment) {
+        new SaveFollowUpTask(profileId, followupdate, comment).execute();
+    }
+
+    public static void updateFollowUp(String noti_id) {
+        new UpdateFollowupTask(noti_id).execute();
+    }
+
+    public static void sendTokenToServer(FcmTokenModal tokenModal) {
+        new CreateNewFcmTokenTask(tokenModal).execute();
+    }
+
+    public static void addPushNotificationToServer(Activity activity, FcmNotificationModal fcmNotificationModal) {
+        new AddPushNotificationToServerTask(activity,fcmNotificationModal).execute();
+    }
+
+    public static void getAdminNotice(Activity activity, Customer loggedinCustomer) {
+        new FetchAdminNoticesTask(activity,loggedinCustomer).execute();
+    }
+
+    public static void syncAccountBalanceForHomeScreen(String profileId, Activity activity, ExtendedFloatingActionButton balanceBtn) {
+        new SyncAccountBalanceForHomeScreenTask(profileId,activity,balanceBtn).execute();
+    }
+
+    public static void getAllViewedContacts(String cpid, Dialog d, Activity activity) {
+        new GetAdminAllViewedContactsTask(cpid,d,activity).execute();
+    }
+
+    static class CreateNewFcmTokenTask extends AsyncTask<Void, Void, Void> {
+
+        FcmTokenModal tokenModal;
+
+        public CreateNewFcmTokenTask(FcmTokenModal tokenModal) {
+            this.tokenModal = tokenModal;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                RetrofitClient.getInstance().getApi().createFcmTokenToServer(tokenModal).execute();
+            } catch (IOException e) {
+                System.out.println("");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    static class GetAdminAllViewedContactsTask extends AsyncTask<Void, Void, Void> {
+
+        String cpid;
+        Dialog d;
+        Activity activity;
+        List<ContactViewedModal> list ;
+
+        public GetAdminAllViewedContactsTask(String cpid, Dialog d, Activity activity) {
+            this.cpid = cpid;
+            this.d = d;
+            this.activity = activity;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+               list = RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body();
+            } catch (IOException e) {
+                System.out.println("");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(list != null && !list.isEmpty()){
+                ContactViewedAdapter adapter = new ContactViewedAdapter(list, activity);
+                RecyclerView recyclerView = d.findViewById(R.id.recyclerView);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                recyclerView.setAdapter(adapter);
+            }
+        }
+    }
+
+    static class AddPushNotificationToServerTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+        FcmNotificationModal fcmNotificationModal ;
+        public AddPushNotificationToServerTask(Activity activity, FcmNotificationModal fcmNotificationModal) {
+            this.activity = activity ;
+            this.fcmNotificationModal = fcmNotificationModal;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                RetrofitClient.getInstance().getApi().createFcmNotificationToServer(fcmNotificationModal).execute();
+            } catch (IOException e) {
+                System.out.println("");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    static class FetchAdminNoticesTask extends AsyncTask<Void, Void, Void> {
+
+        String noticeType ;
+        Activity activity;
+        Customer customer;
+
+        SingleResponse response;
+        public FetchAdminNoticesTask(Activity activity, Customer customer) {
+            this.activity = activity ;
+            this.customer = customer;
+            this.noticeType = customer.getIsNoticeAvailable();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                response = RetrofitClient.getInstance().getApi().getAdminNotice(noticeType, customer.getProfileId()).execute().body();
+            } catch (IOException e) {
+                System.out.println("");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (response != null && !response.getResult().equalsIgnoreCase("0")) {
+                Dialog d = new Dialog(activity);
+                if(noticeType.equalsIgnoreCase("custom") || noticeType.equalsIgnoreCase("longtext")){
+                    d.setContentView(R.layout.notification_text_dialog);
+                    ((TextView)d.findViewById(R.id.longtext)).setText(response.getResult());
+                }
+                else if(noticeType.equalsIgnoreCase("image")){
+                    d.setContentView(R.layout.notification_image_dialog);
+                    Glide.with(activity)
+                            .load(response.getResult())
+                            .placeholder(R.drawable.oops)
+                            .into((ImageView) d.findViewById(R.id.img));
+                }
+                d.setCanceledOnTouchOutside(true);
+                d.setCancelable(true);
+                d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                d.show();
+            }
+
+
+        }
+    }
+
+    static class SyncAccountBalanceForHomeScreenTask extends AsyncTask<Void, Void, Void> {
+
+        String profileId ;
+        ExtendedFloatingActionButton button;
+        Activity activity;
+        List<OrderModal> activeOrder;
+
+        public SyncAccountBalanceForHomeScreenTask(String profileId , Activity activity, ExtendedFloatingActionButton button) {
+            this.activity = activity ;
+            this.profileId = profileId;
+            this.button = button;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                activeOrder = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(profileId).execute().body();
+            } catch (IOException e) {
+                System.out.println("");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (activeOrder != null && !activeOrder.isEmpty()) {
+                LocalCache.setActiveOrder(activeOrder.get(0), activity);
+                OrderModal activeOrder = LocalCache.getActiveOrder(activity);
+                if (activeOrder != null && activeOrder.getId() != null) {
+                    button.setVisibility(View.VISIBLE);
+                    button.setText("Balance : "+activeOrder.getCountRemaining());
+                }
+                else
+                    button.setVisibility(View.GONE);
+            }
+            else
+                button.setVisibility(View.GONE);
+
+
+        }
+    }
+
+
+    static class SaveFollowUpTask extends AsyncTask<Void, Void, Void> {
+
+        String profileId;
+        String followupdate;
+        String comment;
+
+        public SaveFollowUpTask(String profileId, String followupdate, String comment) {
+            this.profileId = profileId;
+            this.followupdate = followupdate;
+            this.comment = comment;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date() + " api call : SaveFollowUpTask");
+            try {
+                RetrofitClient.getInstance().getApi().saveFollowUp(profileId, followupdate, comment).execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "nw error");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.i("ss_nw_call", "onPostExecute ");
+            super.onPostExecute(aVoid);
+        }
     }
 
     static class CheckAccountStatusTask extends AsyncTask<Void, Void, Void> {
@@ -211,7 +503,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : CheckAccountStatusTask");
+            Log.i("ss_nw_call", new Date() + " api call : CheckAccountStatusTask");
             try {
                 obj = RetrofitClient.getInstance().getApi().checkAccountStatus(mobile).execute().body();
             } catch (Exception e) {
@@ -224,16 +516,12 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
-            if(obj != null && obj.getResult().equalsIgnoreCase("true"))
+            if (obj != null && obj.getResult().equalsIgnoreCase("true"))
                 account_deactivated = true;
 
-            if(!account_deactivated){
+            if (!account_deactivated) {
 
                 HelperUtils.vibrateFunction(activity);
-
-                activity.findViewById(R.id.buttonGetOtp).setVisibility(View.GONE);
-                activity.showProgressBar();
-
 
                 PhoneAuthProvider.getInstance().verifyPhoneNumber(
                         "+91" + mobile,
@@ -272,12 +560,11 @@ public class ApiCallUtil {
                             }
                         }
                 );
-            }
-            else{
+            } else {
                 activity.findViewById(R.id.loginbox).setVisibility(View.GONE);
                 activity.findViewById(R.id.errorbox).setVisibility(View.VISIBLE);
                 activity.findViewById(R.id.contactsupportbtn).setVisibility(View.VISIBLE);
-                ((TextView)activity.findViewById(R.id.errorTxt)).setText("Account deactivated");
+                ((TextView) activity.findViewById(R.id.errorTxt)).setText("Account deactivated");
             }
         }
     }
@@ -288,7 +575,7 @@ public class ApiCallUtil {
         Dialog d;
         List<TransactionModal> txnList;
 
-        public GetAllTransactionsTask(Dialog d , Activity activity) {
+        public GetAllTransactionsTask(Dialog d, Activity activity) {
             this.activity = activity;
             this.d = d;
         }
@@ -299,7 +586,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetAllTransactionsTask");
+            Log.i("ss_nw_call", new Date() + " api call : GetAllTransactionsTask");
             try {
                 txnList = RetrofitClient.getInstance().getApi().getAllTransactions().execute().body();
             } catch (Exception e) {
@@ -312,13 +599,15 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
-            if(txnList != null && !txnList.isEmpty()){
+            if (txnList != null && !txnList.isEmpty()) {
                 // update in recyclerview
                 TransactionAdapter adapter = new TransactionAdapter(txnList, activity, d);
                 RecyclerView recyclerView = d.findViewById(R.id.recyclerView);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
-                recyclerView.setAdapter(adapter);
+                if(recyclerView != null ){
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                    recyclerView.setAdapter(adapter);
+                }
             }
         }
     }
@@ -339,7 +628,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : DisableProfileTask");
+            Log.i("ss_nw_call", new Date() + " api call : DisableProfileTask");
             try {
                 RetrofitClient.getInstance().getApi().disableProfile(vcpid).execute();
             } catch (Exception e) {
@@ -356,7 +645,7 @@ public class ApiCallUtil {
     }
 
     public static void deleteProfile(Activity activity, String vcpid) {
-        new DeleteProfileTask(activity,vcpid).execute();
+        new DeleteProfileTask(activity, vcpid).execute();
     }
 
     static class DeleteProfileTask extends AsyncTask<Void, Void, Void> {
@@ -375,7 +664,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : DeleteProfileTask");
+            Log.i("ss_nw_call", new Date() + " api call : DeleteProfileTask");
             try {
                 RetrofitClient.getInstance().getApi().deleteProfile(vcpid).execute();
             } catch (Exception e) {
@@ -390,12 +679,17 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             if (HelperUtils.isConnected(activity)) {
                 LocalCache.setLoggedInCustomer(new Customer(), activity);
+                LocalCache.setCustomerActivity(new CustomerActivityModal(), activity);
                 LocalCache.setActiveOrder(new OrderModal(), activity);
                 LocalCache.setLevel1List(new ArrayList<>(), activity);
                 LocalCache.setContactViewedList(new ArrayList<>(), activity);
-                LocalCache.setMembershipList(new ArrayList<>( ), activity);
-                LocalCache.setGenderStat(new ArrayList<>( ), activity);
+                LocalCache.setMembershipList(new ArrayList<>(), activity);
+                LocalCache.setGenderStat(new ArrayList<>(), activity);
                 LocalCache.setIsLive("Account deactivated", activity);
+                LocalCache.setContactviewedMatchesList(true, activity);
+                LocalCache.setLikedMatchesList(true, activity);
+                LocalCache.setShortlistedMatchesList(true, activity);
+                LocalCache.setSentinterestMatchesList(true, activity);
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(activity, SendOtpActivity.class);
                 intent.putExtra("logout", true);
@@ -432,7 +726,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetAllCustomerProfilesTask");
+            Log.i("ss_nw_call", new Date() + " api call : GetAllCustomerProfilesTask");
             try {
                 list = RetrofitClient.getInstance().getApi().getAllCustomerProfiles(loggedInCpid).execute().body();
 
@@ -447,16 +741,25 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
+                List<Level_1_cardModal> newList = new ArrayList<>();
+                newList = list.stream()
+                        .distinct()
+                        .collect(Collectors.toList());
                 //Collections.shuffle(list);
 
+                if(LocalCache.getLevel1List(activity) != null && !LocalCache.getLevel1List(activity).isEmpty())
+                    newList = checkAndUpdateLikes(newList,activity);
+
+
                 if (LocalCache.getLevel1List(activity).isEmpty())
-                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(newList);
+
 
                 if (override)
-                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+                    ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(newList);
 
 
-                LocalCache.setLevel1List(list, activity);
+                LocalCache.setLevel1List(newList, activity);
 
                 d.stop();
                 progressBar.setVisibility(View.GONE);
@@ -470,42 +773,87 @@ public class ApiCallUtil {
             d.stop();
             progressBar.setVisibility(View.GONE);
         }
+
+        private List<Level_1_cardModal> checkAndUpdateLikes(List<Level_1_cardModal> newList, Activity activity) {
+            List<Level_1_cardModal> updatedList  = new ArrayList<>() ;
+            List<Level_1_cardModal> cachedList = LocalCache.getLevel1List(activity);
+
+            if (cachedList != null && !cachedList.isEmpty()) {
+                updatedList = newList.stream()
+                        .map(newItem -> {
+                            Level_1_cardModal cachedItem = findItemById(cachedList, newItem.getProfileId());
+
+                            if (cachedItem != null) {
+                                // Compare and update properties if needed
+                                if (shouldUpdate(newItem.getIsLiked(), cachedItem.getIsLiked())) {
+                                    newItem.setIsLiked(cachedItem.getIsLiked());
+                                }
+                                if (shouldUpdate(newItem.getIsShortlisted(), cachedItem.getIsShortlisted())) {
+                                    newItem.setIsShortlisted(cachedItem.getIsShortlisted());
+                                }
+                                if (shouldUpdate(newItem.getIsInterestsent(), cachedItem.getIsInterestsent())) {
+                                    newItem.setIsInterestsent(cachedItem.getIsInterestsent());
+                                }
+
+                                // Add more comparisons for other properties if needed
+
+                                return newItem;
+                            } else {
+                                return newItem;
+                            }
+                        })
+                        .collect(Collectors.toList());
+
+                // TODO: Use the updatedList as needed
+            }
+            return updatedList;
+        }
+
+        // Utility method to find an item by profile ID
+        private Level_1_cardModal findItemById(List<Level_1_cardModal> list, String profileId) {
+            return list.stream()
+                    .filter(item -> item.getProfileId().equals(profileId))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        // Utility method to check if the property should be updated
+        private boolean shouldUpdate(String newValue, String cachedValue) {
+            // Implement your logic here, e.g., if the values are not equal
+            return !newValue.equals(cachedValue);
+        }
     }
 
-    public static void getProfilesByTag(String cpid, Fragment fragment, String tag, SpinKitView progressBar) {
-        new GetProfilesByTagTask(cpid, fragment, tag, progressBar).execute();
+
+
+    public static void syncUserActivity(String cpid, Activity activity) {
+        new SyncUserActivityTask(cpid, activity).execute();
     }
 
-    static class GetProfilesByTagTask extends AsyncTask<Void, Void, Void> {
 
-        String cpid, tag;
 
-        Fragment fragment;
-        List<Level_1_cardModal> list = new ArrayList<>();
+    static class SyncUserActivityTask extends AsyncTask<Void, Void, Void> {
 
-        SpinKitView progressBar;
+        String cpid;
 
-        Circle d;
+        Activity activity;
+        List<CustomerActivityModal> activityModal = new ArrayList<>();
 
-        public GetProfilesByTagTask(String cpid, Fragment fragment, String tag, SpinKitView progressBar) {
+
+        public SyncUserActivityTask(String cpid, Activity activity) {
             this.cpid = cpid;
-            this.tag = tag;
-            this.fragment = fragment;
-            this.progressBar = progressBar;
+            this.activity = activity;
         }
 
         @Override
         protected void onPreExecute() {
-            d = new Circle();
-            progressBar.setIndeterminateDrawable(d);
-            progressBar.setVisibility(View.VISIBLE);
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetProfilesByTagTask");
+            Log.i("ss_nw_call", new Date() + " api call : SyncUserActivityTask");
             try {
-                list = RetrofitClient.getInstance().getApi().getProfilesByTag(cpid, tag).execute().body();
+                activityModal = RetrofitClient.getInstance().getApi().getActivityData(cpid).execute().body();
 
             } catch (Exception e) {
                 Log.i("ss_nw_call", "nw error");
@@ -518,15 +866,10 @@ public class ApiCallUtil {
             Log.i("ss_nw_call", "onPostExecute ");
             super.onPostExecute(aVoid);
             //HelperUtility.addLastTenDaysCount(list, activity);
-            if (list != null && !list.isEmpty()) {
-                Log.i("onPostExecute", "list size  " + list.size());
-                ((MatchesFragment) fragment).initRecyclerView(list);
-                d.stop();
-                progressBar.setVisibility(View.GONE);
-            } else
-                Log.i("onPostExecute", "list is null");
-            d.stop();
-            progressBar.setVisibility(View.GONE);
+            if(activityModal != null && !activityModal.isEmpty()){
+                CustomerActivityModal modal = activityModal.get(0);
+                LocalCache.setCustomerActivity(modal,activity);
+            }
         }
     }
 
@@ -553,15 +896,18 @@ public class ApiCallUtil {
 
         @Override
         protected void onPreExecute() {
+            Log.i("ss_nw_call", "performance : GetLevel2DataTask preexecute ");
             super.onPreExecute();
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetLevel2DataTask");
+            Log.i("ss_nw_call", new Date() + " api call : GetLevel2DataTask");
             try {
+                Log.i("ss_nw_call", "performance : GetLevel2DataTask doinbackground api calling start ");
                 list = RetrofitClient.getInstance().getApi().getLevel2DataByCPID(cpid).execute().body();
+                Log.i("ss_nw_call", "performance : GetLevel2DataTask doinbackground api calling end ");
                 // TODO: 14-Sep-23 prepare single rest api
-                Customer c = LocalCache.getLoggedInCustomer(activity);
+                //Customer c = LocalCache.getLoggedInCustomer(activity);
                 //contactviewedlist = RetrofitClient.getInstance().getApi().getContactViewedProfiles(c.getProfileId()).execute().body();
 
 
@@ -574,8 +920,10 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute calling... ");
+            Log.i("ss_nw_call", "performance : GetLevel2DataTask onPostExecute ");
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
+
 
                 // set iscontactViewed
                 list.get(0).setContactViewed(false);
@@ -587,10 +935,14 @@ public class ApiCallUtil {
                     }
                 }
 
-                Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list size  " + list.size() + " time is " + new Date());
-                activity.startActivity(new Intent(activity, Level2ProfileActivity.class).putExtra("level2data", new Gson().toJson(list.get(0))));
+                ((Level2ProfileActivity)activity).initByLevel2Object(list.get(0));
+
+                Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list size  " + list.size() + " time is " );
+                //activity.startActivity(new Intent(activity, Level2ProfileActivity.class).putExtra("level2data", new Gson().toJson(list.get(0))));
+
+
             } else
-                Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list is null  time is " + new Date());
+                Log.i("ss_nw_call", "GetLevel2DataTask onPostExecute list is null  time is " );
         }
     }
 
@@ -621,17 +973,28 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : ViewContactDataTask");
+            Log.i("ss_nw_call", new Date() + " api call : ViewContactDataTask");
             try {
                 // check if package exists or not
                 response = RetrofitClient.getInstance().getApi().viewContactData(cpid, vcpid.getProfileId()).execute().body();
-                if(response !=  null && response.getResult().equalsIgnoreCase("true")){
-                    syncAccountBalance(cpid, activity, null,null, null, false);
-                    updateLoggedInCustomerDetails(activity,mobile);
+                if (response != null && response.getResult() != null && response.getResult().equalsIgnoreCase("true")) {
+                    syncAccountBalance(cpid, activity, null, null, null, false);
+                    updateLoggedInCustomerDetails(activity, mobile);
+
+                    // update view contact data list here
+                    List<Level_1_cardModal> list = LocalCache.getLevel1List(activity);
+                    for(Level_1_cardModal o : list){
+                        if(o.getProfileId().equalsIgnoreCase(vcpid.getProfileId())){
+                            o.setIsViewed("1");
+                            LocalCache.updateLevel1List(o,activity,false);
+                            break;
+                        }
+                    }
+                    LocalCache.setContactviewedMatchesList(false,activity);
                 }
 
             } catch (Exception e) {
-                Log.i("ss_nw_call", "UpdateViewCountTask error" + e.toString());
+                Log.i("ss_nw_call", "UpdateViewCountTask error" + e);
             }
             return null;
         }
@@ -640,35 +1003,41 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "UpdateViewCountTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
-            if(response !=  null && response.getResult().equalsIgnoreCase("true")){
-                ((TextView)activity.findViewById(R.id.address)).setText(vcpid.getAddress());
-                ((TextView)activity.findViewById(R.id.mobile1)).setText(vcpid.getMobile1());
-                ((TextView)activity.findViewById(R.id.mobile2)).setText(vcpid.getMobile2());
-                ((TextView)activity.findViewById(R.id.mobile3)).setText(vcpid.getMobile3());
-                ((TextView)activity.findViewById(R.id.email)).setText(vcpid.getEmail());
-                activity.findViewById(R.id.contactDetailsLayout).setVisibility(View.GONE);
+            if (response != null && response.getResult() != null && response.getResult().equalsIgnoreCase("true")) {
                 activity.findViewById(R.id.viewContactDetailsBtn).setEnabled(false);
                 activity.findViewById(R.id.viewContactDetailsBtn).setVisibility(View.GONE);
-                activity.findViewById(R.id.contact_card).setVisibility(View.VISIBLE);
 
-                if(vcpid.getMobile2().equalsIgnoreCase(""))
-                    activity.findViewById(R.id.call2_link).setVisibility(View.GONE);
-            }
-            else{
-                new BuyMembershipBottomSheetDialog(activity).show(((Level2ProfileActivity)activity).getSupportFragmentManager(), "ModalBottomSheet");
+                if(vcpid.getIsDummy() != null && vcpid.getIsDummy().equalsIgnoreCase("yes")){
+                    activity.findViewById(R.id.marriage_card).setVisibility(View.VISIBLE);
+                }
+                else{
+                    new ViewedContactBottomSheetDialog(activity,vcpid).show(((Level2ProfileActivity)activity).getSupportFragmentManager(), "ViewedContactBottomSheetDialog");
+
+                    //activity.findViewById(R.id.contact_card).setVisibility(View.VISIBLE);
+                    ((TextView) activity.findViewById(R.id.address)).setText(vcpid.getAddress());
+                    ((TextView) activity.findViewById(R.id.mobile1)).setText(vcpid.getMobile1());
+                    ((TextView) activity.findViewById(R.id.mobile2)).setText(vcpid.getMobile2());
+                    ((TextView) activity.findViewById(R.id.mobile3)).setText(vcpid.getMobile3());
+                    ((TextView) activity.findViewById(R.id.email)).setText(vcpid.getEmail());
+                    MediaPlayer.create(activity, R.raw.done_sound).start();
+                }
+
+            } else {
+                ApiCallUtil.addLeads(cpid,vcpid.getProfileId(),"clicked_view_contact_button");
+                Level2ProfileActivity.showBuyMembershipBottomSheet();
             }
 
         }
     }
 
-    public static void syncAccountBalance(String cpid, Activity activity, CardView cb_card,CardView membership_card, TextView cb_text, Boolean flag) {
+    public static void syncAccountBalance(String cpid, Activity activity, CardView cb_card, CardView membership_card, TextView cb_text, Boolean flag) {
         new SyncAccountBalanceTask(cpid, activity, cb_card, membership_card, cb_text, flag).execute();
     }
 
     static class SyncAccountBalanceTask extends AsyncTask<Void, Void, Void> {
 
         String cpid;
-        List<OrderModal> response_list;
+        List<OrderModal> activeOrder;
 
         Activity activity;
         CardView cb_card;
@@ -676,7 +1045,7 @@ public class ApiCallUtil {
         TextView cb_text;
         Boolean flag;
 
-        public SyncAccountBalanceTask(String cpid, Activity activity, CardView cb_card, CardView membership_card,TextView cb_text, Boolean flag) {
+        public SyncAccountBalanceTask(String cpid, Activity activity, CardView cb_card, CardView membership_card, TextView cb_text, Boolean flag) {
             this.cpid = cpid;
             this.activity = activity;
             this.cb_card = cb_card;
@@ -691,9 +1060,9 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : SyncAccountBalanceTask");
+            Log.i("ss_nw_call", new Date() + " api call : SyncAccountBalanceTask");
             try {
-                response_list = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
+                activeOrder = RetrofitClient.getInstance().getApi().getActiveOrderByCpid(cpid).execute().body();
                 LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body(), activity);
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetCountLeftTask error" + e.toString());
@@ -705,30 +1074,40 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             Log.i("ss_nw_call", "GetCountLeftTask onPostExecute calling... ");
             super.onPostExecute(aVoid);
-            if (response_list != null && !response_list.isEmpty()) {
-                LocalCache.setActiveOrder(response_list.get(0), activity);
+            if (activeOrder != null && !activeOrder.isEmpty()) {
+                LocalCache.setActiveOrder(activeOrder.get(0), activity);
                 OrderModal activeOrder = LocalCache.getActiveOrder(activity);
                 if (flag && activeOrder != null && activeOrder.getId() != null) {
-                    int balance = Integer.parseInt(activeOrder.getMaxCount()) - Integer.parseInt(activeOrder.getUsedCount());
                     cb_card.setVisibility(View.VISIBLE);
                     membership_card.setVisibility(View.VISIBLE);
-                    cb_text.setText("Contact Balance : " + balance);
+                    cb_text.setText("Contact Balance : " + activeOrder.getCountRemaining());
                 }
             }
         }
     }
 
-    public static void getEducationList(Activity activity) {
-        new GetEducationListTask(activity).execute();
+    public static void getEducationList(Activity activity, String _gender) {
+        new GetEducationListTask(activity,_gender).execute();
     }
-    static class GetEducationListTask extends AsyncTask<Void, Void, Void> {
+
+    public static void getCityList(Activity activity, String _gender) {
+        new GetCityListTask(activity,_gender).execute();
+    }
+
+    public static void getCasteList(Activity activity, String _gender) {
+        new GetCasteListTask(activity,_gender).execute();
+    }
+
+    static class GetCityListTask extends AsyncTask<Void, Void, Void> {
 
         List<SingleResponse> response_list;
 
         Activity activity;
+        String _gender;
 
-        public GetEducationListTask(Activity activity) {
+        public GetCityListTask(Activity activity,String _gender) {
             this.activity = activity;
+            this._gender = _gender;
         }
 
         @Override
@@ -737,10 +1116,10 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetEducationListTask");
+            Log.i("ss_nw_call", new Date() + " api call : GetCityListTask");
             try {
-                educationApiCalled = true;
-                response_list = RetrofitClient.getInstance().getApi().getAllEducationList().execute().body();
+                cityApiCalled = true;
+                response_list = RetrofitClient.getInstance().getApi().getAllCityList(_gender).execute().body();
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetEducationListTask error" + e.toString());
             }
@@ -750,21 +1129,20 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            LocalCache.setEducationList(response_list,activity);
+            LocalCache.setCityList(response_list, activity);
         }
     }
 
-    public static void getOccupationList(Activity activity) {
-        new GetOccupationListTask(activity).execute();
-    }
-    static class GetOccupationListTask extends AsyncTask<Void, Void, Void> {
+    static class GetCasteListTask extends AsyncTask<Void, Void, Void> {
 
         List<SingleResponse> response_list;
 
         Activity activity;
+        String _gender;
 
-        public GetOccupationListTask(Activity activity) {
+        public GetCasteListTask(Activity activity,String _gender) {
             this.activity = activity;
+            this._gender = _gender;
         }
 
         @Override
@@ -773,10 +1151,88 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetOccupationListTask");
+            Log.i("ss_nw_call", new Date() + " api call : GetEducationListTask");
+            try {
+                casteApiCalled = true;
+                response_list = RetrofitClient.getInstance().getApi().getAllCasteList(_gender).execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "GetEducationListTask error" + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            LocalCache.setCasteList(response_list, activity);
+        }
+    }
+
+    static class GetEducationListTask extends AsyncTask<Void, Void, Void> {
+
+        List<SingleResponse> response_list;
+
+        Activity activity;
+        String _gender;
+
+        public GetEducationListTask(Activity activity,String _gender) {
+            this.activity = activity;
+            this._gender = _gender;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date() + " api call : GetEducationListTask");
+            try {
+                educationApiCalled = true;
+                response_list = RetrofitClient.getInstance().getApi().getAllEducationList(_gender).execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "GetEducationListTask error" + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            LocalCache.setEducationList(response_list, activity);
+        }
+    }
+
+    public static void getOccupationList(Activity activity, String _gender) {
+        new GetOccupationListTask(activity,_gender).execute();
+    }
+
+    public static void getLastnamesList(Activity activity, String _gender) {
+        new GetLastnamesTask(activity,_gender).execute();
+    }
+
+    static class GetOccupationListTask extends AsyncTask<Void, Void, Void> {
+
+        List<SingleResponse> response_list;
+
+        Activity activity;
+         String _gender;
+
+        public GetOccupationListTask(Activity activity, String _gender) {
+            this.activity = activity;
+            this._gender = _gender;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date() + " api call : GetOccupationListTask");
             try {
                 occupationApiCalled = true;
-                response_list = RetrofitClient.getInstance().getApi().getAllOccupationList().execute().body();
+                response_list = RetrofitClient.getInstance().getApi().getAllOccupationList(_gender).execute().body();
             } catch (Exception e) {
                 Log.i("ss_nw_call", "GetOccupationListTask error" + e.toString());
             }
@@ -786,9 +1242,45 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            LocalCache.setOccupationList(response_list , activity);
+            LocalCache.setOccupationList(response_list, activity);
         }
     }
+
+    static class GetLastnamesTask extends AsyncTask<Void, Void, Void> {
+
+        List<SingleResponse> response_list;
+
+        Activity activity;
+        String _gender;
+
+        public GetLastnamesTask(Activity activity,String _gender) {
+            this.activity = activity;
+            this._gender = _gender;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date() + " api call : GetOccupationListTask");
+            try {
+                lastnamesApiCalled = true;
+                response_list = RetrofitClient.getInstance().getApi().getAllLastnamesList(_gender).execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "GetOccupationListTask error" + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            LocalCache.setLastnamesList(response_list, activity);
+        }
+    }
+
 
     public static void addToShortListedProfiles(String cpid, String vcpid) {
         new AddToShortListedProfilesTask(cpid, vcpid).execute();
@@ -830,7 +1322,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : AddToShortListedProfilesTask");
+            Log.i("ss_nw_call", new Date() + " api call : AddToShortListedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToShortListedProfiles(cpid, vcpid).execute().body();
 
@@ -867,7 +1359,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : AddToNotInterestedProfilesTask");
+            Log.i("ss_nw_call", new Date() + " api call : AddToNotInterestedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToNotInterestedProfiles(cpid, vcpid).execute().body();
 
@@ -904,7 +1396,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : AddToInterestedProfilesTask");
+            Log.i("ss_nw_call", new Date() + " api call : AddToInterestedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToInterestedProfiles(cpid, vcpid).execute().body();
 
@@ -941,7 +1433,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : AddToLikedProfilesTask");
+            Log.i("ss_nw_call", new Date() + " api call : AddToLikedProfilesTask");
             try {
                 RetrofitClient.getInstance().getApi().addToLikedProfiles(cpid, vcpid).execute().body();
 
@@ -973,7 +1465,7 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : AddNotificationTask");
+            Log.i("ss_nw_call", new Date() + " api call : AddNotificationTask");
             try {
                 RetrofitClient.getInstance().getApi().addNotification(modal).execute().body();
 
@@ -1019,26 +1511,45 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : SetLoggedInCustomerTask");
+            Log.i("ss_nw_call", new Date() + " api call : SetLoggedInCustomerTask");
             try {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
+
                 LocalCache.setMembershipList(RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body(), activity);
 
-                if(!educationApiCalled)
-                getEducationList(activity);
-                if(!occupationApiCalled)
-                getOccupationList(activity);
+
+
+
+
 
                 if (customer != null && !customer.isEmpty()) {
+                    Log.i("ss_nw_call", "pkg :id " + customer.get(0).getActivepackageid());
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());
                     LocalCache.setLoggedInCustomer(customer.get(0), activity);
 
-
+                    syncAccountBalance(customer.get(0).getProfileId(), activity, null, null, null, false);
                     LocalCache.setContactViewedList(RetrofitClient.getInstance().getApi().getContactViewedProfiles(customer.get(0).getProfileId()).execute().body(), activity);
+
+                    // todo call this only for paid user
+                    String _gender = customer.get(0).getGender() != null && customer.get(0).getGender().equalsIgnoreCase("male") ? "female" : "male";
+                    if(customer.get(0).getActivepackageid() != null){
+                        if (!educationApiCalled)
+                            getEducationList(activity,_gender);
+                        if (!occupationApiCalled)
+                            getOccupationList(activity,_gender);
+                        if (!lastnamesApiCalled)
+                            getLastnamesList(activity,_gender);
+                        if (!cityApiCalled)
+                            getCityList(activity,_gender);
+                        if (!casteApiCalled)
+                            getCasteList(activity,_gender);
+                    }
+
+
 
                 }
             } catch (Exception e) {
-                
+
             }
             return null;
         }
@@ -1075,15 +1586,17 @@ public class ApiCallUtil {
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : UpdateLoggedInCustomerDetailsTask");
+            Log.i("ss_nw_call", new Date() + " api call : UpdateLoggedInCustomerDetailsTask");
             try {
                 customer = RetrofitClient.getInstance().getApi().getCustomerByMobile(mobile).execute().body();
                 if (customer != null && !customer.isEmpty()) {
                     Log.i("local_logs", "SendOtpActivity - saving customer" + new Date());
-                    LocalCache.setLoggedInCustomer(customer.get(0), activity);
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+                        LocalCache.setLoggedInCustomer(customer.get(0), activity);
+                    }
                 }
             } catch (Exception e) {
-                
+
             }
             return null;
         }
@@ -1105,26 +1618,46 @@ public class ApiCallUtil {
         Activity activity;
         TextView no_noti_text;
         RecyclerView recyclerView;
+        String cpid;
 
-        public GetUserNotificationsListTask(Activity activity, Dialog dialog) {
+        Boolean flag = false;
+        Boolean showSingleNotification;
+
+        public GetUserNotificationsListTask(Activity activity, Dialog dialog, String cpid, Boolean showSingleNotification) {
             this.dialog = dialog;
             this.activity = activity;
+            this.cpid = cpid;
+            this.showSingleNotification = showSingleNotification;
+            if(!showSingleNotification){
+                no_noti_text = dialog.findViewById(R.id.no_noti_text);
+                recyclerView = dialog.findViewById(R.id.notificationlistRecyclerview);
+            }
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            no_noti_text = dialog.findViewById(R.id.no_noti_text);
-            recyclerView = dialog.findViewById(R.id.notificationlistRecyclerview);
+            
         }
 
         protected Void doInBackground(Void... params) {
-            Log.i("ss_nw_call", new Date()+" api call : GetUserNotificationsListTask");
+            Log.i("ss_nw_call", new Date() + " api call : GetUserNotificationsListTask");
             try {
-                Customer c = LocalCache.getLoggedInCustomer(activity);
-                notificationsList = RetrofitClient.getInstance().getApi().getUserNotifications(c.getProfileId()).execute().body();
+                if (cpid == null) {
+                    // user flow
+                    Customer c = LocalCache.getLoggedInCustomer(activity);
+                    cpid = c.getProfileId();
+                    notificationsList = RetrofitClient.getInstance().getApi().getUserNotifications(cpid).execute().body();
+                } else{
+                    //admin flow
+                    flag = true;
+                    notificationsList = RetrofitClient.getInstance().getApi().adminByCpid(cpid).execute().body();
+                }
+
+
+
             } catch (Exception e) {
-                
+
             }
             return null;
         }
@@ -1132,16 +1665,124 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (notificationsList != null && !notificationsList.isEmpty()) {
-                NotificationAdapter adapter = new NotificationAdapter(notificationsList, activity, dialog);
+            if(showSingleNotification){
+                if (notificationsList != null && !notificationsList.isEmpty()) {
+                    NotificationModal modal = null ;
+                    for(NotificationModal obj : notificationsList){
+                        if(obj.getIs_viewed().equalsIgnoreCase("0")){
+                            modal = obj;
+                            break;
+                        }
+                    }
+                    if(modal != null){
+                        LinearLayout layout = ((LinearLayout)dialog.findViewById(R.id.notilayout));
+                        Button callbutton = ((Button)dialog.findViewById(R.id.callbutton));
+                        CardView notificationcard = dialog.findViewById(R.id.card);
+                        ((TextView)dialog.findViewById(R.id.notiid)).setText(String.valueOf(modal.getId()));
+                        ((TextView)dialog.findViewById(R.id.vcpid)).setText(String.valueOf(modal.getVcpid()));
+                        ((TextView)dialog.findViewById(R.id.name)).setText(modal.getTitle());
+                        ((TextView)dialog.findViewById(R.id.city)).setText(modal.getCity());
+                        ((TextView)dialog.findViewById(R.id.age)).setText(modal.getAge()+" yrs");
+                        ((Button)dialog.findViewById(R.id.callbutton)).setText("Call "+modal.getClientname());
+                        Glide.with(activity)
+                                .load(modal.getPhoto())
+                                .placeholder(R.drawable.oops)
+                                .into(((ImageView)dialog.findViewById(R.id.photo)));
+
+                        notificationcard.setOnClickListener(view -> {
+                            dialog.dismiss();
+                            ApiCallUtil.addLeads(cpid, ((TextView)dialog.findViewById(R.id.vcpid)).getText().toString().trim(),"clicked_notification_popup_card");
+                            ApiCallUtil.updateViewedNotificationState(((TextView)dialog.findViewById(R.id.notiid)).getText().toString().trim());
+                            ApiCallUtil.redirected_via_home_screen_noti = true;
+                            //ApiCallUtil.getLevel2Data(((TextView)dialog.findViewById(R.id.vcpid)).getText().toString().trim(), activity);
+                            activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                                    .putExtra("level2data", ((TextView)dialog.findViewById(R.id.vcpid)).getText().toString().trim()));
+                        });
+                        callbutton.setOnClickListener(view -> {
+                            dialog.dismiss();
+                            ApiCallUtil.addLeads(cpid, ((TextView)dialog.findViewById(R.id.vcpid)).getText().toString().trim(),"clicked_notification_popup_card");
+                            ApiCallUtil.updateViewedNotificationState(((TextView)dialog.findViewById(R.id.notiid)).getText().toString().trim());
+                            ApiCallUtil.redirected_via_home_screen_noti = true;
+                            //ApiCallUtil.getLevel2Data(((TextView)dialog.findViewById(R.id.vcpid)).getText().toString().trim(), activity);
+                            activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                                    .putExtra("level2data", ((TextView)dialog.findViewById(R.id.vcpid)).getText().toString().trim()));
+
+                        });
+
+                        String color = null;
+                        ObjectAnimator anim = null;
+                        anim = ObjectAnimator.ofInt(callbutton, "backgroundColor", Color.GREEN, Color.YELLOW,Color.WHITE);
+
+                        //linearLayout.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        anim.setDuration(1500);
+                        anim.setEvaluator(new ArgbEvaluator());
+                        anim.setRepeatMode(ValueAnimator.REVERSE);
+                        anim.setRepeatCount(Animation.INFINITE);
+                        anim.start();
+
+                        dialog.setCanceledOnTouchOutside(false);
+                        dialog.setCancelable(false);
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog.show();
+                    }
+                }
+            }
+            else {
+                if (notificationsList != null && !notificationsList.isEmpty()) {
+
+                    NotificationAdapter adapter = new NotificationAdapter(notificationsList, activity, dialog, flag);
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    recyclerView.setVisibility(View.GONE);
+                    no_noti_text.setVisibility(View.VISIBLE);
+                }
+            }
+
+        }
+    }
+
+    static class GetDistinctUserNotificationsTask extends AsyncTask<Void, Void, Void> {
+
+
+        List<Level_1_cardModal> list;
+        Activity activity;
+        RecyclerView recyclerView;
+        AllMembersAdapter adapter;
+
+        public GetDistinctUserNotificationsTask(Activity activity, RecyclerView recyclerView, AllMembersAdapter adapter) {
+            this.activity = activity;
+            this.recyclerView = recyclerView;
+            this.adapter = adapter;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.i("ss_nw_call", new Date() + " api call : GetUserNotificationsListTask");
+            try {
+                list = RetrofitClient.getInstance().getApi().getDistinctUserNotifications().execute().body();
+            } catch (Exception e) {
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (list != null && !list.isEmpty()) {
+                AllMemberActivity.filteredList = list;
+                adapter = new AllMembersAdapter(list, activity, true);
+                AllMemberActivity.adapter = adapter;
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(activity));
                 recyclerView.setAdapter(adapter);
-            } else {
-                recyclerView.setVisibility(View.GONE);
-                no_noti_text.setVisibility(View.VISIBLE);
             }
-
         }
     }
 
@@ -1161,7 +1802,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : UpdateViewedNotificationStateTask");
+                Log.i("ss_nw_call", new Date() + " api call : UpdateViewedNotificationStateTask");
                 RetrofitClient.getInstance().getApi().updateViewedNotificationState(noti_id).execute().body();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -1176,22 +1817,18 @@ public class ApiCallUtil {
         }
     }
 
-    static class GetContactViewedProfilesTask extends AsyncTask<Void, Void, Void> {
+
+    static class AddLeadsTask extends AsyncTask<Void, Void, Void> {
 
 
         String cpid;
-        List<ContactViewedModal> list = new ArrayList<>();
-        ContactViewedAdapter adapter;
-        RecyclerView contactviewedRecyclerView;
-        Activity activity;
-        TextView cv_count;
+        String vcpid;
+        String type;
 
-        public GetContactViewedProfilesTask(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView,TextView cv_count, Activity activity) {
+        public AddLeadsTask(String cpid, String vcpid, String type) {
             this.cpid = cpid;
-            this.adapter = adapter;
-            this.contactviewedRecyclerView = contactviewedRecyclerView;
-            this.activity = activity;
-            this.cv_count = cv_count;
+            this.vcpid = vcpid;
+            this.type = type;
         }
 
         @Override
@@ -1201,7 +1838,129 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : GetContactViewedProfilesTask");
+                Log.i("ss_nw_call", new Date() + " api call : AddLeadsTask");
+                RetrofitClient.getInstance().getApi().addLeads(cpid,vcpid,type).execute().body();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+        }
+    }
+
+    static class UpdateFollowupTask extends AsyncTask<Void, Void, Void> {
+
+
+        String id;
+
+        public UpdateFollowupTask(String noti_id) {
+            this.id = noti_id;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                Log.i("ss_nw_call", new Date() + " api call : UpdateFollowupTask");
+                RetrofitClient.getInstance().getApi().updateFollowup(id).execute().body();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+        }
+    }
+
+    static class GetFollowupsTask extends AsyncTask<Void, Void, Void> {
+
+
+        String cpid;
+
+        Activity activity;
+        List<FollowUpModal> list = null;
+
+        RecyclerView recyclerView;
+
+        public GetFollowupsTask(String cpid, RecyclerView recyclerView, Activity activity) {
+            this.cpid = cpid;
+            this.activity = activity;
+            this.recyclerView = recyclerView;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                Log.i("ss_nw_call", new Date() + " api call : GetFollowupsTask");
+                if (cpid == null) {
+                    // all followups
+                    list = RetrofitClient.getInstance().getApi().getAllFollowUps().execute().body();
+                } else
+                    list = RetrofitClient.getInstance().getApi().getFollowUpByCpid(cpid).execute().body();
+            } catch (Exception e) {
+                Log.i("ss_nw_call", "GetFollowupsTask error : " + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (list != null && !list.isEmpty()) {
+
+                FollowUpAdapter adapter = new FollowUpAdapter(list, activity);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                recyclerView.setAdapter(adapter);
+
+            }
+        }
+    }
+
+    static class GetContactViewedProfilesTask extends AsyncTask<Void, Void, Void> {
+
+
+        String cpid;
+        List<ContactViewedModal> list = new ArrayList<>();
+        ContactViewedAdapter adapter;
+        RecyclerView contactviewedRecyclerView;
+        Activity activity;
+        TextView cv_count;
+        TextView cv_zero;
+
+        public GetContactViewedProfilesTask(String cpid, ContactViewedAdapter adapter, RecyclerView contactviewedRecyclerView, TextView cv_count,TextView cv_zero, Activity activity) {
+            this.cpid = cpid;
+            this.adapter = adapter;
+            this.contactviewedRecyclerView = contactviewedRecyclerView;
+            this.activity = activity;
+            this.cv_count = cv_count;
+            this.cv_zero = cv_zero;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                Log.i("ss_nw_call", new Date() + " api call : GetContactViewedProfilesTask");
                 list = RetrofitClient.getInstance().getApi().getContactViewedProfiles(cpid).execute().body();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -1213,12 +1972,15 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
-                cv_count.setText("Total contacts viewed : "+ list.size());
+                cv_count.setText("Total contacts viewed : " + list.size());
                 adapter = new ContactViewedAdapter(list, activity);
                 contactviewedRecyclerView.setHasFixedSize(true);
                 contactviewedRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
                 contactviewedRecyclerView.setAdapter(adapter);
+                contactviewedRecyclerView.setVisibility(View.VISIBLE);
             }
+            else
+                cv_zero.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1236,13 +1998,15 @@ public class ApiCallUtil {
         Boolean onboardNewUser = false;
 
         Fragment fragment;
+        Boolean isAdmin;
 
-        public RegisterNewCustomerTask(Customer c, Activity activity, Boolean onboardNewUser, Fragment fragment) {
+        public RegisterNewCustomerTask(Customer c, Activity activity, Boolean onboardNewUser, Fragment fragment, Boolean isAdmin) {
             this.c = c;
             this.activity = activity;
             progressBar = activity.findViewById(R.id.progressBar1);
             this.onboardNewUser = onboardNewUser;
             this.fragment = fragment;
+            this.isAdmin = isAdmin;
         }
 
         @Override
@@ -1256,12 +2020,13 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : RegisterNewCustomerTask");
-                persistedCustomerObj = RetrofitClient.getInstance().getApi().registerNewCustomernew(c).execute().body();
-                if(persistedCustomerObj != null){
-                    LocalCache.setLoggedInCustomer(persistedCustomerObj.get(0),activity);
-                    if(onboardNewUser)
-                    ApiCallUtil.cpid = persistedCustomerObj.get(0).getProfileId();
+                Log.i("ss_nw_call", new Date() + " api call : RegisterNewCustomerTask");
+                persistedCustomerObj = RetrofitClient.getInstance().getApi().registerAndGetCustomer(c).execute().body();
+                if (persistedCustomerObj != null) {
+                    if(!isAdmin)
+                    LocalCache.setLoggedInCustomer(persistedCustomerObj.get(0), activity);
+                    if (onboardNewUser)
+                        ApiCallUtil.cpid = persistedCustomerObj.get(0).getProfileId();
                 }
 
             } catch (Exception e) {
@@ -1282,8 +2047,7 @@ public class ApiCallUtil {
                     Intent intent = new Intent(activity, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activity.startActivity(intent);
-                }
-                else{
+                } else {
                     MediaPlayer.create(activity, R.raw.done_sound).start();
                     HelperUtils.showDialog(activity, R.drawable.success_icon, "Profile created !!!", "id : " + persistedCustomerObj.get(0).getProfileId());
                 }
@@ -1328,7 +2092,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : UpdateProfileTask");
+                Log.i("ss_nw_call", new Date() + " api call : UpdateProfileTask");
                 loggedInCustomer = RetrofitClient.getInstance().getApi().updateProfile(c).execute().body();
                 if (updateCache && loggedInCustomer != null && !loggedInCustomer.isEmpty()) {
                     LocalCache.setLoggedInCustomer(loggedInCustomer.get(0), activity);
@@ -1346,6 +2110,8 @@ public class ApiCallUtil {
             if (progressBar != null)
                 progressBar.setVisibility(View.GONE);
             MediaPlayer.create(activity, R.raw.done_sound).start();
+            // setting level2 obj , just to update views
+            ApiCallUtil.editedCustomerProfile = c ;
             activity.onBackPressed();
             if (forceupdate) {
                 Intent intent = new Intent(activity, MainActivity.class);
@@ -1367,9 +2133,9 @@ public class ApiCallUtil {
         String error;
         TextInputEditText mobile1;
 
-        Button savebtn;
+        ExtendedFloatingActionButton savebtn;
 
-        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, Button savebtn) {
+        public ValidateLoginMobileTask(Activity activity, String mobile, LinearLayout formLayout, LinearLayout cmLayout, TextInputEditText mobile1, ExtendedFloatingActionButton savebtn) {
             this.activity = activity;
             this.mobile = mobile;
             this.formLayout = formLayout;
@@ -1385,7 +2151,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : ValidateLoginMobileTask");
+                Log.i("ss_nw_call", new Date() + " api call : ValidateLoginMobileTask");
                 //response = RetrofitClient.getInstance().getApi().isMobileExists(mobile).execute().body();
                 response = RetrofitClient.getInstance().getApi().isMobileExistsAll(mobile).execute().body();
             } catch (Exception e) {
@@ -1404,6 +2170,7 @@ public class ApiCallUtil {
                 } else {
                     // allow registration flow
                     formLayout.setVisibility(View.VISIBLE);
+                    savebtn.setVisibility(View.VISIBLE);
                     mobile1.setText(mobile);
                     mobile1.setEnabled(false);
                     //savebtn.setEnabled(true);
@@ -1433,7 +2200,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : GetAdminPhoneTask");
+                Log.i("ss_nw_call", new Date() + " api call : GetAdminPhoneTask");
                 response = RetrofitClient.getInstance().getApi().getAdminPhone().execute().body();
             } catch (Exception e) {
             }
@@ -1444,7 +2211,7 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (response != null && !response.getResult().equalsIgnoreCase("0"))
-                LocalCache.setAdminPhone(response.getResult(),activity);
+                LocalCache.setAdminPhone(response.getResult(), activity);
         }
     }
 
@@ -1470,7 +2237,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : GetMyMembershipsTask");
+                Log.i("ss_nw_call", new Date() + " api call : GetMyMembershipsTask");
                 list = RetrofitClient.getInstance().getApi().getMyMemberships(cpid).execute().body();
             } catch (Exception e) {
 
@@ -1509,10 +2276,8 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : GetMembershipPlansTask");
-                list = LocalCache.getMembershipList(activity);
-                if (list == null && list.isEmpty())
-                    list = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
+                Log.i("ss_nw_call", new Date() + " api call : GetMembershipPlansTask");
+                list = RetrofitClient.getInstance().getApi().getAllMembershipPlans().execute().body();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1523,6 +2288,8 @@ public class ApiCallUtil {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (list != null && !list.isEmpty()) {
+                LocalCache.setMembershipList(new ArrayList<>(), activity);
+                LocalCache.setMembershipList(list, activity);
                 adapter = new BuyMembershipAdapter(list, activity);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -1554,7 +2321,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : ValidateAdminCodeTask");
+                Log.i("ss_nw_call", new Date() + " api call : ValidateAdminCodeTask");
                 obj = RetrofitClient.getInstance().getApi().getAdminCode().execute().body();
 
             } catch (Exception e) {
@@ -1568,6 +2335,7 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             if (obj != null) {
                 if (inputCode.equalsIgnoreCase(obj.getResult())) {
+                    MediaPlayer.create(activity, R.raw.done_sound).start();
                     d.dismiss();
                     activity.startActivity(new Intent(activity, AdminZoneActivity.class));
                 } else {
@@ -1597,7 +2365,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : CheckIsLiveTask");
+                Log.i("ss_nw_call", new Date() + " api call : CheckIsLiveTask");
                 obj = RetrofitClient.getInstance().getApi().isLive().execute().body();
             } catch (Exception e) {
                 Log.i("local_logs", e.toString());
@@ -1608,11 +2376,10 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if(obj != null){
-                LocalCache.setIsLive(obj.getResult(),activity);
-            }
-            else
-                LocalCache.setIsLive("server error",activity);
+            if (obj != null) {
+                LocalCache.setIsLive(obj.getResult(), activity);
+            } else
+                LocalCache.setIsLive("server error", activity);
 
         }
     }
@@ -1634,7 +2401,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : SyncStatsTask");
+                Log.i("ss_nw_call", new Date() + " api call : SyncStatsTask");
                 list = RetrofitClient.getInstance().getApi().getStats().execute().body();
 
             } catch (Exception e) {
@@ -1648,33 +2415,39 @@ public class ApiCallUtil {
             super.onPostExecute(aVoid);
             if (list != null) {
                 LocalCache.setGenderStat(list, activity);
-                String malecount = "0", femalecount = "0";
-                for (Stat g : list) {
-                    if (g.getGender().equalsIgnoreCase("male"))
-                        malecount = g.getCount();
-                    else if (g.getGender().equalsIgnoreCase("female"))
-                        femalecount = g.getCount();
-                }
-                ((TextView) activity.findViewById(R.id.totalmalecount)).setText(malecount);
-                ((TextView) activity.findViewById(R.id.totalfemalecount)).setText(femalecount);
+
+                Stat stat = list.get(0);
+                ((TextView) activity.findViewById(R.id.totalmalecount)).setText(String.valueOf(stat.getMale()));
+                ((TextView) activity.findViewById(R.id.totalfemalecount)).setText(String.valueOf(stat.getFemale()));
+                ((TextView) activity.findViewById(R.id.malewithphotos)).setText(String.valueOf(stat.getMale_profiles_with_photos()));
+                ((TextView) activity.findViewById(R.id.malewithoutphotos)).setText(String.valueOf(stat.getMale_profiles_without_photos()));
+                ((TextView) activity.findViewById(R.id.femalewithphotos)).setText(String.valueOf(stat.getFemale_profiles_with_photos()));
+                ((TextView) activity.findViewById(R.id.femalewithoutphotos)).setText(String.valueOf(stat.getFemale_profiles_without_photos()));
+                ((TextView) activity.findViewById(R.id.collection)).setText("Rs." + stat.getCollection());
+                ((TextView) activity.findViewById(R.id.paidmembers)).setText(String.valueOf(stat.getPaid_customer()));
+                ((TextView) activity.findViewById(R.id.nonpaidmembers)).setText(String.valueOf(stat.getNon_paid_customer()));
             }
         }
     }
 
-    static class GetFilteredLevel1DataTask extends AsyncTask<Void, Void, Void> {
+
+    static class SearchLevel1DataTask extends AsyncTask<Void, Void, Void> {
 
         Activity activity;
+
         List<Level_1_cardModal> list;
 
         FilterModal filter;
 
         Fragment fragment;
+        Dialog d;
 
 
-        public GetFilteredLevel1DataTask(Activity activity, Fragment fragment, FilterModal filter) {
+        public SearchLevel1DataTask(Activity activity, Fragment fragment, FilterModal filter,Dialog d) {
             this.filter = filter;
             this.activity = activity;
             this.fragment = fragment;
+            this.d = d;
         }
 
         @Override
@@ -1684,8 +2457,8 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : GetFilteredLevel1DataTask");
-                list = RetrofitClient.getInstance().getApi().getFilteredLevel1Profiles(filter).execute().body();
+                Log.i("ss_nw_call", new Date() + " api call : SearchLevel1DataTask");
+                list = RetrofitClient.getInstance().getApi().searchLevel1Profiles(filter).execute().body();
 
             } catch (Exception e) {
                 Log.i("local_logs", e.toString());
@@ -1696,13 +2469,60 @@ public class ApiCallUtil {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            HelperUtils.searchProfileBottomSheetDialog.dismiss();
+            d.dismiss();
             ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
-            if (list != null && !list.isEmpty())
-                LocalCache.setLevel1List(list, activity);
+           /* if (list != null && !list.isEmpty())
+                LocalCache.setLevel1List(list, activity);*/
 
         }
     }
+
+    static class SearchSingleProfileTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+
+        List<Level_1_cardModal> list;
+
+        Fragment fragment;
+
+        FilterModal modal;
+        Dialog d;
+
+
+        public SearchSingleProfileTask(Activity activity, Fragment fragment, FilterModal modal , Dialog d) {
+            this.modal = modal;
+            this.activity = activity;
+            this.fragment = fragment;
+            this.d = d;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+                Log.i("ss_nw_call", new Date() + " api call : SearchSingleProfileTask");
+                list = RetrofitClient.getInstance().getApi().searchLevel1ProfileByCpid(modal).execute().body();
+
+            } catch (Exception e) {
+                Log.i("local_logs", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            d.dismiss();
+            ((HomeFragment) fragment).initLevel_1_CardProfilesRecyclerView(list);
+           /* if (list != null && !list.isEmpty())
+                LocalCache.setLevel1List(list, activity);*/
+
+        }
+    }
+
 
     static class GetFilteredLevel2DataTask extends AsyncTask<Void, Void, Void> {
 
@@ -1732,7 +2552,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : GetFilteredLevel2DataTask");
+                Log.i("ss_nw_call", new Date() + " api call : GetFilteredLevel2DataTask");
                 ProfileExportActivity.temp_level2list = new ArrayList<>();
                 Log.i("local_logs", filter.toString());
                 list = RetrofitClient.getInstance().getApi().getFilteredLevel2Profiles(filter).execute().body();
@@ -1791,7 +2611,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : SearchProfileTask");
+                Log.i("ss_nw_call", new Date() + " api call : SearchProfileTask");
                 if (searchBy.equalsIgnoreCase("profile id"))
                     list = RetrofitClient.getInstance().getApi().getCustomerByCpid(value).execute().body();
                 else if (searchBy.equalsIgnoreCase("mobile"))
@@ -1831,6 +2651,7 @@ public class ApiCallUtil {
         OrderModal orderModal;
 
         SingleResponse response;
+        List<Customer> customer = new ArrayList<>();
 
 
         public AssignMembershipTask(OrderModal orderModal, Activity activity) {
@@ -1845,7 +2666,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : AssignMembershipTask");
+                Log.i("ss_nw_call", new Date() + " api call : AssignMembershipTask");
                 response = RetrofitClient.getInstance().getApi().assignMembership(orderModal).execute().body();
 
             } catch (Exception e) {
@@ -1887,7 +2708,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : DynamicLayoutCreationTask");
+                Log.i("ss_nw_call", new Date() + " api call : DynamicLayoutCreationTask");
                 //activity.runOnUiThread(() -> dynamicLayout(activity,list, v));
                 dynamicLayout(activity, list, v);
 
@@ -1919,7 +2740,7 @@ public class ApiCallUtil {
 
         protected Void doInBackground(Void... params) {
             try {
-                Log.i("ss_nw_call", new Date()+" api call : PersistBitmapTask");
+                Log.i("ss_nw_call", new Date() + " api call : PersistBitmapTask");
                 persistBitmapProcess(activity);
 
             } catch (Exception e) {
@@ -1940,7 +2761,7 @@ public class ApiCallUtil {
 
         try {
             for (Customer obj : list) {
-                createBitmapForViewAsync(v, activity,obj);
+                createBitmapForViewAsync(v, activity, obj);
 
             }
         } catch (Exception e) {
@@ -1951,7 +2772,7 @@ public class ApiCallUtil {
     }
 
     // Function to create the bitmap asynchronously for each view
-    private static void createBitmapForViewAsync(View view, Activity activity,Customer obj) {
+    private static void createBitmapForViewAsync(View view, Activity activity, Customer obj) {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -1973,16 +2794,16 @@ public class ApiCallUtil {
 
     private static void updateExportViewData(View view, Canvas canvas, Bitmap bitmap, Customer obj, Activity activity) {
         Log.i("local_logs", "processing export data for profile " + obj.getProfileId());
-        if(!obj.getB64().isEmpty()){
+        if (!obj.getB64().isEmpty()) {
             Glide.with(activity)
-                    .load(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
-                    .placeholder(HelperUtils.convertBitmapToDrawable(activity,HelperUtils.convertBase64ToBitmap(obj.getB64())))
+                    .load(HelperUtils.convertBitmapToDrawable(activity, HelperUtils.convertBase64ToBitmap(obj.getB64())))
+                    .placeholder(HelperUtils.convertBitmapToDrawable(activity, HelperUtils.convertBase64ToBitmap(obj.getB64())))
                     .into((ImageView) view.findViewById(R.id.profilephotoaddresss));
         }
 
         ((TextView) view.findViewById(R.id.profileid)).setText("Profile id : A" + obj.getProfileId());
         ((TextView) view.findViewById(R.id.name)).setText(obj.getFirstname() + " " + obj.getLastname());
-        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate()+"  ( "+obj.getAge()+" yrs )");
+        ((TextView) view.findViewById(R.id.birthdate)).setText(obj.getBirthdate() + "  ( " + obj.getAge() + " yrs )");
         ((TextView) view.findViewById(R.id.birthtime)).setText(obj.getBirthtime());
         ((TextView) view.findViewById(R.id.birthplace)).setText(obj.getBirthplace());
         ((TextView) view.findViewById(R.id.height)).setText(obj.getHeight());
@@ -2021,8 +2842,8 @@ public class ApiCallUtil {
             try {
                 //((TextView) activity.findViewById(R.id.bitmapCount)).setText("Processing : " + count);
 
-                int percent = (count*100)/blist.size();
-                ((TextView) activity.findViewById(R.id.bitmapCount)).setText(percent+" % completed");
+                int percent = (count * 100) / blist.size();
+                ((TextView) activity.findViewById(R.id.bitmapCount)).setText(percent + " % completed");
                 // Assuming you have a Bitmap object named 'bitmap' containing the generated image
 // and 'obj' is your profile object
 
@@ -2095,7 +2916,158 @@ public class ApiCallUtil {
         }
     }
 
+    public static void fetchAllMembersList(Activity activity, String key, RecyclerView recyclerView, AllMembersAdapter adapter) {
+        AllMemberActivity.filteredList = null;
+        new FetchAllmembersTask(activity, key, recyclerView, adapter).execute();
 
+    }
+
+    static class FetchAllmembersTask extends AsyncTask<Void, Void, Void> {
+
+        List<Level_1_cardModal> list = null;
+        Activity activity;
+        String key;
+        RecyclerView recyclerView;
+        AllMembersAdapter adapter;
+
+        SpinKitView progressBar;
+
+        Circle d = new Circle();
+
+        public FetchAllmembersTask(Activity activity, String key, RecyclerView recyclerView, AllMembersAdapter adapter) {
+            this.activity = activity;
+            this.key = key;
+            this.recyclerView = recyclerView;
+            this.adapter = adapter;
+            progressBar = activity.findViewById(R.id.progressBar1);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setIndeterminateDrawable(d);
+        }
+
+        protected Void doInBackground(Void... params) {
+            try {
+
+                Log.i("ss_nw_call", new Date() + " api call : FetchAllmembersTask");
+                list = RetrofitClient.getInstance().getApi().getAllCustomerProfilesByFilter(key).execute().body();
+
+            } catch (Exception e) {
+                Log.i("local_logs", "FetchAllmembersTask " + e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressBar.setVisibility(View.GONE);
+            if (list != null) {
+
+                AllMemberActivity.filteredList = list;
+                recyclerView = activity.findViewById(R.id.allmembersrecyclerview);
+                Boolean flag = key.equalsIgnoreCase("allpaidmembers") || key.equalsIgnoreCase("allnonpaidmembers") ? true : false;
+                adapter = new AllMembersAdapter(list, activity, flag);
+                AllMemberActivity.adapter = adapter;
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+                recyclerView.setAdapter(adapter);
+            }
+        }
+    }
+
+    public static void sendSmsFunction(Activity activity, List<SmsModal> list) {
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.SEND_SMS}, 1);
+            return;
+        } else {
+            /*sendSmsButton.setVisibility(View.GONE);
+            smsCountLayout.setVisibility(View.GONE);*/
+            new SendSmsFunctionTask(activity, list).execute();
+        }
+    }
+
+    private static class SendSmsFunctionTask extends AsyncTask<String, String, String> {
+        Activity activity;
+        List<SmsModal> list;
+        PendingIntent sentPI;
+        SmsManager sms = SmsManager.getDefault();
+
+        public SendSmsFunctionTask(Activity activity, List<SmsModal> list) {
+            this.activity = activity;
+            this.list = list;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                Log.i("local_logs", "SendSmsFunctionTask sending sms started");
+
+                for (SmsModal obj : list) {
+                    sentPI = PendingIntent.getBroadcast(activity.getApplicationContext(), 0, new Intent("SMS_SENT").setAction(Long.toString(System.currentTimeMillis())), PendingIntent.FLAG_IMMUTABLE);
+                    sms.sendTextMessage(obj.getMobile(), null, obj.getMessage(), sentPI, null);
+                    Log.i("local_logs", "SendSmsFunctionTask sending sms : \nmobile : " + obj.getMobile() + "\nmessage : " + obj.getMessage());
+                }
+
+            } catch (Exception e) {
+                Log.i("local_logs", "SendSmsFunctionTask sending eror : " + e);
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            /*Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    hidepDialog();
+                }
+            }, 4000);*/
+        }
+    }
+
+    private static void initiateViewContactFlow(Activity activity, String vcpid) {
+        Customer loggedinCustomer = LocalCache.getLoggedInCustomer(activity);
+
+        // check if package exist or not
+        if (loggedinCustomer.getActivepackageid() == null ) {
+            Log.i("ss_nw_call", "View contact : pkg id is null");
+            Level2ProfileActivity.showBuyMembershipBottomSheet();
+        }
+        else if(LocalCache.getActiveOrder(activity) != null && LocalCache.getActiveOrder(activity).getCountRemaining() <= 0 ){
+            Log.i("ss_nw_call", "Balance left : "+LocalCache.getActiveOrder(activity).getCountRemaining());
+            Level2ProfileActivity.showBuyMembershipBottomSheet();
+        }else {
+            //ApiCallUtil.getLevel2Data(vcpid, activity);
+            activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                    .putExtra("level2data", vcpid));
+        }
+    }
+
+    public static void sendSMS(Activity activity, String mobile, String message) {
+
+        try {
+            SmsManager sms = SmsManager.getDefault();
+            PendingIntent sentPI;
+            String SENT = "SMS_SENT";
+            sentPI = PendingIntent.getBroadcast(activity.getApplicationContext(), 0,new Intent(SENT), PendingIntent.FLAG_IMMUTABLE);
+            sms.sendTextMessage(mobile, null, message, sentPI, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(activity, "SMS sending failed", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
 }

@@ -1,7 +1,13 @@
 package com.sdgvvk.v1.adapters;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +19,19 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.activity.AllMemberActivity;
+import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.HelperUtils;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
-import com.mikhaellopez.circularimageview.CircularImageView;
+import com.sdgvvk.v1.ui.ActionBottomSheetDialog;
 
 import java.util.List;
 
@@ -28,10 +42,12 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
 
     Activity activity;
 
+    Boolean flag;
 
-    public AllMembersAdapter(List<Level_1_cardModal> itemList, Activity activity) {
+    public AllMembersAdapter(List<Level_1_cardModal> itemList, Activity activity, Boolean flag) {
         mItemList = itemList;
         this.activity = activity;
+        this.flag = flag;
     }
 
     // Based on the View type we are instantiating the
@@ -52,14 +68,45 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
         final Level_1_cardModal obj = mItemList.get(position);
         if (obj != null) {
 
-            holder.name.setText(obj.getFirstname()+" "+obj.getLastname());
-            holder.cpid.setText(obj.getProfileId());
-            Glide.with(activity)
-                    .load(obj.getProfilephotoaddress())
-                    .placeholder(R.drawable.oops)
-                    .into(holder.photo);
+            if(obj.getNoticount() != null && !obj.getNoticount().isEmpty()){
+                holder.actionLink.setVisibility(View.GONE);
+                holder.noticard.setVisibility(View.VISIBLE);
+                holder.notitext.setText(String.valueOf(obj.getNoticount()));
 
-            holder.name.setOnClickListener(view -> ApiCallUtil.getLevel2Data(obj.getProfileId(), activity));
+                holder.call.setVisibility(View.VISIBLE);
+                holder.deleteprofile.setVisibility(View.GONE);
+            }
+            else{
+                holder.actionLink.setVisibility(View.VISIBLE);
+                holder.noticard.setVisibility(View.GONE);
+
+                holder.call.setVisibility(View.GONE);
+                holder.deleteprofile.setVisibility(View.VISIBLE);
+            }
+
+            if(obj.getFollowup_flag() != null && obj.getFollowup_flag().equalsIgnoreCase("1")){
+                holder.card.setCardBackgroundColor(Color.YELLOW);
+            }
+            else
+                holder.card.setCardBackgroundColor(Color.WHITE);
+
+            holder.creationDate.setText("created on : "+obj.getCreationdate());
+            holder.name.setText(obj.getName());
+            holder.cpid.setText(obj.getProfileId());
+            if(flag || (obj.getProfilephotoaddress() != null && !obj.getProfilephotoaddress().isEmpty())){
+                Glide.with(activity)
+                        .load(obj.getProfilephotoaddress())
+                        .placeholder(R.drawable.oops)
+                        .into(holder.photo);
+            }
+            else{
+                if(!flag)
+                holder.photo.setVisibility(View.GONE);
+            }
+
+
+            holder.card.setOnClickListener(view -> activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                    .putExtra("level2data", obj.getProfileId())));
 
             holder.deleteprofile.setOnClickListener(view -> {
                 DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
@@ -84,6 +131,42 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
                         .setPositiveButton("yes", dialogClickListener)
                         .setNegativeButton("no", dialogClickListener).show();
             });
+
+            holder.actionLink.setOnClickListener(view ->
+                    new ActionBottomSheetDialog(activity,obj,holder.card).show(((AllMemberActivity)activity).getSupportFragmentManager(), "ActionBottomSheetDialog")
+            );
+            holder.noticard.setOnClickListener(view -> {
+                Dialog d = new Dialog(activity);
+                d.setContentView(R.layout.notificationlist_dialog);
+
+                d.setContentView(R.layout.notificationlist_dialog);
+                ApiCallUtil.getUserNotifications(activity, d,obj.getProfileId(), false);
+
+                d.setCanceledOnTouchOutside(true);
+                d.setCancelable(true);
+                d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                d.show();
+            });
+
+            holder.call.setOnClickListener(view -> Dexter.withActivity(activity)
+                    .withPermissions(Manifest.permission.CALL_PHONE)
+                    .withListener(new MultiplePermissionsListener() {
+                        @Override
+                        public void onPermissionsChecked(MultiplePermissionsReport report) {
+                            if (report.areAllPermissionsGranted()) {
+                                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                callIntent.setData(Uri.parse("tel:+91" + obj.getMobile().toString().trim()));
+                                activity.startActivity(callIntent);
+                            }
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                            token.continuePermissionRequest();
+                        }
+                    }).check());
+
+
         }
     }
 
@@ -94,11 +177,11 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView name,cpid;
+        public TextView name,cpid,creationDate,notitext;
         CircularImageView photo;
-        ImageView deleteprofile;
+        ImageView deleteprofile,actionLink,call;
 
-        CardView card;
+        CardView card,noticard;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -107,6 +190,11 @@ public class AllMembersAdapter extends RecyclerView.Adapter<AllMembersAdapter.Vi
             this.photo = itemView.findViewById(R.id.photo);
             this.card= itemView.findViewById(R.id.card);
             this.deleteprofile= itemView.findViewById(R.id.deleteprofile);
+            this.actionLink= itemView.findViewById(R.id.actionLink);
+            this.creationDate= itemView.findViewById(R.id.creationDate);
+            this.noticard= itemView.findViewById(R.id.noticard);
+            this.notitext= itemView.findViewById(R.id.notitext);
+            this.call= itemView.findViewById(R.id.call);
 
         }
     }

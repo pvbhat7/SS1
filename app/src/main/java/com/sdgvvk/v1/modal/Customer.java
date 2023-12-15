@@ -34,6 +34,10 @@ public class Customer {
     private String property;
     private String fathername;
     private String mothername;
+
+    private String brother;
+
+    private String sister;
     private String address;
     private String city;
     private String state;
@@ -66,8 +70,9 @@ public class Customer {
 
     private String is_verified;
 
+    private String createdBy;
 
-
+    private String isNoticeAvailable;
     public Customer(){
 
     }
@@ -105,12 +110,11 @@ public class Customer {
                     String mobile1, String mobile2,String mobile3, String mobile4, String gender, String height,
                     String birthtime, String caste,String religion, String education, String occupation,
                     String zodiac, String birthName, String bloodGroup, String property,
-                    String fatherName, String motherName, String address, String city,
+                    String fatherName, String motherName, String brother ,String sister , String address, String city,
                     String marriageStatus, String birthdate, String birthplace,
                     String income, String kuldaivat, String devak, String nakshatra, String nadi,
                     String gan, String yoni, String charan, String gotra, String varn,
-                    String mangal, String expectations,String relation1, String relation2,
-                    String relationname1, String relationname2, String relatives,String family) {
+                    String mangal, String expectations,String relatives,String family) {
         this.creationsource = creationSource;
         this.profilephotoaddress = profilePhotoAddress;
         this.biodataaddress = biodataAddress;
@@ -135,6 +139,8 @@ public class Customer {
         this.property = property;
         this.fathername = fatherName;
         this.mothername = motherName;
+        this.brother = brother;
+        this.sister = sister;
         this.address = address;
         this.city = city;
         this.marriagestatus = marriageStatus;
@@ -624,5 +630,37 @@ public class Customer {
 
     public void setAge(String age) {
         this.age = age;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getIsNoticeAvailable() {
+        return isNoticeAvailable;
+    }
+
+    public void setIsNoticeAvailable(String isNoticeAvailable) {
+        this.isNoticeAvailable = isNoticeAvailable;
+    }
+
+    public String getBrother() {
+        return brother;
+    }
+
+    public void setBrother(String brother) {
+        this.brother = brother;
+    }
+
+    public String getSister() {
+        return sister;
+    }
+
+    public void setSister(String sister) {
+        this.sister = sister;
     }
 }

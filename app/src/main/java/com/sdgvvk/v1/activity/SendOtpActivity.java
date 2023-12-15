@@ -1,7 +1,6 @@
 package com.sdgvvk.v1.activity;
 
 import static com.google.android.material.internal.ViewUtils.hideKeyboard;
-import static com.google.android.material.internal.ViewUtils.showKeyboard;
 
 import android.Manifest;
 import android.app.Activity;
@@ -25,12 +24,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.android.gms.auth.api.phone.SmsRetriever;
+import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.appupdate.AppUpdateOptions;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -38,21 +46,16 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.MainActivity;
+import com.sdgvvk.v1.ProjectConstants;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.HelperUtils;
-import com.github.ybq.android.spinkit.SpinKitView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthProvider;
+import com.sdgvvk.v1.modal.Customer;
+import com.sdgvvk.v1.modal.CustomerActivityModal;
+import com.sdgvvk.v1.modal.OrderModal;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class SendOtpActivity extends AppCompatActivity {
 
@@ -70,6 +73,11 @@ public class SendOtpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_otp);
+        if(getIntent().getExtras() != null){
+            if(getIntent().getExtras().get(ProjectConstants.TARGET_CLASS) != null){
+                Log.i("ss_nw_call", "targetclass : "+(String)getIntent().getExtras().get(ProjectConstants.TARGET_CLASS));
+            }
+        }
         activity = this;
         handleOnClickListeners();
         //test_flow();
@@ -156,13 +164,36 @@ public class SendOtpActivity extends AppCompatActivity {
                 boxCard.setVisibility(View.GONE);
                 Log.i("local_logs", "SendOtpActivity - onCreate called");
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    Log.i("local_logs", "SendOtpActivity - checking firebase logged in codition");
-                    // checking if user is registered in firebase
-                    ApiCallUtil.setLoggedInCustomer(this,user.getPhoneNumber().replace("+91",""), progressBar);
+
+                    // handle notification flow
+                    if(ApiCallUtil.noti_target_class != null){
+                        if(ApiCallUtil.noti_target_class.equalsIgnoreCase("Level2ProfileActivity")){
+                            ApiCallUtil.redirected_via_notification = true;
+                            String cpid = ApiCallUtil.noti_target_cpid;
+                            ApiCallUtil.noti_target_cpid = null;
+                            ApiCallUtil.noti_target_class = null;
+                            //ApiCallUtil.getLevel2Data(cpid, activity);
+                            activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                                    .putExtra("level2data", cpid));
+                        }
+                        else if(ApiCallUtil.noti_target_class.equalsIgnoreCase("NotificationActivity")){
+                            startActivity(new Intent(activity, NotificationActivity.class));
+                        }
+                    }else{
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        Log.i("local_logs", "SendOtpActivity - checking firebase logged in codition");
+                        // checking if user is registered in firebase
+                        ApiCallUtil.setLoggedInCustomer(this,user.getPhoneNumber().replace("+91",""), progressBar);
+                    }
+
+
                 }
-                else
+                else{
+                    askPermission();
                     boxCard.setVisibility(View.VISIBLE);
+
+                }
+
             }
             else{
                 // logout flow
@@ -178,7 +209,9 @@ public class SendOtpActivity extends AppCompatActivity {
             errorbox.setVisibility(View.VISIBLE);
             contactsupportbtn.setVisibility(View.VISIBLE);
             errorTxt.setText(isLive != null ? isLive : "server error");
-            findViewById(R.id.inputMobile).setEnabled(false);
+            TextInputEditText in = findViewById(R.id.inputMobile);
+            if(in != null)
+                in.setEnabled(false);
 
             contactsupportbtn.setOnClickListener(view -> Dexter.withActivity(this)
                     .withPermissions(Manifest.permission.CALL_PHONE)
@@ -226,10 +259,13 @@ public class SendOtpActivity extends AppCompatActivity {
         });
 
         buttonGetOtp.setOnClickListener(view -> {
+            startSmsRetriever();
             hideKeyboard(view);
             if (!HelperUtils.isConnected(this)) {
                 Toast.makeText(SendOtpActivity.this, "NO INTERNET", Toast.LENGTH_SHORT).show();
             } else {
+                activity.findViewById(R.id.buttonGetOtp).setVisibility(View.GONE);
+                showProgressBar();
                 ApiCallUtil.CheckAccountStatus(this,inputMobile.getText().toString());
             }
         });
@@ -258,31 +294,28 @@ public class SendOtpActivity extends AppCompatActivity {
 
     public void signInWIthPhoneAuthCredentials(PhoneAuthCredential phoneAuthCredential) {
         FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        /*progressBar.setVisibility(View.GONE);
-                        buttonVerify.setVisibility(View.INVISIBLE);*/
-                        if (task.isSuccessful()) {
-                            // register user to api server
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            //CustomProgressDialog pb = new CustomProgressDialog(SendOtpActivity.this, "");
-                            showProgressBar();
-                            // TODO: 03-Sep-23
-                            //ApiUtils.initClientAppData(getApplicationContext(), user, SendOtpActivity.this);
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    hideProgressBar();
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
-                                }
-                            }, 2000);
-                        } else {
-                            Toast.makeText(SendOtpActivity.this, "Invalid otp entered", Toast.LENGTH_SHORT).show();
-                            //buttonVerify.setVisibility(View.VISIBLE);
-                        }
+                .addOnCompleteListener(task -> {
+                    /*progressBar.setVisibility(View.GONE);
+                    buttonVerify.setVisibility(View.INVISIBLE);*/
+                    if (task.isSuccessful()) {
+                        // register user to api server
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        //CustomProgressDialog pb = new CustomProgressDialog(SendOtpActivity.this, "");
+                        showProgressBar();
+
+                        //ApiUtils.initClientAppData(getApplicationContext(), user, SendOtpActivity.this);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                hideProgressBar();
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            }
+                        }, 2000);
+                    } else {
+                        Toast.makeText(SendOtpActivity.this, "Invalid otp entered", Toast.LENGTH_SHORT).show();
+                        //buttonVerify.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -331,4 +364,36 @@ public class SendOtpActivity extends AppCompatActivity {
         }
 
     }
+
+    private void askPermission() {
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.RECEIVE_SMS)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+    }
+
+    private void startSmsRetriever() {
+        SmsRetrieverClient client = SmsRetriever.getClient(this /* context */);
+
+        Task<Void> task = client.startSmsRetriever();
+
+        task.addOnSuccessListener(aVoid -> {
+            // SMS retrieval successfully started
+            Log.i("ss_nw_call", "verify otp : startSmsRetriever addOnSuccessListener");
+        });
+
+        task.addOnFailureListener(e -> Log.i("ss_nw_call", "verify otp : startSmsRetriever addOnFailureListener"));
+    }
+
+
 }

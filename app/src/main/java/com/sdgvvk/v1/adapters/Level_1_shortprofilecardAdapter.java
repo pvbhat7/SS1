@@ -1,6 +1,7 @@
 package com.sdgvvk.v1.adapters;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -92,7 +94,9 @@ public class Level_1_shortprofilecardAdapter extends RecyclerView.Adapter<Recycl
                     .into(holder.profilephoto);
 
             holder.level1short_cardview.setOnClickListener(view -> {
-                ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
+                //ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
+                activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                        .putExtra("level2data", obj.getProfileId()));
             });
         }
     }

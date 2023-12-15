@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Level_2_Modal {
 
+    private String isDummy;
     private String b64;
     private Boolean isContactViewed;
     private String profileId;
@@ -36,6 +37,10 @@ public class Level_2_Modal {
     private String property;
     private String fathername;
     private String mothername;
+
+    private String brother;
+
+    private String sister;
     private String address;
     private String city;
     private String state;
@@ -476,5 +481,83 @@ public class Level_2_Modal {
 
     public void setB64(String b64) {
         this.b64 = b64;
+    }
+
+    public String getIsDummy() {
+        return isDummy;
+    }
+
+    public void setIsDummy(String isDummy) {
+        this.isDummy = isDummy;
+    }
+
+    public void copyFromCustomer(Customer customer) {
+        this.profileId = customer.getProfileId();
+        this.firstname = customer.getFirstname();
+        this.lastname = customer.getLastname();
+        this.email = customer.getEmail();
+        this.mobile1 = customer.getMobile1();
+        this.mobile2 = customer.getMobile2();
+        this.mobile3 = customer.getMobile3();
+        this.mobile4 = customer.getMobile4();
+        this.gender = customer.getGender();
+        this.creationdate = customer.getCreationdate();
+        this.creationsource = customer.getCreationsource();
+        this.discontinue = customer.getDiscontinue();
+        this.activepackageid = customer.getActivepackageid();
+        this.profilephotoaddress = customer.getProfilephotoaddress();
+        this.b64 = customer.getB64();
+        this.biodataaddress = customer.getBiodataaddress();
+        this.height = customer.getHeight();
+        this.birthtime = customer.getBirthtime();
+        this.caste = customer.getCaste();
+        this.religion = customer.getReligion();
+        this.education = customer.getEducation();
+        this.occupation = customer.getOccupation();
+        this.zodiac = customer.getZodiac();
+        this.birthname = customer.getBirthname();
+        this.bloodgroup = customer.getBloodgroup();
+        this.property = customer.getProperty();
+        this.fathername = customer.getFathername();
+        this.mothername = customer.getMothername();
+        this.brother = customer.getBrother();
+        this.sister = customer.getSister();
+        this.address = customer.getAddress();
+        this.city = customer.getCity();
+        this.state = customer.getState();
+        this.marriagestatus = customer.getMarriagestatus();
+        this.birthdate = customer.getBirthdate();
+        this.birthday = customer.getBirthday();
+        this.birthplace = customer.getBirthplace();
+        this.income = customer.getIncome();
+        this.kuldaivat = customer.getKuldaivat();
+        this.devak = customer.getDevak();
+        this.nakshatra = customer.getNakshatra();
+        this.nadi = customer.getNadi();
+        this.gan = customer.getGan();
+        this.yoni = customer.getYoni();
+        this.charan = customer.getCharan();
+        this.gotra = customer.getGotra();
+        this.varn = customer.getVarn();
+        this.mangal = customer.getMangal();
+        this.relatives = customer.getRelatives();
+        this.family = customer.getFamily();
+        this.expectations = customer.getExpectations();
+    }
+
+    public String getBrother() {
+        return brother;
+    }
+
+    public void setBrother(String brother) {
+        this.brother = brother;
+    }
+
+    public String getSister() {
+        return sister;
+    }
+
+    public void setSister(String sister) {
+        this.sister = sister;
     }
 }

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    android:id="@+id/resultCard"
+    android:clickable="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="20dp"
+    android:layout_margin="10dp">
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="false"
+        android:orientation="vertical"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content">
+        <androidx.cardview.widget.CardView
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:id="@+id/menu_shortlistedByYou"
+            android:clickable="true"
+            app:cardCornerRadius="40dp"
+            android:layout_width="match_parent"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_height="40dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:src="@drawable/appicon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"/>
+                <TextView
+                    android:gravity="center_vertical"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/appname"
+                    android:layout_width="fill_parent"/>
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+         <ImageView
+             android:id="@+id/img"
+             android:clickable="false"
+             android:layout_marginTop="20dp"
+             android:layout_marginBottom="2dp"
+             android:layout_gravity="right"
+             android:src="@drawable/oops"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"/>
+        <!--<com.github.chrisbanes.photoview.PhotoView
+            android:scaleType="centerCrop"
+            android:id="@+id/imageView"
+            android:layout_width="300dp"
+            android:layout_height="500dp" />-->
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

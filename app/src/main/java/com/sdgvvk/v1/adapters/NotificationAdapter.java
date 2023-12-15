@@ -2,6 +2,7 @@ package com.sdgvvk.v1.adapters;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,11 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.modal.NotificationModal;
-import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.List;
 
@@ -29,12 +31,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     Activity activity;
     Dialog dialog;
+    Boolean flag;
 
-
-    public NotificationAdapter(List<NotificationModal> itemList, Activity activity, Dialog dialog) {
+    public NotificationAdapter(List<NotificationModal> itemList, Activity activity, Dialog dialog, Boolean flag) {
         mItemList = itemList;
         this.activity = activity;
         this.dialog = dialog;
+        this.flag = flag;
     }
 
     // Based on the View type we are instantiating the
@@ -54,7 +57,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(NotificationAdapter.ViewHolder holder, int position) {
         final NotificationModal obj = mItemList.get(position);
         if (obj != null) {
-            holder.notilist_title.setText(obj.getTitle());
+            if (flag) {
+                String tit = "";
+                if (obj.getTitle().contains("liked your profile"))
+                    tit = obj.getTitle().replace("your", "");
+                else if (obj.getTitle().contains("you"))
+                    tit = obj.getTitle().replace("you", "");
+
+                String[] arr = tit.split(" ");
+                String title_ = arr[1] + " " + arr[0] + " " + arr[3];
+
+                holder.notilist_title.setText(title_);
+            } else
+                holder.notilist_title.setText(obj.getTitle());
             holder.notilist_time.setText(obj.getTime());
             Glide.with(activity)
                     .load(obj.getPhoto())
@@ -64,12 +79,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     .load(obj.getIs_viewed().equalsIgnoreCase("1") ? R.drawable.bluetick : R.drawable.graytick)
                     .into(holder.tickimg);
 
+
             holder.noti_card.setOnClickListener(view -> {
-                if (obj.getIs_viewed().equalsIgnoreCase("0"))
-                    ApiCallUtil.updateViewedNotificationState(String.valueOf(obj.getId()));
-                dialog.dismiss();
-                ApiCallUtil.getLevel2Data(obj.getVcpid(), activity);
+                if (!flag) {
+                    if (obj.getIs_viewed().equalsIgnoreCase("0"))
+                        ApiCallUtil.updateViewedNotificationState(String.valueOf(obj.getId()));
+                    dialog.dismiss();
+                }
+
+                activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                        .putExtra("level2data", obj.getVcpid()));
+
             });
+
 
         }
     }

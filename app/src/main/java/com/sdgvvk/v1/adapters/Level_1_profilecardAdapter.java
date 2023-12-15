@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,7 +117,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
         if (obj != null) {
             try {
 
-                if(obj.getIsAdmin().equalsIgnoreCase("999")){
+                // notification notice if present then isadmin = 999
+                if(obj.getIsAdmin() != null && obj.getIsAdmin().equalsIgnoreCase("999")){
                     holder.level1_cardview.setVisibility(View.GONE);
                     holder.notification_cardview.setVisibility(View.VISIBLE);
 
@@ -186,7 +188,10 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
                     Date dob ;
                     dob = new SimpleDateFormat("dd/MM/yyyy").parse(obj.getDob());
                     int daysleft = DateApi.daysDiff(new Date(), dob);
-                    holder.age.setText(Math.abs(daysleft) / 365 + " yrs");
+                    //holder.age.setText(Math.abs(daysleft) / 365 + " yrs , Kolhapur");
+                    String age = Math.abs(daysleft) / 365 + " yrs";
+                    String city = obj.getCity() != null ? " , "+obj.getCity() : "";
+                    holder.age.setText(age+city);
 
 
                     // photo
@@ -222,8 +227,13 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
 
 
                     holder.profilephoto.setOnClickListener(view -> {
+                        Log.i("ss_nw_call", "performance : level 1 card clicked ");
                         ApiCallUtil.clicked_level2activity = true;
-                        ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
+                        ApiCallUtil.addLeads(customer.getProfileId(), obj.getProfileId(),"clicked_level1_profile_card");
+
+
+                        activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                                .putExtra("level2data", obj.getProfileId()));
                     /*if(customer.getIs_verified() != null && customer.getIs_verified().equalsIgnoreCase("2"))
                     ApiCallUtil.getLevel2Data(obj.getProfileId(), activity);
                     else
@@ -312,8 +322,9 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
     private void handleActionClick(Activity activity, ItemViewHolder holder, Fragment fragment, Level_1_cardModal obj, int position, String action) {
         Customer customer = LocalCache.getLoggedInCustomer(activity);
         HelperUtils.vibrateFunction(activity);
-
         if (action.equalsIgnoreCase(ProjectConstants.LIKE)) {
+            obj.setIsLiked("1");
+            LocalCache.updateLevel1List(obj,activity, false);
             Glide.with(activity)
                     .load(R.drawable.redheart)
                     .placeholder(R.drawable.whiteheart)
@@ -324,6 +335,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addToLikedProfiles(customer.getProfileId(), obj.getProfileId());
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_LIKE_PROFILE));
         } else if (action.equalsIgnoreCase(ProjectConstants.SHORTLIST)) {
+            obj.setIsShortlisted("1");
+            LocalCache.updateLevel1List(obj,activity, false);
             HelperUtils.vibrateFunction(activity);
             Glide.with(activity)
                     .load(R.drawable.star_golden)
@@ -335,6 +348,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addToShortListedProfiles(customer.getProfileId(), obj.getProfileId());
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_SHORTLIST_PROFILE));
         } else if (action.equalsIgnoreCase(ProjectConstants.SEND_INTEREST)) {
+            obj.setIsInterestsent("1");
+            LocalCache.updateLevel1List(obj,activity, false);
             HelperUtils.vibrateFunction(activity);
             Glide.with(activity)
                     .load(R.drawable.interestsent)
@@ -346,7 +361,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addToInterestedProfiles(customer.getProfileId(), obj.getProfileId());
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_SEND_INTEREST));
         } else if (action.equalsIgnoreCase(ProjectConstants.IGNORE)) {
-            ((HomeFragment) fragment).showSnackBar("Profile removed");
+            //((HomeFragment) fragment).showSnackBar("Profile removed");
+            LocalCache.updateLevel1List(obj,activity,true);
             HelperUtils.vibrateFunction(activity);
             mItemList.remove(position);
             notifyDataSetChanged();
@@ -354,6 +370,8 @@ public class Level_1_profilecardAdapter extends RecyclerView.Adapter<RecyclerVie
             ApiCallUtil.addNotification(new NotificationModal(customer.getProfileId(),obj.getProfileId(),ProjectConstants.ACTION_IGNORE_PROFILE));
             ApiCallUtil.getAllProfiles(customer.getProfileId(),fragment, sprogressBar,activity,true);
         }
+
+        ApiCallUtil.syncUserActivity(customer.getProfileId(),activity);
     }
 
     public void updateList(List<Level_1_cardModal> list){

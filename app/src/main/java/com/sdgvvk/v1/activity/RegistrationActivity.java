@@ -26,7 +26,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -35,16 +34,17 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.internal.ViewUtils;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.HelperUtils;
 import com.sdgvvk.v1.modal.Customer;
-import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.internal.ViewUtils;
-import com.google.android.material.textfield.TextInputEditText;
-import com.mikhaellopez.circularimageview.CircularImageView;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -65,13 +65,15 @@ public class RegistrationActivity extends AppCompatActivity {
     public SpinKitView progressBar ;
     public static String fileName;
 
-    public TextInputEditText income,cmmobile, email, name, birthname, fathername, birthdate,occupation, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relationname1, relationname2, relatives, family;
+    public TextInputEditText income,cmmobile, email, name, birthname, fathername,brother,sister, birthdate,occupation, mothername, mobile1, mobile2, mobile3, mobile4, education, caste, property, address, kuldaivat, devak, nakshatra, nadi, gan, yoni, charan, gotra, varn, mangal, expectations, relatives, family;
     public AutoCompleteTextView gender, bloodgroup, marriagestatus, height, religion, zodiac, city, birthplace, hour, minute, ampm;
 
     static String clickedImagename, profilePhotoAddressBase64, biodataAddressBase64;
 
     public static final int PICK_IMAGE_REQUEST = 1;
-    Button save_btn, cancel_btn, cmbtn;
+    Button cmbtn;
+
+    ExtendedFloatingActionButton save_btn;
     LinearLayout formLayout, cmlayout;
     CircularImageView profilePhotoAddress, biodataAddress;
 
@@ -85,10 +87,18 @@ public class RegistrationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.i("ss_nw_call", "performance : onCreate top ");
         Log.i("ss_nw_call", new Date()+"lifecycle : RegistrationActivity oncreate");
+        Log.i("ss_nw_call", "performance : super.onCreate start ");
         super.onCreate(savedInstanceState);
+        Log.i("ss_nw_call", "performance : super.onCreate end ");
+        Log.i("ss_nw_call", "performance : setContentView start ");
         setContentView(R.layout.activity_registration);
+        Log.i("ss_nw_call", "performance : setContentView end ");
         init();
+
+      /*  ShimmerFrameLayout s1 = findViewById(R.id.s1);
+        s1.startShimmer();*/
 
         loggedincustomer = LocalCache.getLoggedInCustomer(this);
 
@@ -98,15 +108,17 @@ public class RegistrationActivity extends AppCompatActivity {
             forceupdate = extras.getBoolean("forceupdate");
             onboarding = extras.getBoolean("onboarding");
             profile = extras.getString("profile");
-
         }
 
+        Log.i("ss_nw_call", "performance : setting customerprofileeditcreatemode start ");
         if(profile != null && !profile.isEmpty()){
             customerprofileeditcreatemode = LocalCache.convertJsonToObjectCustomer(profile);
             updateCache = false;
         }
         else
             customerprofileeditcreatemode = loggedincustomer;
+
+        Log.i("ss_nw_call", "performance : setting customerprofileeditcreatemode end ");
 
         if(customerprofileeditcreatemode.getIsAdmin() != null && customerprofileeditcreatemode.getIsAdmin().equalsIgnoreCase("1"))
             isAdmin = true;
@@ -115,32 +127,36 @@ public class RegistrationActivity extends AppCompatActivity {
         biodataAddressBase64 = "";
 
         if (editprofile || forceupdate) {
-            if(!loggedincustomer.getIsAdmin().equalsIgnoreCase("1")){
+            if(!(loggedincustomer.getIsAdmin() != null && loggedincustomer.getIsAdmin().equalsIgnoreCase("1"))){
                 name.setEnabled(false);
                 gender.setEnabled(false);
+                birthdate.setEnabled(false);
                 (findViewById(R.id.gender_)).setEnabled(false);
                 mobile1.setEnabled(false);
             }
             formLayout.setVisibility(View.VISIBLE);
-            cancel_btn.setVisibility(GONE);
+            save_btn.setVisibility(View.VISIBLE);
             preFillFormData();
 
             if(forceupdate)
                 showNotiDialog();
         } else if(onboarding){
-            cancel_btn.setVisibility(GONE);
             formLayout.setVisibility(View.VISIBLE);
+            save_btn.setVisibility(View.VISIBLE);
             mobile1.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber().replace("+91",""));
             mobile1.setEnabled(false);
         }else{
 
             cmlayout.setVisibility(View.VISIBLE);
             formLayout.setVisibility(GONE);
+            save_btn.setVisibility(GONE);
         }
 
         initFormData();
         handleOnclickListeners();
         handleFormOnClickListeners();
+
+        Log.i("ss_nw_call", "performance : onCreate botttom ");
     }
 
     private void showNotiDialog() {
@@ -160,6 +176,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void preFillFormData() {
+        Log.i("ss_nw_call", "performance : preFillFormData top ");
         Customer customer = customerprofileeditcreatemode;
         Glide.with(this).load(customer.getProfilephotoaddress()).placeholder(R.drawable.oops).into(profilePhotoAddress);
         Glide.with(this).load(customer.getBiodataaddress()).placeholder(R.drawable.oops).into(biodataAddress);
@@ -195,6 +212,8 @@ public class RegistrationActivity extends AppCompatActivity {
         property.setText(customer.getProperty());
         fathername.setText(customer.getFathername());
         mothername.setText(customer.getMothername());
+        brother.setText(customer.getBrother());
+        sister.setText(customer.getSister());
         address.setText(customer.getAddress());
         city.setText(customer.getCity());
         marriagestatus.setText(customer.getMarriagestatus());
@@ -213,10 +232,9 @@ public class RegistrationActivity extends AppCompatActivity {
         mangal.setText(customer.getMangal());
         expectations.setText(customer.getExpectations());
         name.setText((customer.getFirstname()) + " " + (customer.getMiddlename() != null ? customer.getMiddlename() : "") + " " + (customer.getLastname() != null ? customer.getLastname() : ""));
-        relationname1.setText(customer.getRelationname1());
-        relationname2.setText(customer.getRelationname2());
         relatives.setText(customer.getRelatives());
         family.setText(customer.getFamily());
+        Log.i("ss_nw_call", "performance : preFillFormData bottom ");
     }
 
     private void handleFormOnClickListeners() {
@@ -282,7 +300,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         save_btn.setOnClickListener(view -> {
             String result = validateOnBoardingForm();
-            if(result.equalsIgnoreCase("")){
+            if(result != null && result.equalsIgnoreCase("")){
                 createProfile();
             }
             else{
@@ -295,11 +313,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 d.show();
             }
         });
-        cancel_btn.setOnClickListener(view -> {
-            nullifyformdata();
-            formLayout.setVisibility(GONE);
-            cmlayout.setVisibility(View.VISIBLE);
-        });
+
         profilePhotoAddress.setOnClickListener(view -> {
             clickedImagename = "profilePhotoAddress";
             Intent intent = new Intent(Intent.ACTION_PICK);
@@ -336,9 +350,9 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void init() {
+        Log.i("ss_nw_call", "performance : init top ");
         progressBar = findViewById(R.id.progressBar1);
         save_btn = findViewById(R.id.save_btn);
-        cancel_btn = findViewById(R.id.cancel_btn);
         formLayout = findViewById(R.id.formLayout);
         profilePhotoAddress = findViewById(R.id.profilePhotoAddress);
         biodataAddress = findViewById(R.id.biodataAddress);
@@ -365,6 +379,8 @@ public class RegistrationActivity extends AppCompatActivity {
         property = findViewById(R.id.property);
         fathername = findViewById(R.id.fathername);
         mothername = findViewById(R.id.mothername);
+        brother = findViewById(R.id.brother);
+        sister = findViewById(R.id.sister);
         address = findViewById(R.id.address);
         city = findViewById(R.id.city);
         marriagestatus = findViewById(R.id.marriagestatus);
@@ -383,18 +399,18 @@ public class RegistrationActivity extends AppCompatActivity {
         mangal = findViewById(R.id.mangal);
         expectations = findViewById(R.id.expectations);
         name = findViewById(R.id.name);
-        relationname1 = findViewById(R.id.relationname1);
-        relationname2 = findViewById(R.id.relationname2);
         relatives = findViewById(R.id.relatives);
         family = findViewById(R.id.family);
+        Log.i("ss_nw_call", "performance : init bottom ");
     }
 
     private void initFormData() {
-
+        Log.i("ss_nw_call", "performance : initFormData top ");
         findViewById(R.id.birthdate).setOnClickListener(view1 -> {
             //Date Picker
             MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-            MaterialDatePicker<Long> picker = builder.build();
+            // Set a custom DateValidator to enforce the desired date format
+                MaterialDatePicker<Long> picker = builder.build();
             picker.show(getSupportFragmentManager(), picker.toString());
             picker.addOnPositiveButtonClickListener(selectedDate -> {
                 // Do something...
@@ -420,45 +436,46 @@ public class RegistrationActivity extends AppCompatActivity {
         });*/
 
 
-        String[] bloodGroupArray = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-        ((AutoCompleteTextView) findViewById(R.id.bloodgroup)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, bloodGroupArray));
+        String[] bloodGroupArray = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-","माहित नाही"};
+        ((AutoCompleteTextView) findViewById(R.id.bloodgroup)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, bloodGroupArray));
 
         String[] heightArray = {"4 feet | 121 cm", "4 feet 1 inch | 124 cm", "4 feet 2 inches | 127 cm", "4 feet 3 inches | 130 cm", "4 feet 4 inches | 132 cm", "4 feet 5 inches | 135 cm", "4 feet 6 inches | 138 cm", "4 feet 7 inches | 140 cm", "4 feet 8 inches | 143 cm", "4 feet 9 inches | 145 cm", "4 feet 10 inches | 148 cm", "4 feet 11 inches | 151 cm", "5 feet | 152 cm", "5 feet 1 inch | 155 cm", "5 feet 2 inches | 157 cm", "5 feet 3 inches | 160 cm", "5 feet 4 inches | 163 cm", "5 feet 5 inches | 165 cm", "5 feet 6 inches | 168 cm", "5 feet 7 inches | 170 cm", "5 feet 8 inches | 173 cm", "5 feet 9 inches | 175 cm", "5 feet 10 inches | 178 cm", "5 feet 11 inches | 180 cm", "6 feet | 183 cm", "6 feet 1 inch | 185 cm", "6 feet 2 inches | 188 cm", "6 feet 3 inches | 191 cm", "6 feet 4 inches | 193 cm", "6 feet 5 inches | 196 cm", "6 feet 6 inches | 198 cm", "6 feet 7 inches | 201 cm", "6 feet 8 inches | 203 cm", "6 feet 9 inches | 206 cm", "6 feet 10 inches | 208 cm", "6 feet 11 inches | 211 cm", "7 feet | 213 cm", "7 feet 1 inch | 216 cm", "7 feet 2 inches | 218 cm", "7 feet 3 inches | 221 cm", "7 feet 4 inches | 224 cm", "7 feet 5 inches | 226 cm", "7 feet 6 inches | 229 cm", "7 feet 7 inches | 231 cm", "7 feet 8 inches | 234 cm", "7 feet 9 inches | 237 cm", "7 feet 10 inches | 239 cm", "7 feet 11 inches | 242 cm"};
-        ((AutoCompleteTextView) findViewById(R.id.height)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, heightArray));
+        ((AutoCompleteTextView) findViewById(R.id.height)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, heightArray));
 
         /*String[] educationArray = {"B.E.", "B.Sc", "B.Ed", "10th Pass"};
         ((AutoCompleteTextView) findViewById(R.id.education)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, educationArray));*/
 
 
         String[] hourArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-        ((AutoCompleteTextView) findViewById(R.id.hour)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, hourArray));
+        ((AutoCompleteTextView) findViewById(R.id.hour)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, hourArray));
 
         String[] minuteArray = {"00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"};
-        ((AutoCompleteTextView) findViewById(R.id.minute)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, minuteArray));
+        ((AutoCompleteTextView) findViewById(R.id.minute)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, minuteArray));
 
         String[] ampmArray = {"am", "pm"};
-        ((AutoCompleteTextView) findViewById(R.id.ampm)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, ampmArray));
+        ((AutoCompleteTextView) findViewById(R.id.ampm)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, ampmArray));
 
         String[] genderArray = {"female", "male"};
-        ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
+        ((AutoCompleteTextView) findViewById(R.id.gender)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, genderArray));
 
         String[] marriagestatusArray = {"single", "married", "divorsed", "widowed"};
-        ((AutoCompleteTextView) findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, marriagestatusArray));
+        ((AutoCompleteTextView) findViewById(R.id.marriagestatus)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, marriagestatusArray));
 
-        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "satara", "sangli","solapur","belgav","thane"};
-        ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
-        ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, birthplaceArray));
+        String[] birthplaceArray = {"Kolhapur", "Pune", "Mumbai", "Satara", "Sangli","Karad","Solapur","Belgav","Thane"};
+        ((AutoCompleteTextView) findViewById(R.id.birthplace)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, birthplaceArray));
+        ((AutoCompleteTextView) findViewById(R.id.city)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, birthplaceArray));
 
         String[] zodiacArray = {"मेष | Aries", "वृषभ | Taurus", "मिथुन | Gemini", "कर्क | Cancer", "सिंह | Leo", "कन्या | Virgo", "तुला | Libra",
-                "वृश्चिक | Scorpio", "धनु | Sagittarius", "मकर | Capricorn", "कुंभ | Aquarius", "मीन | Pisces"};
-        ((AutoCompleteTextView) findViewById(R.id.zodiac)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, zodiacArray));
+                "वृश्चिक | Scorpio", "धनु | Sagittarius", "मकर | Capricorn", "कुंभ | Aquarius", "मीन | Pisces","माहित नाही"};
+        ((AutoCompleteTextView) findViewById(R.id.zodiac)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, zodiacArray));
 
 
+        ((AutoCompleteTextView) findViewById(R.id.religion)).setText("Hindu");
         String[] religionArray = {"Hindu", "Brahmin", "Muslim", "Cristian", "sikh", "jain"};
-        ((AutoCompleteTextView) findViewById(R.id.religion)).setAdapter(new ArrayAdapter(this, R.layout.package_list_item, religionArray));
-        ((TextInputEditText)findViewById(R.id.caste)).setText("मराठा  96 कोळी");
+        ((AutoCompleteTextView) findViewById(R.id.religion)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, religionArray));
+        ((TextInputEditText)findViewById(R.id.caste)).setText("९६ कुळी मराठा");
 
-
+        Log.i("ss_nw_call", "performance : initFormData bottom ");
     }
 
     private void createProfile() {
@@ -482,38 +499,43 @@ public class RegistrationActivity extends AppCompatActivity {
         } else
             firstname = name;
 
-        String relation1 = "Brother";
-        String relation2 = "Sister";
-
         String birthtime = hour.getText().toString().trim() + ":" + minute.getText().toString().trim() + " " + ampm.getText().toString().trim();
-        if(birthtime.equalsIgnoreCase(":"))
+        if(birthtime != null && birthtime.equalsIgnoreCase(":"))
             birthtime = "";
 
 
         Customer c = new Customer(creationsource, profilePhotoAddressBase64, biodataAddressBase64,
                 firstname, middlename, lastname, email.getText().toString().trim(), mobile1.getText().toString().trim(), mobile2.getText().toString().trim(), mobile3.getText().toString().trim(), mobile4.getText().toString().trim(), gender.getText().toString().trim(), height.getText().toString().trim(),
                 birthtime, caste.getText().toString().trim(), religion.getText().toString().trim(), education.getText().toString().trim(), occupation.getText().toString().trim(), zodiac.getText().toString().trim(), birthname.getText().toString().trim(), bloodgroup.getText().toString().trim(),
-                property.getText().toString().trim(), fathername.getText().toString().trim(), mothername.getText().toString().trim(), address.getText().toString().trim(), city.getText().toString().trim(), marriagestatus.getText().toString().trim(), birthdate.getText().toString().trim(),
+                property.getText().toString().trim(), fathername.getText().toString().trim(), mothername.getText().toString().trim(),brother.getText().toString().trim(),sister.getText().toString().trim(), address.getText().toString().trim(), city.getText().toString().trim(), marriagestatus.getText().toString().trim(), birthdate.getText().toString().trim(),
                 birthplace.getText().toString().trim(), income.getText().toString().trim(), kuldaivat.getText().toString().trim(), devak.getText().toString().trim(), nakshatra.getText().toString().trim(), nadi.getText().toString().trim(), gan.getText().toString().trim(), yoni.getText().toString().trim(),
-                charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(), relation1, relation2, relationname1.getText().toString().trim(), relationname2.getText().toString().trim(), relatives.getText().toString().trim(), family.getText().toString().trim());
+                charan.getText().toString().trim(), gotra.getText().toString().trim(), varn.getText().toString().trim(), mangal.getText().toString().trim(), expectations.getText().toString().trim(), relatives.getText().toString().trim(), family.getText().toString().trim());
+
+        if(isAdmin)
+            c.setCreatedBy("admin");
+        else
+            c.setCreatedBy("user");
 
         if (editprofile || forceupdate) {
             c.setProfileId(customerprofileeditcreatemode.getProfileId());
             ApiCallUtil.updateProfile(c, this, updateCache,forceupdate);
         } else if (onboarding){
-            ApiCallUtil.registerProfile(c, this, true, null);
+            ApiCallUtil.registerProfile(c, this, true, null,isAdmin);
         }else{
             // register new profile
-            ApiCallUtil.registerProfile(c, this, false, null);
+            ApiCallUtil.registerProfile(c, this, false, null,isAdmin);
         }
+
 
 
         nullifyformdata();
         cmmobile.setText("");
 
         formLayout.setVisibility(GONE);
+        save_btn.setVisibility(GONE);
         if((!editprofile) && (loggedincustomer.getIsAdmin() != null && loggedincustomer.getIsAdmin().equalsIgnoreCase("1"))) {
             cmlayout.setVisibility(View.VISIBLE);
+            save_btn.setEnabled(true);
         }
     }
 
@@ -590,6 +612,8 @@ public class RegistrationActivity extends AppCompatActivity {
         property.setText("");
         fathername.setText("");
         mothername.setText("");
+        brother.setText("");
+        sister.setText("");
         address.setText("");
         city.setText("");
         marriagestatus.setText("");
@@ -607,8 +631,6 @@ public class RegistrationActivity extends AppCompatActivity {
         varn.setText("");
         mangal.setText("");
         expectations.setText("");
-        relationname1.setText("");
-        relationname2.setText("");
         //family.setText("");
         relatives.setText("");
         profilePhotoAddressBase64 = "";
@@ -753,6 +775,6 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(!forceupdate)
-        super.onBackPressed();
+            super.onBackPressed();
     }
 }

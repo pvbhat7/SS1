@@ -29,20 +29,20 @@ public class ContactViewedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_viewed);
-        activeOrder = LocalCache.getActiveOrder(this);
+        //activeOrder = LocalCache.getActiveOrder(this);
         initUiElements();
 
 
 
 
-        if(activeOrder.getUsedCount().equalsIgnoreCase("0")) {
+       /* if(activeOrder.getUsedCount().equalsIgnoreCase("0")) {
             contactviewedRecyclerView.setVisibility(View.GONE);
             cv_zero.setVisibility(View.VISIBLE);
         }
-
+*/
         customer = LocalCache.getLoggedInCustomer(this);
 
-        ApiCallUtil.getContactViewedProfiles(customer.getProfileId(),adapter,contactviewedRecyclerView,cv_count,this);
+        ApiCallUtil.getContactViewedProfiles(customer.getProfileId(),adapter,contactviewedRecyclerView,cv_count,cv_zero,this);
     }
 
     private void initUiElements() {

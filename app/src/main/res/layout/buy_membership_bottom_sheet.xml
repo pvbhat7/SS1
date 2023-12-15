@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/coordinatorLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     card_view:cardElevation="0dp"
-    app:cardCornerRadius="40dp">
+    app:cardCornerRadius="0dp">
     <LinearLayout
+        android:id="@+id/bottomSheetLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:orientation="vertical">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/membership_card"
+            app:cardBackgroundColor="@color/yellow"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_margin="10dp"
@@ -26,11 +30,12 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@font/roboto_bold"
                 android:gravity="center_vertical"
-                android:text="Select membership plan"
+                android:text="@string/buymemship"
                 android:textAlignment="center"
                 android:textColor="@color/black" />
 
         </androidx.cardview.widget.CardView>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bsmembershipRecyclerview"
@@ -40,6 +45,6 @@
             android:scrollbars="vertical" />
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

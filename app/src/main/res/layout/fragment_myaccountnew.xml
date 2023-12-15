@@ -134,6 +134,7 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/adminzone_card"
+                    android:visibility="gone"
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
@@ -274,6 +275,7 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/mymembership_card"
+                    android:visibility="gone"
                     android:layout_marginTop="8dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
@@ -402,15 +404,16 @@
                                 android:src="@drawable/logout_icon"
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"/>
+
                             <TextView
-                                android:textColor="@color/txtcolor"
-                                android:layout_marginLeft="25dp"
-                                android:textSize="16dp"
-                                android:fontFamily="@font/comic_bold"
-                                android:layout_gravity="center_vertical"
-                                android:text="Log out"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="22dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="25dp"
+                                android:fontFamily="@font/comic_bold"
+                                android:text="Log out"
+                                android:textColor="@color/txtcolor"
+                                android:textSize="16dp" />
                         </LinearLayout>
                         <View
                             android:layout_marginTop="3dp"
@@ -420,9 +423,67 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+                <androidx.cardview.widget.CardView
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="10dp"
+                    android:layout_width="fill_parent"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="false"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:gravity="center_vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/users_testing"
+                            android:visibility="gone"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_marginLeft="10dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/logout_icon"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="25dp"
+                                android:fontFamily="@font/comic_bold"
+                                android:text="Users testing"
+                                android:textColor="@color/txtcolor"
+                                android:textSize="16dp" />
+                        </LinearLayout>
+                        <View
+                            android:layout_marginTop="3dp"
+                            android:layout_width="fill_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorDivider"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <Button
+                    android:id="@+id/sendsms"
+                    android:visibility="gone"
+                    android:text="send sms"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"/>
+
                 <TextView
                     android:id="@+id/version"
-                    android:textColor="@color/txtcolor"
+                    android:textColor="@color/purple_700"
                     android:layout_marginTop="5dp"
                     android:text=""
                     android:textAlignment="center"

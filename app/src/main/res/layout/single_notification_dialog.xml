@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="10dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:id="@+id/notilayout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/notiid"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/vcpid"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:src="@drawable/oops"
+                android:id="@+id/photo"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/name"
+                    android:text="Prashant liked your profile"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="9dp"
+                    android:textSize="14dp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/comic_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_marginLeft="10dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp">
+                    <ImageView
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/place_icon"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+                    <TextView
+                        android:id="@+id/city"
+                        android:text="Kolhapur"
+                        android:layout_marginLeft="5dp"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="10dp"
+                        android:fontFamily="@font/comic_bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="15dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="3dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp">
+                    <ImageView
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/time_icon"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+                    <TextView
+                        android:id="@+id/age"
+                        android:text="28 yrs"
+                        android:layout_marginLeft="5dp"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="10dp"
+                        android:fontFamily="@font/comic_bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="15dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/contactPanel"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/callbutton"
+                        android:textColor="@color/black"
+                        android:text="Call Prashant"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textSize="8dp"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

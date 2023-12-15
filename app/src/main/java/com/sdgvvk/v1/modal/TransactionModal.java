@@ -2,10 +2,23 @@ package com.sdgvvk.v1.modal;
 
 public class TransactionModal {
 
+    private String cpid;
     private String name;
     private String mobile;
     private String date;
     private String amount;
+
+    private String countUsed;
+
+    private String photo;
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
 
     public String getName() {
         return name;
@@ -37,5 +50,21 @@ public class TransactionModal {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getCountUsed() {
+        return countUsed;
+    }
+
+    public void setCountUsed(String countUsed) {
+        this.countUsed = countUsed;
+    }
+
+    public String getCpid() {
+        return cpid;
+    }
+
+    public void setCpid(String cpid) {
+        this.cpid = cpid;
     }
 }

@@ -17,16 +17,15 @@ public class OrderModal {
 
     public Integer countRemaining;
 
-    public OrderModal() {
-
-    }
-    public OrderModal(String cpid, String membershipId, String paymentmode, String txnDate, String startDate, String endDate) {
+    public OrderModal(String cpid, String membershipId, String paymentmode, String txnDate) {
         this.cpid = cpid;
         this.membershipId = membershipId;
         this.paymentmode = paymentmode;
         this.txndate = txnDate;
-        this.startDate = startDate;
-        this.endDate = endDate;
+    }
+
+
+    public OrderModal() {
     }
 
     public String getId() {

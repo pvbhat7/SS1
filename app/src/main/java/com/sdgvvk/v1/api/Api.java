@@ -1,10 +1,14 @@
 package com.sdgvvk.v1.api;
 
 
+import com.sdgvvk.v1.livedata.YourDataModel;
 import com.sdgvvk.v1.modal.ContactViewedModal;
 import com.sdgvvk.v1.modal.Customer;
+import com.sdgvvk.v1.modal.CustomerActivityModal;
+import com.sdgvvk.v1.modal.FcmNotificationModal;
+import com.sdgvvk.v1.modal.FcmTokenModal;
 import com.sdgvvk.v1.modal.FilterModal;
-import com.sdgvvk.v1.modal.Stat;
+import com.sdgvvk.v1.modal.FollowUpModal;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
 import com.sdgvvk.v1.modal.Level_2_Modal;
 import com.sdgvvk.v1.modal.MembershipModal;
@@ -12,6 +16,7 @@ import com.sdgvvk.v1.modal.MyMembershipModal;
 import com.sdgvvk.v1.modal.NotificationModal;
 import com.sdgvvk.v1.modal.OrderModal;
 import com.sdgvvk.v1.modal.SingleResponse;
+import com.sdgvvk.v1.modal.Stat;
 import com.sdgvvk.v1.modal.TransactionModal;
 
 import java.util.List;
@@ -33,8 +38,17 @@ public interface Api {
     @GET("level1_view/all.php")
     Call<List<Level_1_cardModal>> getAllCustomerProfiles(@Query("cpid") String cpid);
 
-    @POST("level1_view/allFilteredLevel1.php")
-    Call<List<Level_1_cardModal>> getFilteredLevel1Profiles(@Body FilterModal modal);
+    @GET("level1_view/byadminfilter.php")
+    Call<List<Level_1_cardModal>> getAllCustomerProfilesByFilter(@Query("filter") String filter);
+
+    /*@POST("level1_view/allFilteredLevel1.php")
+    Call<List<Level_1_cardModal>> getFilteredLevel1Profiles(@Body FilterModal modal);*/
+
+    @POST("level1_view/search.php")
+    Call<List<Level_1_cardModal>> searchLevel1Profiles(@Body FilterModal modal);
+
+    @POST("level1_view/searchByCpid.php")
+    Call<List<Level_1_cardModal>> searchLevel1ProfileByCpid(@Body FilterModal modal);
 
     @POST("level2_view/allFilteredLevel2.php")
     Call<List<Customer>> getFilteredLevel2Profiles(@Body FilterModal modal);
@@ -48,6 +62,10 @@ public interface Api {
     Call<SingleResponse> viewContactData(@Query("cpid") String cpid , @Query("vcpid") String vcpid);
     @GET("level1_view/viewcontact/getProfilesByTag.php")
     Call<List<Level_1_cardModal>> getProfilesByTag(@Query("cpid") String cpid , @Query("tag") String tag);
+
+
+    @GET("customer/getActivityData.php")
+    Call<List<CustomerActivityModal>> getActivityData(@Query("cpid") String cpid );
 
     @GET("level1_view/viewcontact/getByCpid.php")
     Call<List<ContactViewedModal>> getContactViewedProfiles(@Query("cpid") String cpid);
@@ -102,8 +120,17 @@ public interface Api {
     @GET("notification/getByCpid.php")
     Call<List<NotificationModal>> getUserNotifications(@Query("cpid") String cpid);
 
+    @GET("notification/adminByCpid.php")
+    Call<List<NotificationModal>> adminByCpid(@Query("cpid") String cpid);
+
+
+
+    @GET("notification/getDistinctUsers.php")
+    Call<List<Level_1_cardModal>> getDistinctUserNotifications();
+
     @GET("notification/updateById.php")
     Call<ResponseBody> updateViewedNotificationState(@Query("id") String id);
+
 
 
     // CUSTOMER
@@ -120,7 +147,7 @@ public interface Api {
     Call<SingleResponse> registerNewCustomer(@Body Customer customer);
 
     @POST("customer/app_submit_register_new.php")
-    Call<List<Customer>> registerNewCustomernew(@Body Customer customer);
+    Call<List<Customer>> registerAndGetCustomer(@Body Customer customer);
 
     @POST("customer/updateProfile.php")
     Call<List<Customer>> updateProfile(@Body Customer customer);
@@ -150,8 +177,11 @@ public interface Api {
     @GET("isLive.php")
     Call<SingleResponse> isLive();
 
-    @GET("customer/getStats.php")
+    @GET("admin/getStats.php")
     Call<List<Stat>> getStats();
+
+    @GET("admin/getAdminNotice.php")
+    Call<SingleResponse> getAdminNotice(@Query("noticeType") String noticeType,@Query("cpid") String cpid);
 
 
     @GET("customer/disableProfile.php")
@@ -166,9 +196,46 @@ public interface Api {
     @GET("transaction/all.php")
     Call<List<TransactionModal>> getAllTransactions();
 
-    @GET("educationList.php")
-    Call<List<SingleResponse>> getAllEducationList();
+    @GET("educationList_v1.php")
+    Call<List<SingleResponse>> getAllEducationList(@Query("gender") String gender);
 
-    @GET("occupationList.php")
-    Call<List<SingleResponse>> getAllOccupationList();
+    @GET("citylist_v1.php")
+    Call<List<SingleResponse>> getAllCityList(@Query("gender") String gender);
+
+    @GET("castelist_v1.php")
+    Call<List<SingleResponse>> getAllCasteList(@Query("gender") String gender);
+
+    @GET("occupationList_v1.php")
+    Call<List<SingleResponse>> getAllOccupationList(@Query("gender") String gender);
+
+    @GET("lastnames_v1.php")
+    Call<List<SingleResponse>> getAllLastnamesList(@Query("gender") String gender);
+
+    @GET("admin/saveFollowUp.php")
+    Call<ResponseBody> saveFollowUp(@Query("cpid") String cpid , @Query("followupdate") String followupdate ,@Query("comment") String comment);
+
+    
+    @GET("admin/getFollowupByCpid.php")
+    Call<List<FollowUpModal>> getFollowUpByCpid(@Query("cpid") String cpid);
+
+    @GET("admin/getAllFollowUps.php")
+    Call<List<FollowUpModal>> getAllFollowUps();
+
+    @GET("admin/updateFollowup.php")
+    Call<ResponseBody> updateFollowup(@Query("id") String id);
+
+    @POST("fcmToken/create.php")
+    Call<String> createFcmTokenToServer(@Body FcmTokenModal modal);
+    @POST("fcmNotifications/add.php")
+    Call<String> createFcmNotificationToServer(@Body FcmNotificationModal modal);
+
+    @GET("admin/addLeads.php")
+    Call<ResponseBody> addLeads(@Query("cpid") String cpid , @Query("vcpid") String vcpid , @Query("type") String type);
+
+    @GET("users.php")
+    Call<List<YourDataModel>> getAllUsers();
+
+
+    @GET("updateUserStatus.php")
+    Call<ResponseBody> updateUserStatus(@Query("isApproved") String isApproved,@Query("id") String id);
 }

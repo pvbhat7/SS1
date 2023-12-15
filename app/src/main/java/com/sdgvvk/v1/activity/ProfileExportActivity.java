@@ -124,13 +124,13 @@ public class ProfileExportActivity extends AppCompatActivity {
         gender.setText("female");
         String[] genderArray = {"female", "male"};
 
-        gender.setAdapter(new ArrayAdapter(this, R.layout.package_list_item, genderArray));
+        gender.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, genderArray));
 
         String[] heightArray = {"4 feet | 121 cm", "4 feet 1 inch | 124 cm", "4 feet 2 inches | 127 cm", "4 feet 3 inches | 130 cm", "4 feet 4 inches | 132 cm", "4 feet 5 inches | 135 cm", "4 feet 6 inches | 138 cm", "4 feet 7 inches | 140 cm", "4 feet 8 inches | 143 cm", "4 feet 9 inches | 145 cm", "4 feet 10 inches | 148 cm", "4 feet 11 inches | 151 cm", "5 feet | 152 cm", "5 feet 1 inch | 155 cm", "5 feet 2 inches | 157 cm", "5 feet 3 inches | 160 cm", "5 feet 4 inches | 163 cm", "5 feet 5 inches | 165 cm", "5 feet 6 inches | 168 cm", "5 feet 7 inches | 170 cm", "5 feet 8 inches | 173 cm", "5 feet 9 inches | 175 cm", "5 feet 10 inches | 178 cm", "5 feet 11 inches | 180 cm", "6 feet | 183 cm", "6 feet 1 inch | 185 cm", "6 feet 2 inches | 188 cm", "6 feet 3 inches | 191 cm", "6 feet 4 inches | 193 cm", "6 feet 5 inches | 196 cm", "6 feet 6 inches | 198 cm", "6 feet 7 inches | 201 cm", "6 feet 8 inches | 203 cm", "6 feet 9 inches | 206 cm", "6 feet 10 inches | 208 cm", "6 feet 11 inches | 211 cm", "7 feet | 213 cm", "7 feet 1 inch | 216 cm", "7 feet 2 inches | 218 cm", "7 feet 3 inches | 221 cm", "7 feet 4 inches | 224 cm", "7 feet 5 inches | 226 cm", "7 feet 6 inches | 229 cm", "7 feet 7 inches | 231 cm", "7 feet 8 inches | 234 cm", "7 feet 9 inches | 237 cm", "7 feet 10 inches | 239 cm", "7 feet 11 inches | 242 cm"};
         minHeight.setText("4 feet | 121 cm");
         maxHeight.setText("7 feet 11 inches | 242 cm");
-        minHeight.setAdapter(new ArrayAdapter(this, R.layout.package_list_item, heightArray));
-        maxHeight.setAdapter(new ArrayAdapter(this, R.layout.package_list_item, heightArray));
+        minHeight.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, heightArray));
+        maxHeight.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, heightArray));
 
         String[] ageArray = new String[38]; // Since you want to fill it till 55 (55 - 18 + 1)
 
@@ -139,8 +139,8 @@ public class ProfileExportActivity extends AppCompatActivity {
         }
         minAge.setText("18");
         maxAge.setText("70");
-        minAge.setAdapter(new ArrayAdapter(this, R.layout.package_list_item, ageArray));
-        maxAge.setAdapter(new ArrayAdapter(this, R.layout.package_list_item, ageArray));
+        minAge.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, ageArray));
+        maxAge.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, ageArray));
     }
 
     public void exportProfiles() {

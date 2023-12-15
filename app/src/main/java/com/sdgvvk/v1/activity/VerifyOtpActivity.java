@@ -4,7 +4,10 @@ package com.sdgvvk.v1.activity;
 import static com.google.android.material.internal.ViewUtils.hideKeyboard;
 import static com.google.android.material.internal.ViewUtils.showKeyboard;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,19 +23,21 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.sdgvvk.v1.R;
-import com.sdgvvk.v1.api.ApiCallUtil;
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.auth.api.phone.SmsRetriever;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.api.ApiCallUtil;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class VerifyOtpActivity extends AppCompatActivity {
 
@@ -44,14 +49,21 @@ public class VerifyOtpActivity extends AppCompatActivity {
     EditText otptext;
     Button buttonVerifyOtp;
 
+    private MySMSBroadcastReceiver receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("local_logs","SendOtpActivity - onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_otp);
 
+        receiver = new MySMSBroadcastReceiver();
         initFields();
         onclickListeners();
+
+        // Register a broadcast receiver to listen for the SMS
+        // Register the receiver
+        registerReceiver(receiver, new IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION));
         handleVerifyOtpFunctionality();
         otptext.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -59,6 +71,41 @@ public class VerifyOtpActivity extends AppCompatActivity {
         showKeyboard(otptext);
 
     }
+
+    class MySMSBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (SmsRetriever.SMS_RETRIEVED_ACTION.equals(intent.getAction())) {
+                Log.i("ss_nw_call", "verify otp : BroadcastReceiver onReceive");
+                Bundle extras = intent.getExtras();
+                if (extras != null) {
+                    Status status = (Status) extras.get(SmsRetriever.EXTRA_STATUS);
+                    Log.i("ss_nw_call", "verify otp : statuscode "+status.getStatusCode());
+                    if (status != null) {
+                        switch (status.getStatusCode()) {
+                            case CommonStatusCodes.SUCCESS:
+                                // Get the SMS message
+                                String message = extras.getString(SmsRetriever.EXTRA_SMS_MESSAGE);
+                                Log.i("ss_nw_call", "verify otp : message "+message);
+                                // Extract the verification code from the SMS and auto-fill the OTP EditText
+                                // You can use a regular expression to extract the code or any other method
+                                if (message != null) {
+                                    String code = extractCodeFromMessage(message);
+                                    Log.i("ss_nw_call", "verify otp : otp "+code);
+                                    otptext.setText(code);
+                                }
+                                break;
+
+                            case CommonStatusCodes.TIMEOUT:
+                                Log.i("ss_nw_call", "verify otp : timeout");
+                                // SMS retrieval timed out
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     private void onclickListeners() {
         otptext.addTextChangedListener(new TextWatcher() {
@@ -93,76 +140,67 @@ public class VerifyOtpActivity extends AppCompatActivity {
                 return;
             }
             String code = otptext.getText().toString().trim();
+
+
             if(verificationId != null){
                 buttonVerify.setVisibility(View.GONE);
                 showProgressBar();
                 PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.getCredential(verificationId,code);
                 FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                buttonVerify.setVisibility(View.GONE);
-                                hideProgressBar();
+                        .addOnCompleteListener(task -> {
+                            buttonVerify.setVisibility(View.GONE);
+                            hideProgressBar();
 
-                                if(task.isSuccessful()){
-                                    hideKeyboard(view);
-                                    boxCard.setVisibility(View.GONE);
-                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                    ApiCallUtil.setLoggedInCustomer(VerifyOtpActivity.this,user.getPhoneNumber().replace("+91",""),(SpinKitView)findViewById(R.id.progressBar));
-                                    //showProgressBar();
-                                    // TODO: 03-Sep-23
-                                    //ApiUtils.initClientAppData(getApplicationContext(),user,VerifyOtpActivity.this);
-                                    /*new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            hideProgressBar();
-                                            Intent intent = new Intent(VerifyOtpActivity.this, MainActivity.class);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            VerifyOtpActivity.this.startActivity(intent);
-                                        }
-                                    }, 3000);*/
+                            if(task.isSuccessful()){
+                                hideKeyboard(view);
+                                boxCard.setVisibility(View.GONE);
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                ApiCallUtil.setLoggedInCustomer(VerifyOtpActivity.this,user.getPhoneNumber().replace("+91",""),(SpinKitView)findViewById(R.id.progressBar));
+                                //showProgressBar();
+                                //ApiUtils.initClientAppData(getApplicationContext(),user,VerifyOtpActivity.this);
+                                /*new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        hideProgressBar();
+                                        Intent intent = new Intent(VerifyOtpActivity.this, MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        VerifyOtpActivity.this.startActivity(intent);
+                                    }
+                                }, 3000);*/
 
-                                }
-                                else
-                                {
-                                    Toast.makeText(VerifyOtpActivity.this,"Invalid otp entered",Toast.LENGTH_SHORT).show();
-                                    buttonVerify.setVisibility(View.VISIBLE);
-                                }
+                            }
+                            else
+                            {
+                                Toast.makeText(VerifyOtpActivity.this,"Invalid otp entered",Toast.LENGTH_SHORT).show();
+                                buttonVerify.setVisibility(View.VISIBLE);
                             }
                         });
-
-            }
-
-        });
-
-        findViewById(R.id.txtResendOtp).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                        "+91"+getIntent().getStringExtra("mobile"),
-                        60,
-                        TimeUnit.SECONDS,
-                        VerifyOtpActivity.this,
-                        new PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
-
-                            @Override
-                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                            }
-
-                            @Override
-                            public void onVerificationFailed(@NonNull FirebaseException e) {
-                                Toast.makeText(VerifyOtpActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onCodeSent(@NonNull String newVerificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                                verificationId = newVerificationId;
-                                Toast.makeText(VerifyOtpActivity.this,"otp sent",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
             }
         });
+
+        findViewById(R.id.txtResendOtp).setOnClickListener(view -> PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                "+91"+getIntent().getStringExtra("mobile"),
+                60,
+                TimeUnit.SECONDS,
+                VerifyOtpActivity.this,
+                new PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
+
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                    }
+
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        Toast.makeText(VerifyOtpActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCodeSent(@NonNull String newVerificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                        verificationId = newVerificationId;
+                        Toast.makeText(VerifyOtpActivity.this,"otp sent",Toast.LENGTH_SHORT).show();
+                    }
+                }
+        ));
     }
 
     private void initFields() {
@@ -190,5 +228,32 @@ public class VerifyOtpActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
     }
 
+    // Method to start SMS retrieval
 
+    // Method to extract the verification code from the SMS message
+    private String extractCodeFromMessage(String message) {
+        // Implement your logic to extract the code from the SMS message
+        // For example, you can use a regular expression to find the code
+        // Modify this according to the format of the OTP in your SMS
+        Pattern pattern = Pattern.compile("(\\d{6})");
+        Matcher matcher = pattern.matcher(message);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            // Handle the case where the code couldn't be extracted
+            return "";
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        // Unregister the receiver to avoid memory leaks
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+        }
+
+        super.onDestroy();
+    }
 }

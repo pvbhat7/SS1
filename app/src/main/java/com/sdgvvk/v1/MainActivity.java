@@ -14,34 +14,31 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
-
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.play.core.appupdate.AppUpdateInfo;
-import com.google.android.play.core.appupdate.AppUpdateManager;
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.model.AppUpdateType;
-import com.google.android.play.core.install.model.UpdateAvailability;
-import com.mikhaellopez.circularimageview.CircularImageView;
-import com.sdgvvk.v1.activity.Level2ProfileActivity;
-import com.sdgvvk.v1.api.ApiCallUtil;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.sdgvvk.v1.api.HelperUtils;
-import com.sdgvvk.v1.databinding.ActivityMainBinding;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.sdgvvk.v1.api.ApiCallUtil;
+import com.sdgvvk.v1.api.HelperUtils;
+import com.sdgvvk.v1.databinding.ActivityMainBinding;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -67,10 +64,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onCreate");
         super.onCreate(savedInstanceState);
-
+        if(getIntent().getExtras() != null){
+            if(getIntent().getExtras().get(ProjectConstants.TARGET_CLASS) != null){
+                Log.i("ss_nw_call", "targetclass : "+(String)getIntent().getExtras().get(ProjectConstants.TARGET_CLASS));
+            }
+        }
         if (ctx == null || ((MainActivity) ctx).isDestroyed())
             ctx = this;
 
+        FirebaseApp.initializeApp(this);
         ApiCallUtil.getAdminPhone(this);
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

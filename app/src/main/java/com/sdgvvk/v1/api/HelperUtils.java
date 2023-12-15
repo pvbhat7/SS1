@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
-import com.sdgvvk.v1.SearchProfileBottomSheetDialog;
 import com.sdgvvk.v1.modal.Customer;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -31,13 +30,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 
-import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 public class HelperUtils {
 
-    public static SearchProfileBottomSheetDialog searchProfileBottomSheetDialog;
 
 
     public static void vibrateFunction(Activity activity) {

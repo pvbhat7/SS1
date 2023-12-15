@@ -8,6 +8,7 @@ public class ContactViewedModal {
     private String mobile;
     private String viewedOn;
     private String dob;
+    private String isDummy;
 
     public String getVcpid() {
         return vcpid;
@@ -63,5 +64,13 @@ public class ContactViewedModal {
 
     public void setDob(String dob) {
         this.dob = dob;
+    }
+
+    public String getIsDummy() {
+        return isDummy;
+    }
+
+    public void setIsDummy(String isDummy) {
+        this.isDummy = isDummy;
     }
 }

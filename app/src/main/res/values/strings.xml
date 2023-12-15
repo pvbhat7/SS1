@@ -73,9 +73,28 @@
     <string name="mavshi">मावशी </string>
     <string name="ajoba">आजोबा </string>
     <string name="aaji">आजी </string>
+    <string name="profile_not_available">यांचे लग्न ठरले आहेत त्यामुळे यांचे contact उपलब्द नाही आहे </string>
+
 
     <string name="relatives">नातेसंबंध </string>
     <string name="expectation">अपेक्षा </string>
+    <string name="applink">App &amp; youtube link </string>
+    <string name="appname">श्री दत्त गुरु वधू-वर केंद्र</string>
+    <string name="buymemship">मेम्बरशिप घेण्यासाठी इथे क्लिक करा</string>
 
+
+    <string name="notice">
+    नमस्कार प्रणाली भाट,
+
+    "श्री दत्त गुरु वधू-वर केंद्र" मध्ये आपले हार्दिक स्वागत
+    आम्हाला हे सांगताना खूप आनंद होत आहे की आम्ही स्वतःचे वधू-वर सूचक केंद्र सुरु केलं आहे तरी सर्वांनी
+     खालील लिंक वापरून स्थळें website आणि  app वर पाहू शकता.
+
+    प्रोफाइल  लिंक : https://tavrostechinfo.com/profile?id=4405
+    अँप डाउनलोड लिंक : https://play.google.com/store/apps/details?id=com.sdgvvk.v1
+
+    आमचे अँप डाउनलोड करून तुम्ही भरपूर स्थळे पाहू शकता अगदी माफक दारात.
+    अधिक माहिती साठी आम्हाला संपर्क करा : 7972864487
+    </string>
 
 </resources>

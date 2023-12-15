@@ -3,28 +3,30 @@ package com.sdgvvk.v1;
 import android.app.Activity;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sdgvvk.v1.modal.ContactViewedModal;
 import com.sdgvvk.v1.modal.Customer;
-import com.sdgvvk.v1.modal.SingleResponse;
-import com.sdgvvk.v1.modal.Stat;
+import com.sdgvvk.v1.modal.CustomerActivityModal;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
 import com.sdgvvk.v1.modal.MembershipModal;
 import com.sdgvvk.v1.modal.OrderModal;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.sdgvvk.v1.modal.SingleResponse;
+import com.sdgvvk.v1.modal.Stat;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 public class LocalCache {
 
 
-    public static String setLoggedInCustomer(Customer customer, Activity activity){
-        String jsonString = new Gson().toJson(customer);
-        AppPreference.setStringPref(activity, AppPreference.CUSTOMER_JSON, AppPreference.CUSTOMER_JSON,jsonString);
-        return jsonString;
+    public static void setLoggedInCustomer(Customer customer, Activity activity){
+        if(customer != null){
+            String jsonString = new Gson().toJson(customer);
+            AppPreference.setStringPref(activity, AppPreference.CUSTOMER_JSON, AppPreference.CUSTOMER_JSON,jsonString);
+        }
     }
 
     public static Customer getLoggedInCustomer(Activity activity) {
@@ -41,10 +43,11 @@ public class LocalCache {
         return new Gson().fromJson(json, Customer.class);
     }
 
-    public static String setActiveOrder(OrderModal orderModal, Activity activity){
-        String jsonString = new Gson().toJson(orderModal);
-        AppPreference.setStringPref(activity, AppPreference.ACTIVE_ORDER_JSON, AppPreference.ACTIVE_ORDER_JSON,jsonString);
-        return jsonString;
+    public static void setActiveOrder(OrderModal orderModal, Activity activity){
+        if(orderModal != null){
+            String jsonString = new Gson().toJson(orderModal);
+            AppPreference.setStringPref(activity, AppPreference.ACTIVE_ORDER_JSON, AppPreference.ACTIVE_ORDER_JSON,jsonString);
+        }
     }
 
     public static OrderModal getActiveOrder(Activity activity) {
@@ -57,10 +60,9 @@ public class LocalCache {
         return orderModal;
     }
 
-    public static String setLevel1List(List<Level_1_cardModal> list, Activity activity){
+    public static void setLevel1List(List<Level_1_cardModal> list, Activity activity){
         String jsonString = new Gson().toJson(list);
         AppPreference.setStringPref(activity, AppPreference.LEVEL_1_LIST_JSON, AppPreference.LEVEL_1_LIST_JSON,jsonString);
-        return jsonString;
     }
 
     public static List<Level_1_cardModal> getLevel1List(Activity activity) {
@@ -74,10 +76,9 @@ public class LocalCache {
         return list;
     }
 
-    public static String setContactViewedList(List<ContactViewedModal> list, Activity activity){
+    public static void setContactViewedList(List<ContactViewedModal> list, Activity activity){
         String jsonString = new Gson().toJson(list);
         AppPreference.setStringPref(activity, AppPreference.CONTACT_VIEWED_LIST_JSON, AppPreference.CONTACT_VIEWED_LIST_JSON,jsonString);
-        return jsonString;
     }
 
     public static List<ContactViewedModal> getContactViewedList(Activity activity) {
@@ -91,10 +92,9 @@ public class LocalCache {
         return list;
     }
 
-    public static String setGenderStat(List<Stat> list, Activity activity){
+    public static void setGenderStat(List<Stat> list, Activity activity){
         String jsonString = new Gson().toJson(list);
         AppPreference.setStringPref(activity, AppPreference.GENDER_STAT_JSON, AppPreference.GENDER_STAT_JSON,jsonString);
-        return jsonString;
     }
 
     public static List<Stat> getGenderStat(Activity activity) {
@@ -109,10 +109,9 @@ public class LocalCache {
     }
 
 
-    public static String setMembershipList(List<MembershipModal> list, Activity activity){
+    public static void setMembershipList(List<MembershipModal> list, Activity activity){
         String jsonString = new Gson().toJson(list);
         AppPreference.setStringPref(activity, AppPreference.MEMBERSHIP_LIST_JSON, AppPreference.MEMBERSHIP_LIST_JSON,jsonString);
-        return jsonString;
     }
 
     public static List<MembershipModal> getMembershipList(Activity activity) {
@@ -126,10 +125,9 @@ public class LocalCache {
         return list;
     }
 
-    public static String setAdminPhone(String adminPhone, Activity activity){
+    public static void setAdminPhone(String adminPhone, Activity activity){
         String jsonString = new Gson().toJson(adminPhone);
         AppPreference.setStringPref(activity, AppPreference.ADMINPHONE_JSON, AppPreference.ADMINPHONE_JSON,jsonString);
-        return jsonString;
     }
 
     public static String getAdminPhone(Activity activity) {
@@ -143,10 +141,9 @@ public class LocalCache {
     }
 
 
-    public static String setIsLive(String flag, Activity activity) {
+    public static void setIsLive(String flag, Activity activity) {
         String jsonString = new Gson().toJson(flag);
         AppPreference.setStringPref(activity, AppPreference.IS_LIVE_JSON, AppPreference.IS_LIVE_JSON,jsonString);
-        return jsonString;
     }
 
     public static String getIsLive(Activity activity) {
@@ -159,7 +156,7 @@ public class LocalCache {
         return flag;
     }
 
-    public static String setEducationList(List<SingleResponse> list, Activity activity){
+    public static void setEducationList(List<SingleResponse> list, Activity activity){
         List<String> list_ = new ArrayList<>();
         if(list != null && !list.isEmpty()){
             for(SingleResponse obj : list){
@@ -169,7 +166,6 @@ public class LocalCache {
         }
         String jsonString = new Gson().toJson(list_);
         AppPreference.setStringPref(activity, AppPreference.EDUCATION_JSON, AppPreference.EDUCATION_JSON,jsonString);
-        return jsonString;
     }
 
     public static List<String> getEducationList(Activity activity) {
@@ -183,7 +179,53 @@ public class LocalCache {
         return list;
     }
 
-    public static String setOccupationList(List<SingleResponse> list, Activity activity){
+    public static void setCasteList(List<SingleResponse> list, Activity activity){
+        List<String> list_ = new ArrayList<>();
+        if(list != null && !list.isEmpty()){
+            for(SingleResponse obj : list){
+                Log.i("ss_nw_call", "looper adding "+obj.getResult());
+                list_.add(obj.getResult());
+            }
+        }
+        String jsonString = new Gson().toJson(list_);
+        AppPreference.setStringPref(activity, AppPreference.CASTE_JSON, AppPreference.CASTE_JSON,jsonString);
+    }
+
+    public static List<String> getCasteList(Activity activity) {
+        List<String> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.CASTE_JSON, AppPreference.CASTE_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static void setCityList(List<SingleResponse> list, Activity activity){
+        List<String> list_ = new ArrayList<>();
+        if(list != null && !list.isEmpty()){
+            for(SingleResponse obj : list){
+                Log.i("ss_nw_call", "looper adding "+obj.getResult());
+                list_.add(obj.getResult());
+            }
+        }
+        String jsonString = new Gson().toJson(list_);
+        AppPreference.setStringPref(activity, AppPreference.CITY_JSON, AppPreference.CITY_JSON,jsonString);
+    }
+
+    public static List<String> getCityList(Activity activity) {
+        List<String> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.CITY_JSON, AppPreference.CITY_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static void setOccupationList(List<SingleResponse> list, Activity activity){
         List<String> list_ = new ArrayList<>();
         if(list != null && !list.isEmpty()){
             for(SingleResponse obj : list){
@@ -192,7 +234,6 @@ public class LocalCache {
         }
         String jsonString = new Gson().toJson(list_);
         AppPreference.setStringPref(activity, AppPreference.OCCUPATION_JSON, AppPreference.OCCUPATION_JSON,jsonString);
-        return jsonString;
     }
 
     public static List<String> getOccupationList(Activity activity) {
@@ -204,6 +245,170 @@ public class LocalCache {
             list = gson.fromJson(jsonString, type);
         }
         return list;
+    }
+
+
+    public static void setLastnamesList(List<SingleResponse> list, Activity activity){
+        List<String> list_ = new ArrayList<>();
+        if(list != null && !list.isEmpty()){
+            for(SingleResponse obj : list){
+                list_.add(obj.getResult());
+            }
+        }
+        String jsonString = new Gson().toJson(list_);
+        AppPreference.setStringPref(activity, AppPreference.LASTNAMES_JSON, AppPreference.LASTNAMES_JSON,jsonString);
+    }
+
+    public static List<String> getLastnamesList(Activity activity) {
+        List<String> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.LASTNAMES_JSON, AppPreference.LASTNAMES_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+
+    public static void setCustomerActivity(CustomerActivityModal modal, Activity activity){
+        if(modal != null){
+            String jsonString = new Gson().toJson(modal);
+            AppPreference.setStringPref(activity, AppPreference.CUSTOMER_ACTIVITY_JSON, AppPreference.CUSTOMER_ACTIVITY_JSON,jsonString);
+        }
+    }
+
+    public static CustomerActivityModal getCustomerActivity(Activity activity) {
+        CustomerActivityModal modal;
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.CUSTOMER_ACTIVITY_JSON, AppPreference.CUSTOMER_ACTIVITY_JSON);
+        if (!jsonString.isEmpty())
+            modal = new Gson().fromJson(jsonString, CustomerActivityModal.class);
+        else
+            modal = new CustomerActivityModal();
+        return modal;
+    }
+
+
+    public static void setContactviewedMatchesList(Boolean clearList , Activity activity){
+        List<Level_1_cardModal> finalList = new ArrayList<>();
+
+        if(!clearList){
+            List<Level_1_cardModal> templist = getLevel1List(activity);
+
+            for(Level_1_cardModal obj : templist){
+                if(obj.getIsViewed().equalsIgnoreCase("1"))
+                    finalList.add(obj);
+            }
+        }
+
+        String jsonString = new Gson().toJson(finalList);
+        AppPreference.setStringPref(activity, AppPreference.MATCHES_CONTACTVIEWED_JSON, AppPreference.MATCHES_CONTACTVIEWED_JSON,jsonString);
+    }
+
+    public static List<Level_1_cardModal> getContactviewedMatchesList(Activity activity) {
+        List<Level_1_cardModal> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.MATCHES_CONTACTVIEWED_JSON, AppPreference.MATCHES_CONTACTVIEWED_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<Level_1_cardModal>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static void setLikedMatchesList(Boolean clearList , Activity activity){
+        List<Level_1_cardModal> finalList = new ArrayList<>();
+        if(!clearList){
+            List<Level_1_cardModal> templist = getLevel1List(activity);
+            for(Level_1_cardModal obj : templist){
+                if(obj.getIsLiked().equalsIgnoreCase("1"))
+                    finalList.add(obj);
+            }
+        }
+
+        String jsonString = new Gson().toJson(finalList);
+        AppPreference.setStringPref(activity, AppPreference.MATCHES_LIKED_JSON, AppPreference.MATCHES_LIKED_JSON,jsonString);
+    }
+
+    public static List<Level_1_cardModal> getLikedMatchesList(Activity activity) {
+        List<Level_1_cardModal> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.MATCHES_LIKED_JSON, AppPreference.MATCHES_LIKED_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<Level_1_cardModal>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static void setShortlistedMatchesList(Boolean clearList , Activity activity){
+        List<Level_1_cardModal> finalList = new ArrayList<>();
+        if(!clearList){
+            List<Level_1_cardModal> templist = getLevel1List(activity);
+            for(Level_1_cardModal obj : templist){
+                if(obj.getIsShortlisted().equalsIgnoreCase("1"))
+                    finalList.add(obj);
+            }
+        }
+
+        String jsonString = new Gson().toJson(finalList);
+        AppPreference.setStringPref(activity, AppPreference.MATCHES_SHORTLISTED_JSON, AppPreference.MATCHES_SHORTLISTED_JSON,jsonString);
+    }
+
+    public static List<Level_1_cardModal> getShortlistedMatchesList(Activity activity) {
+        List<Level_1_cardModal> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.MATCHES_SHORTLISTED_JSON, AppPreference.MATCHES_SHORTLISTED_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<Level_1_cardModal>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static void setSentinterestMatchesList(Boolean clearList ,Activity activity){
+        List<Level_1_cardModal> finalList = new ArrayList<>();
+        if(!clearList){
+            List<Level_1_cardModal> templist = getLevel1List(activity);
+            for(Level_1_cardModal obj : templist){
+                if(obj.getIsInterestsent().equalsIgnoreCase("1"))
+                    finalList.add(obj);
+            }
+        }
+
+        String jsonString = new Gson().toJson(finalList);
+        AppPreference.setStringPref(activity, AppPreference.MATCHES_SENTINTEREST_JSON, AppPreference.MATCHES_SENTINTEREST_JSON,jsonString);
+    }
+
+    public static List<Level_1_cardModal> getSentinterestMatchesList(Activity activity) {
+        List<Level_1_cardModal> list = new ArrayList<>();
+        String jsonString = AppPreference.getStringPref(activity, AppPreference.MATCHES_SENTINTEREST_JSON, AppPreference.MATCHES_SENTINTEREST_JSON);
+        if (!jsonString.isEmpty()){
+            Type type = new TypeToken<ArrayList<Level_1_cardModal>>() {}.getType();
+            Gson gson = new Gson();
+            list = gson.fromJson(jsonString, type);
+        }
+        return list;
+    }
+
+    public static void updateLevel1List(Level_1_cardModal updatedItem, Activity activity, boolean toBeRemoved) {
+        List<Level_1_cardModal> cachedData = getLevel1List(activity);
+
+        if (cachedData != null) {
+            for (Level_1_cardModal item : cachedData) {
+                if (item.getProfileId().equals(updatedItem.getProfileId())) {
+                    if (toBeRemoved) {
+                        cachedData.remove(item);
+                    } else {
+                        // Update the specific item in the cached data with the same object reference
+                        cachedData.set(cachedData.indexOf(item), updatedItem);
+                    }
+
+                    setLevel1List(cachedData, activity); // Update the cached data
+                    return; // Exit the loop early
+                }
+            }
+        }
     }
 
 

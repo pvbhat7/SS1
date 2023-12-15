@@ -7,14 +7,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    public static final String TAVROS_SERVER = "http://tavrostechinfo.com/PROGYM/progym_online/api/";
-    public static final String GGS_SERVER = "http://tavrostechinfo.com/PROGYM/ggs/api/";
+    public static final String TAVROS_SERVER = "https://tavrostechinfo.com/PROGYM/progym_online/api/";
+    public static final String GGS_SERVER = "https://tavrostechinfo.com/PROGYM/ggs/api/";
 
-    public static final String MATRIMONY_SERVER = "http://tavrostechinfo.com/matrimony/api/";
-    public static final String TEST_SERVER = "http://tavrostechinfo.com/PROGYM/test_api/api/";
-    public static final String LOCALHOST_SERVER = "http://localhost/progym_online/api/";
+    public static final String MATRIMONY_SERVER = "https://tavrostechinfo.com/matrimony/api/";
+    //public static final String MATRIMONY_SERVER = "https://tavrostechinfo.com/matrimony/api/";
+    public static final String TEST_SERVER = "https://tavrostechinfo.com/PROGYM/test_api/api/";
+    public static final String LOCALHOST_SERVER = "https://localhost/progym_online/api/";
 
-    private static String BASE_URL = "http://192.168.1.11/progym_online/api/";
+    private static String BASE_URL = "https://192.168.1.11/progym_online/api/";
     private static RetrofitClient retrofitClient;
     private static Retrofit retrofit;
 

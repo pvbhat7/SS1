@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    android:id="@+id/resultCard"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="550dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="20dp"
+    android:layout_margin="5dp">
+    <LinearLayout
+        android:foregroundGravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/noticebar_card"
+            android:clickable="true"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:id="@+id/notice_header"
+                android:gravity="center_vertical"
+                android:textAlignment="center"
+                android:textColor="@color/txtcolor"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/roboto_bold"
+                android:text="Notifications"
+                android:layout_width="fill_parent"/>
+
+        </androidx.cardview.widget.CardView>
+
+       <ImageView
+           android:src="@drawable/updateapp"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"/>
+
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

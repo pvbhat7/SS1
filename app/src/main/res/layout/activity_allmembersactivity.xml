@@ -51,10 +51,18 @@
 
     </androidx.cardview.widget.CardView>
 
-
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:visibility="gone"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progressBar1"
+        style="@style/SpinKitView.Large.MultiplePulse"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_gravity="center"
+        app:SpinKit_Color="@color/colorAccent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview"
+        android:id="@+id/allmembersrecyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="30dp"

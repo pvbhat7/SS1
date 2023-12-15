@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -57,7 +58,22 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.name.setText(obj.getName());
         holder.mobile.setText(obj.getMobile());
         holder.date.setText(obj.getDate());
+        holder.date.setText(obj.getDate());
         holder.amount.setText("Rs. "+obj.getAmount());
+        holder.countUsed.setText("Count used : "+obj.getCountUsed());
+        Glide.with(activity)
+                .load(obj.getPhoto())
+                .placeholder(R.drawable.oops)
+                .into(holder.photo);
+
+        holder.parentLayout.setOnClickListener(view -> {
+            Dialog d = new Dialog(activity);
+            d.setContentView(R.layout.transactions_dialog);
+            ((TextView)d.findViewById(R.id.title)).setText("Contacts viewed");
+            ApiCallUtil.getAllViewedContacts(obj.getCpid(),d,activity);
+            //d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            d.show();
+        });
     }
 
     // getItemCount() method returns the size of the list
@@ -74,7 +90,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-       public TextView name , mobile , date , amount;
+       public TextView name , mobile , date , amount,countUsed;
+        CircularImageView photo;
+       LinearLayout parentLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -82,6 +100,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             this.mobile = itemView.findViewById(R.id.mobile);
             this.date = itemView.findViewById(R.id.date);
             this.amount = itemView.findViewById(R.id.amount);
+            this.countUsed = itemView.findViewById(R.id.countUsed);
+            this.parentLayout = itemView.findViewById(R.id.parentLayout);
+            this.photo = itemView.findViewById(R.id.photo);
+
+
         }
     }
 

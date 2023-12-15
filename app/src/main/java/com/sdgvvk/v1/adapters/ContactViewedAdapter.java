@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.activity.AdminZoneActivity;
+import com.sdgvvk.v1.activity.Level2ProfileActivity;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.modal.ContactViewedModal;
 import com.karumi.dexter.Dexter;
@@ -66,7 +70,8 @@ public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdap
             Glide.with(activity)
                     .load(obj.getPhoto())
                     .into(holder.cv_photo);
-            holder.cv_card.setOnClickListener(view -> ApiCallUtil.getLevel2Data(obj.getVcpid(), activity));
+            holder.cv_card.setOnClickListener(view -> activity.startActivity(new Intent(activity, Level2ProfileActivity.class)
+                    .putExtra("level2data", obj.getVcpid())));
 
             holder.cv_whatstappicon.setOnClickListener(view -> {
                 Customer loggedinCustomer = LocalCache.getLoggedInCustomer(activity);
@@ -109,8 +114,13 @@ public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdap
                     }).check());
 
             holder.cv_instaicon.setOnClickListener(view -> {
-
+                Toast.makeText(activity, "not available...", Toast.LENGTH_SHORT).show();
             });
+
+            if(obj.getIsDummy().equalsIgnoreCase("yes")){
+                holder.marriage_card.setVisibility(View.VISIBLE);
+                holder.contactPanel.setVisibility(View.GONE);
+            }
 
         }
     }
@@ -126,7 +136,8 @@ public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdap
         public TextView cv_name,cv_city,cv_age,cv_viewedOn;
 
         public ImageView cv_photo,cv_callicon,cv_whatstappicon,cv_instaicon;
-        CardView cv_card;
+        CardView cv_card,marriage_card;
+        LinearLayout contactPanel;
         public ViewHolder(View itemView) {
             super(itemView);
             this.cv_name = itemView.findViewById(R.id.cv_name);
@@ -138,6 +149,9 @@ public class ContactViewedAdapter extends RecyclerView.Adapter<ContactViewedAdap
             this.cv_callicon = itemView.findViewById(R.id.cv_callicon);
             this.cv_whatstappicon = itemView.findViewById(R.id.cv_whatstappicon);
             this.cv_instaicon = itemView.findViewById(R.id.cv_instaicon);
+            this.contactPanel = itemView.findViewById(R.id.contactPanel);
+            this.marriage_card = itemView.findViewById(R.id.marriage_card);
+
         }
     }
 

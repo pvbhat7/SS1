@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -19,11 +20,10 @@ import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.HelperUtils;
 import com.sdgvvk.v1.adapters.Level_1_shortprofilecardAdapter;
 import com.sdgvvk.v1.modal.Customer;
+import com.sdgvvk.v1.modal.CustomerActivityModal;
 import com.sdgvvk.v1.modal.Level_1_cardModal;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -33,12 +33,13 @@ public class MatchesFragment extends Fragment {
 
     public CardView menu_contactsViewed, menu_shortlistedByYou, menu_likedByYou, menu_ignoredByYou, menu_interestSentByYou;
 
+    public TextView txt1, txt2, txt3, txt4;
+
     private View view;
 
-    SpinKitView progressBar;
 
     RecyclerView contactViewedRecyclerView;
-    
+
     Customer customer;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,58 +49,84 @@ public class MatchesFragment extends Fragment {
         HelperUtils.checkNetworkStatus(this.getActivity());
 
         customer = LocalCache.getLoggedInCustomer(this.getActivity());
-        
+
         initUIElements();
         handleOnclick();
-        syncLoggedInCustomer();
-        ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, "1",progressBar);
+        LocalCache.setContactviewedMatchesList(false,getActivity());
+        LocalCache.setLikedMatchesList(false,getActivity());
+        LocalCache.setShortlistedMatchesList(false,getActivity());
+        LocalCache.setSentinterestMatchesList(false,getActivity());
+
+        txt1.setText(LocalCache.getContactviewedMatchesList(this.getActivity()).size()+" Profiles");
+        txt2.setText(LocalCache.getLikedMatchesList(this.getActivity()).size()+" Profiles");
+        txt3.setText(LocalCache.getShortlistedMatchesList(this.getActivity()).size()+" Profiles");
+        txt4.setText(LocalCache.getSentinterestMatchesList(this.getActivity()).size()+" Profiles");
+
+        startRecyclerview(LocalCache.getContactviewedMatchesList(this.getActivity()));
+
+
+
+        //syncLoggedInCustomer();
+        //ApiCallUtil.syncUserActivity(customer.getProfileId(), this.getActivity());
+
+
         return view;
+    }
+
+    private void startRecyclerview(List<Level_1_cardModal> list) {
+
+            initRecyclerView(list);
     }
 
 
     private void initUIElements() {
-        progressBar = view.findViewById(R.id.progressBar);
         contactViewedRecyclerView = view.findViewById(R.id.contactViewedRecyclerView);
         coordinatorLayout = view.findViewById(R.id.level1CoordinatorLayout);
         menu_contactsViewed = view.findViewById(R.id.menu_contactsViewed);
         menu_shortlistedByYou = view.findViewById(R.id.menu_shortlistedByYou);
         menu_likedByYou = view.findViewById(R.id.menu_likedByYou);
-        menu_ignoredByYou = view.findViewById(R.id.menu_ignoredByYou);
+        //menu_ignoredByYou = view.findViewById(R.id.menu_ignoredByYou);
         menu_interestSentByYou = view.findViewById(R.id.menu_interestSentByYou);
+
+        txt1 = view.findViewById(R.id.txt1);
+        txt2 = view.findViewById(R.id.txt2);
+        txt3 = view.findViewById(R.id.txt3);
+        txt4 = view.findViewById(R.id.txt4);
     }
 
     private void handleOnclick() {
         menu_contactsViewed.setOnClickListener(view -> {
-            contactViewedRecyclerView.setVisibility(View.GONE);
-            ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, "1", progressBar);
             resetCardSelection(ProjectConstants.ACTION_VIEW_CONTACT_DETAILS);
+            startRecyclerview(LocalCache.getContactviewedMatchesList(this.getActivity()));
+            //ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, this.getActivity(), ProjectConstants.MATCHES_CONTACT_VIEWED);
         });
 
         menu_shortlistedByYou.setOnClickListener(view -> {
-            contactViewedRecyclerView.setVisibility(View.GONE);
-            ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, "2", progressBar);
             resetCardSelection(ProjectConstants.ACTION_SHORTLIST_PROFILE);
+            startRecyclerview(LocalCache.getShortlistedMatchesList(this.getActivity()));
+            //ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, this.getActivity(), ProjectConstants.MATCHES_SHORTLIST);
         });
 
         menu_likedByYou.setOnClickListener(view -> {
-            contactViewedRecyclerView.setVisibility(View.GONE);
-            ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, "3", progressBar);
             resetCardSelection(ProjectConstants.ACTION_LIKE_PROFILE);
+            startRecyclerview(LocalCache.getLikedMatchesList(this.getActivity()));
+            //ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, this.getActivity(), ProjectConstants.MATCHES_LIKED);
+
         });
 
-        menu_ignoredByYou.setOnClickListener(view -> {
+       /* menu_ignoredByYou.setOnClickListener(view -> {
             contactViewedRecyclerView.setVisibility(View.GONE);
             ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, "4", progressBar);
             resetCardSelection(ProjectConstants.ACTION_IGNORE_PROFILE);
-        });
+        });*/
         menu_interestSentByYou.setOnClickListener(view -> {
-            contactViewedRecyclerView.setVisibility(View.GONE);
-            ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, "5", progressBar);
             resetCardSelection(ProjectConstants.ACTION_SEND_INTEREST);
+            startRecyclerview(LocalCache.getSentinterestMatchesList(this.getActivity()));
+            //ApiCallUtil.getProfilesByTag(customer.getProfileId(), this, this.getActivity(), ProjectConstants.MATCHES_SENT_INTEREST);
+
         });
 
     }
-
 
 
     @Override
@@ -132,30 +159,34 @@ public class MatchesFragment extends Fragment {
     }
 
     private void resetCardSelection(String selection) {
-        menu_contactsViewed.setBackgroundColor(getResources().getColor(R.color.white));
-        menu_shortlistedByYou.setBackgroundColor(getResources().getColor(R.color.white));
-        menu_likedByYou.setBackgroundColor(getResources().getColor(R.color.white));
-        menu_ignoredByYou.setBackgroundColor(getResources().getColor(R.color.white));
-        menu_interestSentByYou.setBackgroundColor(getResources().getColor(R.color.white));
+        float cornerRadius = 15f; // Replace this with your desired corner radius
 
-        if(selection.equalsIgnoreCase(ProjectConstants.ACTION_VIEW_CONTACT_DETAILS))
-            menu_contactsViewed.setBackgroundColor(getResources().getColor(R.color.yellow));
-        else if(selection.equalsIgnoreCase(ProjectConstants.ACTION_LIKE_PROFILE))
-            menu_likedByYou.setBackgroundColor(getResources().getColor(R.color.yellow));
-        else if(selection.equalsIgnoreCase(ProjectConstants.ACTION_SHORTLIST_PROFILE))
-            menu_shortlistedByYou.setBackgroundColor(getResources().getColor(R.color.yellow));
-        else if(selection.equalsIgnoreCase(ProjectConstants.ACTION_SEND_INTEREST))
-            menu_interestSentByYou.setBackgroundColor(getResources().getColor(R.color.yellow));
-        else if(selection.equalsIgnoreCase(ProjectConstants.ACTION_IGNORE_PROFILE))
-            menu_ignoredByYou.setBackgroundColor(getResources().getColor(R.color.yellow));
+        menu_contactsViewed.setCardBackgroundColor(getResources().getColor(R.color.white));
+        menu_shortlistedByYou.setCardBackgroundColor(getResources().getColor(R.color.white));
+        menu_likedByYou.setCardBackgroundColor(getResources().getColor(R.color.white));
+        menu_interestSentByYou.setCardBackgroundColor(getResources().getColor(R.color.white));
 
+        if (selection.equalsIgnoreCase(ProjectConstants.ACTION_VIEW_CONTACT_DETAILS)) {
+            menu_contactsViewed.setCardBackgroundColor(getResources().getColor(R.color.yellow));
+            menu_contactsViewed.setRadius(cornerRadius);
+        } else if (selection.equalsIgnoreCase(ProjectConstants.ACTION_LIKE_PROFILE)) {
+            menu_likedByYou.setCardBackgroundColor(getResources().getColor(R.color.yellow));
+            menu_likedByYou.setRadius(cornerRadius);
+        } else if (selection.equalsIgnoreCase(ProjectConstants.ACTION_SHORTLIST_PROFILE)) {
+            menu_shortlistedByYou.setCardBackgroundColor(getResources().getColor(R.color.yellow));
+            menu_shortlistedByYou.setRadius(cornerRadius);
+        } else if (selection.equalsIgnoreCase(ProjectConstants.ACTION_SEND_INTEREST)) {
+            menu_interestSentByYou.setCardBackgroundColor(getResources().getColor(R.color.yellow));
+            menu_interestSentByYou.setRadius(cornerRadius);
+        }
+        // Add more conditions if needed for other cards
     }
 
-    private void syncLoggedInCustomer() {
+   /* private void syncLoggedInCustomer() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            ApiCallUtil.updateLoggedInCustomerDetails(this.getActivity(),user.getPhoneNumber().replace("+91",""));
+            ApiCallUtil.updateLoggedInCustomerDetails(this.getActivity(), user.getPhoneNumber().replace("+91", ""));
         }
-    }
+    }*/
 
 }
