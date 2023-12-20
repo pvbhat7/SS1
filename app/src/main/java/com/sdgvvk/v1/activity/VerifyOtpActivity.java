@@ -4,10 +4,7 @@ package com.sdgvvk.v1.activity;
 import static com.google.android.material.internal.ViewUtils.hideKeyboard;
 import static com.google.android.material.internal.ViewUtils.showKeyboard;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,9 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.google.android.gms.auth.api.phone.SmsRetriever;
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.common.api.Status;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,7 +43,6 @@ public class VerifyOtpActivity extends AppCompatActivity {
     EditText otptext;
     Button buttonVerifyOtp;
 
-    private MySMSBroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +50,9 @@ public class VerifyOtpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_otp);
 
-        receiver = new MySMSBroadcastReceiver();
         initFields();
         onclickListeners();
 
-        // Register a broadcast receiver to listen for the SMS
-        // Register the receiver
-        registerReceiver(receiver, new IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION));
         handleVerifyOtpFunctionality();
         otptext.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -72,40 +61,6 @@ public class VerifyOtpActivity extends AppCompatActivity {
 
     }
 
-    class MySMSBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (SmsRetriever.SMS_RETRIEVED_ACTION.equals(intent.getAction())) {
-                Log.i("ss_nw_call", "verify otp : BroadcastReceiver onReceive");
-                Bundle extras = intent.getExtras();
-                if (extras != null) {
-                    Status status = (Status) extras.get(SmsRetriever.EXTRA_STATUS);
-                    Log.i("ss_nw_call", "verify otp : statuscode "+status.getStatusCode());
-                    if (status != null) {
-                        switch (status.getStatusCode()) {
-                            case CommonStatusCodes.SUCCESS:
-                                // Get the SMS message
-                                String message = extras.getString(SmsRetriever.EXTRA_SMS_MESSAGE);
-                                Log.i("ss_nw_call", "verify otp : message "+message);
-                                // Extract the verification code from the SMS and auto-fill the OTP EditText
-                                // You can use a regular expression to extract the code or any other method
-                                if (message != null) {
-                                    String code = extractCodeFromMessage(message);
-                                    Log.i("ss_nw_call", "verify otp : otp "+code);
-                                    otptext.setText(code);
-                                }
-                                break;
-
-                            case CommonStatusCodes.TIMEOUT:
-                                Log.i("ss_nw_call", "verify otp : timeout");
-                                // SMS retrieval timed out
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-    };
 
     private void onclickListeners() {
         otptext.addTextChangedListener(new TextWatcher() {
@@ -228,32 +183,10 @@ public class VerifyOtpActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
     }
 
-    // Method to start SMS retrieval
-
-    // Method to extract the verification code from the SMS message
-    private String extractCodeFromMessage(String message) {
-        // Implement your logic to extract the code from the SMS message
-        // For example, you can use a regular expression to find the code
-        // Modify this according to the format of the OTP in your SMS
-        Pattern pattern = Pattern.compile("(\\d{6})");
-        Matcher matcher = pattern.matcher(message);
-
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else {
-            // Handle the case where the code couldn't be extracted
-            return "";
-        }
-    }
 
 
     @Override
     protected void onDestroy() {
-        // Unregister the receiver to avoid memory leaks
-        if (receiver != null) {
-            unregisterReceiver(receiver);
-        }
-
         super.onDestroy();
     }
 }

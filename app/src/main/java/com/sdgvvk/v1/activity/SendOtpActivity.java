@@ -19,15 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.google.android.gms.auth.api.phone.SmsRetriever;
-import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
@@ -35,7 +31,6 @@ import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.UpdateAvailability;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -50,11 +45,7 @@ import com.sdgvvk.v1.ProjectConstants;
 import com.sdgvvk.v1.R;
 import com.sdgvvk.v1.api.ApiCallUtil;
 import com.sdgvvk.v1.api.HelperUtils;
-import com.sdgvvk.v1.modal.Customer;
-import com.sdgvvk.v1.modal.CustomerActivityModal;
-import com.sdgvvk.v1.modal.OrderModal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SendOtpActivity extends AppCompatActivity {
@@ -189,7 +180,6 @@ public class SendOtpActivity extends AppCompatActivity {
 
                 }
                 else{
-                    askPermission();
                     boxCard.setVisibility(View.VISIBLE);
 
                 }
@@ -259,7 +249,6 @@ public class SendOtpActivity extends AppCompatActivity {
         });
 
         buttonGetOtp.setOnClickListener(view -> {
-            startSmsRetriever();
             hideKeyboard(view);
             if (!HelperUtils.isConnected(this)) {
                 Toast.makeText(SendOtpActivity.this, "NO INTERNET", Toast.LENGTH_SHORT).show();
@@ -365,35 +354,7 @@ public class SendOtpActivity extends AppCompatActivity {
 
     }
 
-    private void askPermission() {
-        Dexter.withActivity(this)
-                .withPermissions(Manifest.permission.RECEIVE_SMS)
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()) {
-                        }
-                    }
 
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }).check();
-    }
-
-    private void startSmsRetriever() {
-        SmsRetrieverClient client = SmsRetriever.getClient(this /* context */);
-
-        Task<Void> task = client.startSmsRetriever();
-
-        task.addOnSuccessListener(aVoid -> {
-            // SMS retrieval successfully started
-            Log.i("ss_nw_call", "verify otp : startSmsRetriever addOnSuccessListener");
-        });
-
-        task.addOnFailureListener(e -> Log.i("ss_nw_call", "verify otp : startSmsRetriever addOnFailureListener"));
-    }
 
 
 }

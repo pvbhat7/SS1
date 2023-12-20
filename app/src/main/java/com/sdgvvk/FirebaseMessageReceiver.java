@@ -132,7 +132,6 @@ public class FirebaseMessageReceiver
 
     private NotificationCompat.Builder getSimpleBuilder(int noti_id, Intent intent, String title, String message,String channelId) {
         int color = ContextCompat.getColor(this, R.color.colorPrimary);
-        //sentPI = PendingIntent.getBroadcast(activity.getApplicationContext(),0,new Intent("SMS_SENT").setAction(Long.toString(System.currentTimeMillis())), PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, noti_id, intent.setAction(Long.toString(System.currentTimeMillis())), PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat
                 .Builder(getApplicationContext(),

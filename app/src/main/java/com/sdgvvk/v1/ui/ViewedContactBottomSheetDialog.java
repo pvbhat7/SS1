@@ -2,11 +2,9 @@ package com.sdgvvk.v1.ui;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -25,7 +22,9 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.sdgvvk.v1.LocalCache;
 import com.sdgvvk.v1.R;
+import com.sdgvvk.v1.modal.Customer;
 import com.sdgvvk.v1.modal.Level_2_Modal;
 
 import java.net.URLEncoder;
@@ -33,10 +32,9 @@ import java.util.List;
 
 public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
 
-    String profileLink,name ;
+    String loggedincustomerprofilelink,profileLink,name ;
 
     private static String mobile = "" , message = "श्री दत्त गुरु वधू-वर केंद्र : \n अँप डाउनलोड लिंक \n: http://bit.ly/3SsXq7M";
-    private static final int REQUEST_SMS = 1;
 
     private String youtubelink = "https://www.youtube.com/watch?v=Nzurh8PXEuM&t=2s";
     Activity activity;
@@ -75,6 +73,9 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
     private void handleOnClickListeners() {
 
         if(obj != null){
+            Customer loggedincustomer = LocalCache.getLoggedInCustomer(this.getActivity());
+
+            loggedincustomerprofilelink = "https://tavrostechinfo.com/profile?id="+loggedincustomer.getProfileId()+" ";
             profileLink = "https://tavrostechinfo.com/profile?id="+obj.getProfileId()+" ";
             name = obj.getFirstname()+" "+obj.getLastname();
 
@@ -87,7 +88,7 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
 
                 whatsapp1.setOnClickListener(view -> {
                     mobile = obj.getMobile1();
-                    smstrigger();
+                    
                     sendWhatsappMsg("+91" + obj.getMobile1().toString().trim());
                 });
             }
@@ -100,7 +101,7 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
 
                 whatsapp2.setOnClickListener(view -> {
                     mobile = obj.getMobile2();
-                    smstrigger();
+                    
                     sendWhatsappMsg("+91" + obj.getMobile2().toString().trim());
                 });
             }
@@ -113,7 +114,7 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
 
                 whatsapp3.setOnClickListener(view -> {
                     mobile = obj.getMobile3();
-                    smstrigger();
+                    
                     sendWhatsappMsg("+91" + obj.getMobile3().toString().trim());
                 });
             }
@@ -126,7 +127,7 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
 
                 whatsapp4.setOnClickListener(view -> {
                     mobile = obj.getMobile4();
-                    smstrigger();
+                    
                     sendWhatsappMsg("+91" + obj.getMobile4().toString().trim());
                 });
             }
@@ -157,37 +158,14 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
                 }).check();
     }
 
-    private void smstrigger() {
-        Dexter.withActivity(activity)
-                .withPermissions(Manifest.permission.SEND_SMS)
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()) {
-                            sendSMS();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }).check();
-    }
 
     private void sendWhatsappMsg(String phoneNumber) {
         String message = "नमस्कार "+name+",\n" +
-                "\n" +
-                "    \"*श्री दत्त गुरु वधू-वर केंद्र*\" मध्ये आपले हार्दिक स्वागत. \uD83C\uDF89 \uD83C\uDF89 \uD83C\uDF89\n" +
-                "    \nआम्हाला हे सांगताना खूप आनंद होत आहे की आम्ही स्वतःचे वधू-वर सूचक केंद्र सुरु केलं आहे तरी सर्वांनी \n" +
-                "     खालील लिंक वापरून स्थळें website आणि  app वर पाहू शकता.\n" +
-                "\n" +
-                "    अँप डाउनलोड लिंक :\uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \n https://play.google.com/store/apps/details?id=com.sdgvvk.v1\n\n"
-                +"    अधिक माहिती साठी आमचा youtube विडिओ पाहावा  :\uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \n"+youtubelink+"\n\n\n" +
-                "    तुमची प्रोफाइल  लिंक :\uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \n"+profileLink+"\n\n" +
-                "\n" +
-                "    आमचे अँप डाउनलोड करून तुम्ही भरपूर स्थळे पाहू शकता अगदी माफक दारात.\n" +
-                "    अधिक माहिती साठी आम्हाला संपर्क करा : 7972864487";
+                "\n मी तुमची profile \"श्री दत्त गुरु वधू-वर केंद्र अँप\" वर पहिली आहे आणि मला profile आवडली आहे.\nतरी आपण सुद्धा एकदा माझी profile पाहावी खालील लिंक ओपन करून  " +
+                "\n\n" + " माझी प्रोफाइल  लिंक :\uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \n"+loggedincustomerprofilelink+"\n\n"
+                +"   तुमची प्रोफाइल  लिंक :\uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \n"+profileLink+"\n\n" +
+                "\n अँप डाउनलोड लिंक :\uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \uD83D\uDC47\uD83C\uDFFB \n https://play.google.com/store/apps/details?id=com.sdgvvk.v1";
+
         // create an Intent to send data to the whatsapp
         Intent intent = new Intent(Intent.ACTION_VIEW);    // setting action
 
@@ -226,19 +204,6 @@ public class ViewedContactBottomSheetDialog extends BottomSheetDialogFragment {
         mobile4txt = v.findViewById(R.id.mobile4);
     }
 
-    private void sendSMS() {
-
-        try {
-            SmsManager sms = SmsManager.getDefault();
-            PendingIntent sentPI;
-            String SENT = "SMS_SENT";
-            sentPI = PendingIntent.getBroadcast(activity.getApplicationContext(), 0,new Intent(SENT), PendingIntent.FLAG_IMMUTABLE);
-            sms.sendTextMessage(mobile, null, message, sentPI, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(activity, "SMS sending failed", Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
 }
