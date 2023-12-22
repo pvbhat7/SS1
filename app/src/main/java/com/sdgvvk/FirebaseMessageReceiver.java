@@ -77,7 +77,7 @@ public class FirebaseMessageReceiver
 
         Intent intent = getNotificationIntent(dataMap , noti_id , remoteMessage);
 
-        if(!notificationType.isEmpty()){
+        if(notificationType != null && !notificationType.isEmpty()){
 
             if(notificationType.equalsIgnoreCase(ProjectConstants.SIMPLE)){
                 builder = getSimpleBuilder(noti_id , intent , title , message,String.valueOf(noti_id));

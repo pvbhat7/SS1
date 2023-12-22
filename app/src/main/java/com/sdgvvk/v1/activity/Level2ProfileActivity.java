@@ -157,7 +157,7 @@ public class Level2ProfileActivity extends AppCompatActivity {
                 if (viewedProfile_.getIsDummy() != null && viewedProfile_.getIsDummy().equalsIgnoreCase("yes")) {
                     marriage_card.setVisibility(View.VISIBLE);
                 } else {
-                    new ViewedContactBottomSheetDialog(activity, viewedProfile).show(((Level2ProfileActivity) activity).getSupportFragmentManager(), "ViewedContactBottomSheetDialog");
+                    showViewedContactBottomSheet();
                     //contact_card.setVisibility(View.VISIBLE);
                 }
 
@@ -467,6 +467,24 @@ public class Level2ProfileActivity extends AppCompatActivity {
             // Add the new fragment
             BuyMembershipBottomSheetDialog buyMembershipBottomSheetDialog = new BuyMembershipBottomSheetDialog(activity);
             buyMembershipBottomSheetDialog.show(fragmentManager, "BuyMembershipBottomSheetDialog");
+        }
+
+    }
+
+    public static void showViewedContactBottomSheet() {
+        FragmentManager fragmentManager = ((Level2ProfileActivity) activity).getSupportFragmentManager();
+
+        ViewedContactBottomSheetDialog existingFragment = (ViewedContactBottomSheetDialog) fragmentManager.findFragmentByTag("ViewedContactBottomSheetDialog");
+
+        if (existingFragment != null) {
+            // Remove the existing fragment
+            fragmentManager.beginTransaction().remove(existingFragment).commit();
+        }
+
+        if (!fragmentManager.isStateSaved()) {
+            // Add the new fragment
+            ViewedContactBottomSheetDialog viewedContactBottomSheetDialog = new ViewedContactBottomSheetDialog(activity, viewedProfile);
+            viewedContactBottomSheetDialog.show(fragmentManager, "ViewedContactBottomSheetDialog");
         }
 
     }
