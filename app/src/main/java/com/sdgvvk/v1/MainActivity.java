@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onCreate");
+        //committing from branch v18
         super.onCreate(savedInstanceState);
 
         if (ctx == null || ((MainActivity) ctx).isDestroyed())
