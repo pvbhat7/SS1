@@ -78,15 +78,16 @@ public class AdminZoneActivity extends AppCompatActivity {
     public static String pushnotificationImage = null;
     public static final int PICK_IMAGE_REQUEST = 1;
 
-    LinearLayout link1, link2, link3 , link4 , link5 , link7 , inputLayout;
+    LinearLayout link1, link2, link3, link4, link5, link7, inputLayout;
 
     FloatingActionButton link6;
 
-    CardView card1, card2 , card3 , card4, card5, card6, card7 , card8 , card9;
+    CardView card1, card2, card7, card8, card9;
 
     static String searchBy = "";
-    Activity activity ;
+    Activity activity;
     SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +112,15 @@ public class AdminZoneActivity extends AppCompatActivity {
         });
 
         link2.setOnClickListener(view -> {
-            Dexter.withActivity(activity)
+            Dialog d = new Dialog(activity);
+            d.setContentView(R.layout.assign_membership_dialog);
+            inputLayout = d.findViewById(R.id.inputLayout);
+
+            handleAssignMembership(d, activity);
+            d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            d.show();
+
+            /*Dexter.withActivity(activity)
                     .withPermissions(Manifest.permission.SEND_SMS)
                     .withListener(new MultiplePermissionsListener() {
                         @Override
@@ -131,7 +140,7 @@ public class AdminZoneActivity extends AppCompatActivity {
                         public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                             token.continuePermissionRequest();
                         }
-                    }).check();
+                    }).check();*/
 
         });
 
@@ -169,22 +178,11 @@ public class AdminZoneActivity extends AppCompatActivity {
             callAllmembersActivity("allmale");
         });
 
-        card3.setOnClickListener(view -> {
-            callAllmembersActivity("malewithphotos");
-        });
-        card4.setOnClickListener(view -> {
-            callAllmembersActivity("malewithoutphotos");
-        });
 
         card2.setOnClickListener(view -> {
             callAllmembersActivity("allfemale");
         });
-        card5.setOnClickListener(view -> {
-            callAllmembersActivity("femalewithphotos");
-        });
-        card6.setOnClickListener(view -> {
-            callAllmembersActivity("femalewithoutphotos");
-        });
+
 
         card7.setOnClickListener(view -> {
             callAllmembersActivity("allpaidmembers");
@@ -199,8 +197,8 @@ public class AdminZoneActivity extends AppCompatActivity {
             Dialog d = new Dialog(this);
             Activity activity = this;
             d.setContentView(R.layout.transactions_dialog);
-            ((TextView)d.findViewById(R.id.title)).setText("Total Collection");
-            ApiCallUtil.getAllTransactions(d,activity);
+            ((TextView) d.findViewById(R.id.title)).setText("Total Collection");
+            ApiCallUtil.getAllTransactions(d, activity);
             //d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             d.show();
         });
@@ -220,27 +218,26 @@ public class AdminZoneActivity extends AppCompatActivity {
         Button saveBtn = d.findViewById(R.id.save);
         Button uploadimage = d.findViewById(R.id.uploadimage);
 
-        notificationtype.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{ProjectConstants.SIMPLE,ProjectConstants.EXPANDED,ProjectConstants.COLLAPSED}));
-        activitytype.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{ProjectConstants.MAIN_ACTIVITY,ProjectConstants.NOTIFICATION_ACTIVITY,ProjectConstants.LEVEL_2_PROFILE_ACTIVITY}));
+        notificationtype.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{ProjectConstants.SIMPLE, ProjectConstants.EXPANDED, ProjectConstants.COLLAPSED}));
+        activitytype.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{ProjectConstants.MAIN_ACTIVITY, ProjectConstants.NOTIFICATION_ACTIVITY, ProjectConstants.LEVEL_2_PROFILE_ACTIVITY}));
         filter.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{"all", "allmale", "allfemale", "allpaid", "allnonpaid", "allactive"}));
-        category.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{ProjectConstants.CATEGORY_SMALL_TEXT_DIALOG , ProjectConstants.CATEGORY_IMAGE_DIALOG , ProjectConstants.CATEGORY_LONG_TEXT_MESSAGE}));
+        category.setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, new String[]{ProjectConstants.CATEGORY_SMALL_TEXT_DIALOG, ProjectConstants.CATEGORY_IMAGE_DIALOG, ProjectConstants.CATEGORY_LONG_TEXT_MESSAGE}));
 
         saveBtn.setOnClickListener(view1 -> {
-            if(!( activitytype.getText().toString().isEmpty()
-                    ||title.getText().toString().isEmpty()
+            if (!(activitytype.getText().toString().isEmpty()
+                    || title.getText().toString().isEmpty()
                     || subtitle.getText().toString().isEmpty()
                     || notificationtype.getText().toString().isEmpty()
-                    ||filter.getText().toString().isEmpty()
-                    || category.getText().toString().isEmpty()  )){
+                    || filter.getText().toString().isEmpty()
+                    || category.getText().toString().isEmpty())) {
                 d.dismiss();
 
                 FcmNotificationModal fcmNotificationModal = new
-                        FcmNotificationModal(title.getText().toString().trim() , subtitle.getText().toString().trim() , pushnotificationImage ,
-                        category.getText().toString().trim(),longtext.getText().toString().trim(),"NotificationActivity",notificationtype.getText().toString().trim(),"false",filter.getText().toString().trim());
-                ApiCallUtil.addPushNotificationToServer(activity,fcmNotificationModal);
+                        FcmNotificationModal(title.getText().toString().trim(), subtitle.getText().toString().trim(), pushnotificationImage,
+                        category.getText().toString().trim(), longtext.getText().toString().trim(), "NotificationActivity", notificationtype.getText().toString().trim(), "false", filter.getText().toString().trim());
+                ApiCallUtil.addPushNotificationToServer(activity, fcmNotificationModal);
                 Toast.makeText(AdminZoneActivity.this, "submitted...", Toast.LENGTH_SHORT).show();
-            }
-            else
+            } else
                 Toast.makeText(AdminZoneActivity.this, "please fill all details", Toast.LENGTH_SHORT).show();
 
 
@@ -254,14 +251,12 @@ public class AdminZoneActivity extends AppCompatActivity {
         });
 
 
-
-
         d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         d.show();
     }
 
     private void callAllmembersActivity(String key) {
-        Log.i("ss_nw_call", "selected key : "+key);
+        Log.i("ss_nw_call", "selected key : " + key);
         HelperUtils.vibrateFunction(AdminZoneActivity.this);
         Intent intent = new Intent(AdminZoneActivity.this, AllMemberActivity.class);
         intent.putExtra("key", key);
@@ -281,10 +276,6 @@ public class AdminZoneActivity extends AppCompatActivity {
         link7 = findViewById(R.id.link7);
         card1 = findViewById(R.id.card1);
         card2 = findViewById(R.id.card2);
-        card3 = findViewById(R.id.card3);
-        card4 = findViewById(R.id.card4);
-        card5 = findViewById(R.id.card5);
-        card6 = findViewById(R.id.card6);
         card7 = findViewById(R.id.card7);
         card8 = findViewById(R.id.card8);
         card9 = findViewById(R.id.card9);
@@ -303,7 +294,7 @@ public class AdminZoneActivity extends AppCompatActivity {
         EditText searchValue = d.findViewById(R.id.searchValue);
         Button searchBtn = d.findViewById(R.id.searchBtn);
 
-        ((TextInputEditText)d.findViewById(R.id.txnDate)).setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        ((TextInputEditText) d.findViewById(R.id.txnDate)).setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         byName.setOnClickListener(view1 -> {
             inputLayout.setVisibility(View.VISIBLE);
             byName.setCardBackgroundColor(Color.YELLOW);
@@ -362,10 +353,10 @@ public class AdminZoneActivity extends AppCompatActivity {
 
         List<MembershipModal> membershiplist = LocalCache.getMembershipList(this);
         List<String> mlist = new ArrayList<>();
-        Map<String, String > map = new HashMap<>();
-        for(MembershipModal m : membershiplist){
-            mlist.add(m.getDescription()+"  -  Rs."+m.getFees()+"  -> ("+m.getCount()+" contacts)");
-            map.put(m.getDescription()+"  -  Rs."+m.getFees()+"  -> ("+m.getCount()+" contacts)",m.getId());
+        Map<String, String> map = new HashMap<>();
+        for (MembershipModal m : membershiplist) {
+            mlist.add(m.getDescription() + "  -  Rs." + m.getFees() + "  -> (" + m.getCount() + " contacts)");
+            map.put(m.getDescription() + "  -  Rs." + m.getFees() + "  -> (" + m.getCount() + " contacts)", m.getId());
         }
         ((AutoCompleteTextView) d.findViewById(R.id.selectplan)).setAdapter(new ArrayAdapter(this, R.layout.day_dropdown_list_item, mlist.toArray()));
 
@@ -396,7 +387,6 @@ public class AdminZoneActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
             }
         });
-
 
 
         ((AutoCompleteTextView) d.findViewById(R.id.selectplan)).setOnItemClickListener((parent, arg1, pos, id) -> {
@@ -490,7 +480,7 @@ public class AdminZoneActivity extends AppCompatActivity {
 
 
                     if (pushnotificationDialog != null) {
-                        pushnotificationImage  = imgB64;
+                        pushnotificationImage = imgB64;
                         Glide.with(this).load(uri.toString()).placeholder(R.drawable.oops).into((ImageView) pushnotificationDialog.findViewById(R.id.image));
                     }
 
@@ -538,8 +528,6 @@ public class AdminZoneActivity extends AppCompatActivity {
         returnCursor.close();
         return name;
     }
-
-
 
 
 }
