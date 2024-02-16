@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // committing from branch v22 bug fixes
         Log.i("ss_nw_call", new Date()+"lifecycle : Mainactivity onCreate");
         super.onCreate(savedInstanceState);
         if(getIntent().getExtras() != null){
